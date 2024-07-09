@@ -1,5 +1,3 @@
-// import { colors } from "@/styles/colors";
-
 module.exports = {
   content: [
     "./src/pages/**/*.{js,ts,jsx,tsx,mdx}",
@@ -13,13 +11,33 @@ module.exports = {
         "gradient-conic":
         "conic-gradient(from 180deg at 50% 50%, var(--tw-gradient-stops))",
       },
-      colors: ({ colors }) => ({
-        inherit: colors.inherit,
-        transparent: colors.transparent,
-        current: colors.current
-
-        // TODO: Add more colors
-      })
+      colors: {
+        dark: '#333333',
+        light: '#FFFFFF',
+        success: '#79B12A',
+        selected: '#659BB0',
+        danger: '#DC4A43',
+        hover: {
+          light: '#EDF8FC',
+          dark: '#3D5D6A',
+        },
+        background: {
+          light: '#FAFAFA',
+          danger: '#FEE9E8',
+          sidebar: '#F4F5F7',
+        },
+        border: {
+          primary: '#F1F1F1',
+          box: '#DDDDDD'
+        },
+        button: {
+          primary: '#2F4852',
+          danger: '#FEE9E8',
+        },
+        checkbox: {
+          primary: '#3598FF'
+        }
+      }
     },
   },
   plugins: [],
