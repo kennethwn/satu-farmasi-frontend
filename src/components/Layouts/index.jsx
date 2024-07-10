@@ -12,8 +12,8 @@ import { useRouter } from 'next/router';
 
 export default function Layout(props) {
     const router = useRouter();
-    const { user } = props;
-    const [activeKey, setActiveKey] = useState(null);
+    const { user, active } = props;
+    const [activeKey, setActiveKey] = useState(active);
     const [expand, setExpand] = useState(true);
 
     const iconStyle = {
@@ -77,7 +77,7 @@ export default function Layout(props) {
                         <Nav.Item 
                             eventKey="dashboard" 
                             icon={renderIcon("dashboard", activeKey === "dashboard")}
-                            onSelect={() => {
+                            onClick={() => {
                                 router.push("/", undefined, { shallow: true }); 
                                 setActiveKey("dashboard");
                             }}
@@ -88,33 +88,41 @@ export default function Layout(props) {
                             <Nav.Item 
                                 eventKey="diagnosis" 
                                 icon={<GroupIcon />}
-                                onSelect={() => {
-                                    router.push("/diagnosis", undefined,{ shallow: true });
+                                onClick={() => {
+                                    router.push("/diagnose", undefined,{ shallow: true });
                                     setActiveKey("diagnose");
                                 }}
-                            >
-                                {renderTitle("Diagnosis", activeKey === "diagnose")}
-                            </Nav.Item>
+                            >{renderTitle("Diagnosis", activeKey === "diagnose")}</Nav.Item>
                         }
                         <Nav.Item 
                             eventKey="prescribe" 
                             icon={renderIcon("prescribe", activeKey === "prescribe")} 
-                            onSelect={() => {
+                            onClick={() => {
                                 router.push("/prescribe", undefined, { shallow: true });
                                 setActiveKey("prescribe");
                             }}
-                        >
-                            {renderTitle("Resep", activeKey === "prescribe")}
-                        </Nav.Item>
+                        >{renderTitle("Resep", activeKey === "prescribe")}</Nav.Item>
                         <Nav.Menu
                             eventKey="transaction"
                             trigger="hover"
                             title="Transaksi"
-                            icon={renderIcon("transaction", activeKey === "transaction-receive" || activeKey === "transaction-output")}
+                            icon={renderIcon("transaction", activeKey === "transaction-receive" || activeKey === "transaction-expense")}
                             placement="rightStart"
                         >
-                            <Nav.Item onSelect={() => setActiveKey("transaction-receive")} eventKey="transaction-receive">{renderTitle("Penerimaan Obat", activeKey === "transaction-receive")}</Nav.Item>
-                            <Nav.Item onSelect={() => setActiveKey("transaction-output")} eventKey="transaction-output">{renderTitle("Pengeluaran Obat", activeKey === "transaction-output")}</Nav.Item>
+                            <Nav.Item 
+                                onClick={() => {
+                                    router.push("/transaction/receive", undefined, { shallow: true });
+                                    setActiveKey("transaction-receive");
+                                }} 
+                                eventKey="transaction-receive"
+                            >{renderTitle("Penerimaan Obat", activeKey === "transaction-receive")}</Nav.Item>
+                            <Nav.Item 
+                                onClick={() => {
+                                    router.push("/transaction/expense", undefined, { shallow: true });
+                                    setActiveKey("transaction-expense");
+                                }} 
+                                eventKey="transaction-expense"
+                            >{renderTitle("Pengeluaran Obat", activeKey === "transaction-expense")}</Nav.Item>
                         </Nav.Menu>
                         <Nav.Menu
                             eventKey="report"
@@ -123,8 +131,19 @@ export default function Layout(props) {
                             icon={renderIcon("report", activeKey === "report-medicine" || activeKey === "report-transaction")}
                             placement="rightStart"
                         >
-                            <Nav.Item onSelect={() => setActiveKey("report-medicine")} eventKey="report-medicine">{renderTitle("Laporan Obat", activeKey === "report-medicine")}</Nav.Item>
-                            <Nav.Item onSelect={() => setActiveKey("report-transaction")} eventKey="report-transaction">{renderTitle("Laporan Transaksi", activeKey === "report-transaction")}</Nav.Item>
+                            <Nav.Item 
+                                onClick={() => {
+                                    router.push("/report/medicine", undefined, { shallow: true });
+                                    setActiveKey("report-medicine");
+                                }} eventKey="report-medicine"
+                            >{renderTitle("Laporan Obat", activeKey === "report-medicine")}</Nav.Item>
+                            <Nav.Item 
+                                onClick={() => {
+                                    router.push("/report/transaction", undefined, { shallow: true });
+                                    setActiveKey("report-transaction");
+                                }} 
+                                eventKey="report-transaction"
+                            >{renderTitle("Laporan Transaksi", activeKey === "report-transaction")}</Nav.Item>
                         </Nav.Menu>
                         <Nav.Menu
                             eventKey="master"
@@ -141,12 +160,12 @@ export default function Layout(props) {
                             )}
                             placement="rightStart"
                         >
-                            <Nav.Item onSelect={() => {setActiveKey("master-staff"); router.push("/master/staff", undefined, { shallow: true })}} eventKey="master-staff">{renderTitle("Staf", activeKey === "master-staff")}</Nav.Item>
-                            <Nav.Item onSelect={() => setActiveKey("master-medicine")} eventKey="master-medicine">{renderTitle("Obat", activeKey === "master-medicine")}</Nav.Item>
-                            <Nav.Item onSelect={() => setActiveKey("master-vendor")} eventKey="master-vendor">{renderTitle("Vendor", activeKey === "master-vendor")}</Nav.Item>
-                            <Nav.Item onSelect={() => setActiveKey("master-packaging")} eventKey="master-packaging">{renderTitle("Kemasan", activeKey === "master-packaging")}</Nav.Item>
-                            <Nav.Item onSelect={() => setActiveKey("master-generic")} eventKey="master-generic">{renderTitle("Generik Obat", activeKey === "master-generic")}</Nav.Item>
-                            <Nav.Item onSelect={() => setActiveKey("master-classification")} eventKey="master-classification">{renderTitle("Klasifikasi Obat", activeKey === "master-classification")}</Nav.Item>
+                            <Nav.Item onClick={() => {setActiveKey("master-staff"); router.push("/master/staff", undefined, { shallow: true })}} eventKey="master-staff">{renderTitle("Staf", activeKey === "master-staff")}</Nav.Item>
+                            <Nav.Item onClick={() => {setActiveKey("master-medicine"); router.push("/master/medicine", undefined, { shallow: true })}} eventKey="master-medicine">{renderTitle("Obat", activeKey === "master-medicine")}</Nav.Item>
+                            <Nav.Item onClick={() => {setActiveKey("master-vendor"); router.push("/master/vendor", undefined, { shallow: true })}} eventKey="master-vendor">{renderTitle("Vendor", activeKey === "master-vendor")}</Nav.Item>
+                            <Nav.Item onClick={() => {setActiveKey("master-packaging"); router.push("/master/packaging", undefined, { shallow: true })}} eventKey="master-packaging">{renderTitle("Kemasan", activeKey === "master-packaging")}</Nav.Item>
+                            <Nav.Item onClick={() => {setActiveKey("master-generic"); router.push("/master/generic", undefined, { shallow: true })}} eventKey="master-generic">{renderTitle("Generik Obat", activeKey === "master-generic")}</Nav.Item>
+                            <Nav.Item onClick={() => {setActiveKey("master-classification"); router.push("/master/classification", undefined, { shallow: true })}} eventKey="master-classification">{renderTitle("Klasifikasi Obat", activeKey === "master-classification")}</Nav.Item>
                         </Nav.Menu>
                     </Nav>
                     </Sidenav.Body>
@@ -176,7 +195,12 @@ export default function Layout(props) {
     );
 };
 
+Layout.defaultProps = { 
+    active: 'dashboard',
+}
+
 Layout.propTypes = {
     children: propTypes.node,
-    user: propTypes.object
+    user: propTypes.object,
+    active: propTypes.string
 }
