@@ -19,7 +19,7 @@ export default function index() {
   };
 
   return (
-    <Layout>
+    <Layout active='master-staff'>
         <ContentLayout type='child' title="Staf">
             Halaman Staff
         </ContentLayout>
