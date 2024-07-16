@@ -13,12 +13,12 @@ export default function Button(props) {
         isLoading,
     } = props
 
-    if (type === 'primary') className.push(' bg-button-primary text-white hover:bg-hover-dark')
+    if (type === 'primary' || type === 'submit') className.push(' bg-button-primary text-white hover:bg-hover-dark')
     if (type === 'danger') className.push(' bg-button-danger text-danger hover:bg-danger hover:text-white')
 
     if (size === 'sm') className.push(` text-sm inline-block py-2 ${isLoading || appendIcon ? 'px-4' : 'px-8'}`)
     if (size === 'md') className.push(`inline-block py-2.5 ${isLoading || appendIcon ? 'px-4' : 'px-8'}`)
-
+    Button
     const onClick = () => {
         if (props.onClick && !isLoading) props.onClick()
     }
@@ -27,10 +27,10 @@ export default function Button(props) {
         <div className={`select-none rounded-lg font-semibold cursor-pointer ${className.join(" ")}`} disabled={isDisabled} onClick={onClick}>
             <div className='flex flex-row items-center gap-2 place-content-center '>
                 {
-                     prependIcon && (<div>{prependIcon}</div>)
+                    prependIcon && (<div>{prependIcon}</div>)
                 }
                 <div>{props.children}</div>
-                { 
+                {
                     isLoading ? (
                         <div className='transition-all duration-300'>
                             <svg className="w-5 h-5 text-white animate-spin" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
@@ -56,14 +56,14 @@ Button.defaultProps = {
 }
 
 Button.propTypes = {
-    type: propTypes.oneOf(['primary','danger']),
+    type: propTypes.oneOf(['primary', 'danger', 'submit']),
     href: propTypes.string,
     onClick: propTypes.func,
     target: propTypes.string,
     className: propTypes.string,
     prependIcon: propTypes.object,
     appendIcon: propTypes.object,
-    size: propTypes.oneOf(['small','medium','large','flex']),
+    size: propTypes.oneOf(['small', 'medium', 'large', 'flex']),
     isDisabled: propTypes.bool,
     isLoading: propTypes.bool
 }

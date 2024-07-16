@@ -28,7 +28,8 @@ module.exports = {
         },
         border: {
           primary: '#F1F1F1',
-          box: '#DDDDDD'
+          box: '#DDDDDD',
+          auth: '#2F4852',
         },
         button: {
           primary: '#2F4852',

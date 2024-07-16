@@ -9,12 +9,20 @@ import Button from '../Button';
 import PrescribeIcon from '../Icons/PrescribeIcon';
 import propTypes from 'prop-types';
 import { useRouter } from 'next/router';
+import useUser from '@/pages/api/user';
 
 export default function Layout(props) {
+    const { deleteUser } = useUser()
     const router = useRouter();
     const { user, active } = props;
     const [activeKey, setActiveKey] = useState(active);
     const [expand, setExpand] = useState(true);
+
+    const logoutHandler = async () => {
+        const response = await deleteUser();
+        // TODO: show pop up alert for logout confirmation
+        // TODO: redirect user to login page
+    }
 
     const iconStyle = {
         display: "inline-flex",
@@ -179,7 +187,7 @@ export default function Layout(props) {
                                 <span className='text-sm font-semibold text-dark'>{user?.name || "Kenneth William N"}</span>
                             </div>
                             <div className='px-[18px] overflow-hidden w-full whitespace-nowrap'>
-                                <Button type='danger' className='w-full'>Logout</Button>
+                                <Button type='danger' className='w-full' onClick={logoutHandler}>Logout</Button>
                             </div>
                         </React.Fragment>
                         :
