@@ -1,4 +1,4 @@
-import React from 'react'
+import React, { useEffect } from 'react'
 import propTypes from 'prop-types'
 
 export default function Select(props) {
@@ -9,7 +9,7 @@ export default function Select(props) {
         onChange, 
         disabled, 
         placeholder, 
-        value 
+        options
     } = props;
 
     if (disabled === true) className.push(' bg-[#D9D9D9] cursor-not-allowed');
@@ -21,9 +21,12 @@ export default function Select(props) {
             onChange={onChange}
             disabled={disabled}
             placeholder={placeholder}
-            value={value}
             className={`block w-full rounded-full px-4 border py-1.5 text-dark border-dark placeholder:text-gray-400 sm:text-base sm:leading-6 ${className.join(" ")}`}
-        />
+        >
+            {options?.map((option => 
+                <option key={option.id} value={option.id}>{option.name}</option>
+            ))}
+        </select>
     )
 }
 
@@ -31,6 +34,7 @@ Select.defaultProps = {
     type: 'text',
     disabled: false,
     placeholder: 'field name',
+    options: []
 }
 
 Select.propTypes = {
@@ -39,6 +43,6 @@ Select.propTypes = {
     onChange: propTypes.func,
     disabled: propTypes.bool,
     placeholder: propTypes.string,
-    value: propTypes.string,
-    className: propTypes.string
+    className: propTypes.string,
+    options: propTypes.array
 }
