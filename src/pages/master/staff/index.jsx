@@ -1,10 +1,11 @@
 import Layout from '@/components/Layouts'
 import ContentLayout from '@/components/Layouts/Content'
+import { useUserContext } from '@/context/UserContext';
 import useStaffAPI from '@/pages/api/master/staff';
 import React, { useState } from 'react'
 
 export default function index() {
-
+  const { user } = useUserContext();
   const [staff, setStaff] = useState({});
   const { GetAllStaffByUserNik } = useStaffAPI();
 
@@ -19,7 +20,7 @@ export default function index() {
   };
 
   return (
-    <Layout active='master-staff'>
+    <Layout active='master-staff' user={user}>
         <ContentLayout type='child' title="Staf">
             Halaman Staff
         </ContentLayout>

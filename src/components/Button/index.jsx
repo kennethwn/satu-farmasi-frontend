@@ -13,7 +13,7 @@ export default function Button(props) {
         isLoading,
     } = props
 
-    if (type === 'primary' || type === 'submit') className.push(' bg-button-primary text-white hover:bg-hover-dark')
+    if (type === 'primary') className.push(' bg-button-primary text-white hover:bg-hover-dark')
     if (type === 'danger') className.push(' bg-button-danger text-danger hover:bg-danger hover:text-white')
 
     if (size === 'sm') className.push(` text-sm inline-block py-2 ${isLoading || appendIcon ? 'px-4' : 'px-8'}`)
@@ -56,7 +56,7 @@ Button.defaultProps = {
 }
 
 Button.propTypes = {
-    type: propTypes.oneOf(['primary', 'danger', 'submit']),
+    type: propTypes.oneOf(['primary', 'danger']),
     href: propTypes.string,
     onClick: propTypes.func,
     target: propTypes.string,

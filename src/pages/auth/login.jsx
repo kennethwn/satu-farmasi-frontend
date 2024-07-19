@@ -5,6 +5,7 @@ import { useState } from "react";
 import  { z } from "zod";
 import { useForm } from "react-hook-form";
 import { zodResolver } from '@hookform/resolvers/zod';
+import Link from 'next/link'
 
 const loginSchema = z.object({
     email: z.string().min(1, { message: 'Email is required' }).email({ message: 'Invalid email address' }),
@@ -13,7 +14,7 @@ const loginSchema = z.object({
 })
 
 export default function Login() {
-    const { getUser } = useUser();
+    const { router, getUser } = useUser();
     const [error, setError] = useState(null);
 
     const { register, handleSubmit, formState: { errors } } = useForm({ resolver: zodResolver(loginSchema) })
@@ -21,7 +22,7 @@ export default function Login() {
     const LoginHandler = async (data) => {
         try {
             const response = await getUser(data)
-            typeof response === "string" ? console.log(response) : setError(response.message)
+            typeof response === "string" ? router.push("/") : setError(response.message)
         } catch (error) {
             console.log("error: ", error);
         }
@@ -57,7 +58,9 @@ export default function Login() {
                         </li>
                     </ul>
                     : null}
-                    {/* <Button type="submit" className="w-full">Login</Button> */}
+                    <div>
+                        <p>Don't have an account? <Link href="/auth/register">Sign Up</Link> here</p>
+                    </div>
                 <button type='submit' className='w-full'>Login</button>
             </form>
         </main>

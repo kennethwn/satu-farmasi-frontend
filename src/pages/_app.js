@@ -1,3 +1,4 @@
+import { UserProvider } from "@/context/UserContext";
 import "@/styles/tailwind.css";
 import Head from "next/head";
 import React from "react";
@@ -11,7 +12,9 @@ export default function App({ Component, pageProps }) {
         <title>Satu Farmasi</title>
       </Head>
       <div>
-        <Component {...pageProps} />
+        <UserProvider>
+          <Component {...pageProps} />
+        </UserProvider>
       </div>
     </React.Fragment>
   )
