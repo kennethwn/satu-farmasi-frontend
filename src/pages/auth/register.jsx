@@ -6,18 +6,19 @@ import { useForm } from "react-hook-form";
 import { zodResolver } from '@hookform/resolvers/zod';
 import  { z } from "zod";
 import Link from 'next/link'
+import { isOptionalString, isPassword, isRequiredEmail, isRequiredString } from "@/helpers/validation";
 
 const registerSchema = z.object({
-    email: z.string().min(1, { message: 'Email is required' }).email({ message: 'Invalid email address' }),
-    password: z.string().min(1, { message: 'Password is required' }),
-    confirmPassword: z.string().min(1, { message: 'Confirm password is required' }),
-    nik: z.string().min(1, { message: 'NIK is required' }),
-    firstName: z.string().min(1, { message: 'First Name is required' }),
-    lastName: z.string().min(1, { message: 'Last Name is required' }),
-    phoneNum: z.string().min(1, { message: 'Phone Number is required' }),
-    role: z.string(),
-    specialist: z.string().optional(),
-    dob: z.string().min(1, { message: 'Date of Birth is required' }),
+    email: isRequiredEmail(),
+    password: isPassword(),
+    confirmPassword: isPassword(),
+    nik: isRequiredString(),
+    firstName: isRequiredString(),
+    lastName: isRequiredString(),
+    phoneNum: isRequiredString(),
+    role: isRequiredString(),
+    specialist: isOptionalString(),
+    dob: isRequiredString(),
 }).superRefine(({ confirmPassword, password }, ctx) => {
     if (confirmPassword !== password) {
         ctx.addIssue({
@@ -68,6 +69,7 @@ export default function Login() {
         try {
             if (data.role === "pharmacist") {
                 const response = await addPharmacist(data)
+                // TODO: need to check the status response
                 typeof response === 'object' ? router.push("/auth/login") : setError(response.message)
             } else {
                 const response = await addDoctor(data)
