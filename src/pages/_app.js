@@ -1,7 +1,11 @@
 import "@/styles/tailwind.css";
+// import { UserProvider } from "@/context/UserContext";
 import Head from "next/head";
 import React from "react";
+import { ToastContainer } from "react-toastify";
+import 'react-toastify/dist/ReactToastify.min.css';
 import 'rsuite/dist/rsuite.min.css';
+import { UserProvider } from "./api/context/UserContext";
 
 export default function App({ Component, pageProps }) {
   return (
@@ -11,7 +15,10 @@ export default function App({ Component, pageProps }) {
         <title>Satu Farmasi</title>
       </Head>
       <div>
-        <Component {...pageProps} />
+        <UserProvider >
+          <Component {...pageProps} />
+        </UserProvider>
+        <ToastContainer />
       </div>
     </React.Fragment>
   )

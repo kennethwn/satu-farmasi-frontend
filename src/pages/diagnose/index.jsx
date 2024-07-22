@@ -1,6 +1,7 @@
 import PrescriptionForm from "@/components/DynamicForms/PrescriptionForm";
 import Layout from "@/components/Layouts";
 import ContentLayout from "@/components/Layouts/Content";
+import { useUserContext } from "../api/context/UserContext";
 import { useEffect, useState } from "react";
 import useMedicineDropdownOption from "../api/medicineDropdownOption";
 import PatientForm from "@/components/DynamicForms/PatientForm";
@@ -9,6 +10,7 @@ import Input from "@/components/Input";
 import useSubmitDiagnose from "../api/submitDiagnose";
 
 export default function index() {
+    const { user } = useUserContext();
     const [formFields, setFormFields] = useState([
         {   
             medicineId: -1,
@@ -106,7 +108,7 @@ export default function index() {
     };
 
     return (
-        <Layout active="diagnose">
+        <Layout active="diagnose" user={user}>
             <ContentLayout title="Diagnosis">
                 <form onSubmit={handleSubmitDiagnose} className="flex flex-col gap-6">
                     <div className="flex flex-col gap-2">

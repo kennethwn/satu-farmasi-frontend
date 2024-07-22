@@ -1,3 +1,5 @@
+const { Nunito_Sans } = require("next/font/google");
+
 module.exports = {
   content: [
     "./src/pages/**/*.{js,ts,jsx,tsx,mdx}",
@@ -6,6 +8,9 @@ module.exports = {
   ],
   theme: {
     extend: {
+      fontFamily: {
+        Nunito_Sans: ["Nunito Sans", "sans-serif"],
+      },
       backgroundImage: {
         "gradient-radial": "radial-gradient(var(--tw-gradient-stops))",
         "gradient-conic":
@@ -17,6 +22,7 @@ module.exports = {
         success: '#79B12A',
         selected: '#659BB0',
         danger: '#DC4A43',
+        warning: '#FFD400',
         hover: {
           light: '#EDF8FC',
           dark: '#3D5D6A',
@@ -28,7 +34,8 @@ module.exports = {
         },
         border: {
           primary: '#F1F1F1',
-          box: '#DDDDDD'
+          box: '#DDDDDD',
+          auth: '#2F4852',
         },
         button: {
           primary: '#2F4852',
