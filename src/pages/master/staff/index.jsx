@@ -1,7 +1,7 @@
 import Layout from "@/components/Layouts";
 import ContentLayout from "@/components/Layouts/Content";
+import { useUserContext } from '@/context/UserContext';
 import { useEffect, useState } from "react";
-import Filter from "@/components/SelectPicker/filter";
 import SearchBar from "@/components/SearchBar";
 import { Checkbox, Pagination, SelectPicker, Table } from "rsuite";
 import useStaffAPI from "@/pages/api/master/staff";
@@ -9,9 +9,9 @@ import { toast } from "react-toastify";
 import formatDate from "@/helpers/dayHelper";
 import { MdOutlineEdit } from "react-icons/md";
 import { useRouter } from "next/router";
-import index from "../classification";
 
 export default function Index() {
+    const { user } = useUserContext();
     const [staffData, setStaffData] = useState([]);
     const [filter, setFilter] = useState('');
     const [search, setSearch] = useState('');
@@ -25,6 +25,16 @@ export default function Index() {
     const router = useRouter();
     const { HeaderCell, Cell, Column } = Table;
     const { isLoading: loading, GetAllStaff, EditStaff } = useStaffAPI();
+
+    const HandleFetchStaffByNik = async (nik) => {
+        try {
+          const response = await GetAllStaffByUserNik(nik);
+          if (response === undefined || response === null) return;
+          setStaff(data);
+        } catch (error) {
+          console.error(error);
+        }
+      };
 
     const handleSortColumn = (sortColumn, sortType) => {
         setTimeout(() => {
@@ -100,7 +110,7 @@ export default function Index() {
     }, []); 
 
     return (
-        <Layout active="master-staff">
+        <Layout active="master-staff"  user={user}>
             <ContentLayout title="Daftar Staf">
                 <div className="flex flex-row justify-between w-full">
                     <SelectPicker

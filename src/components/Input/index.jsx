@@ -11,7 +11,8 @@ export default function Input(props) {
         onChange, 
         disabled = false, 
         placeholder = 'john doe', 
-        value 
+        register = () => {},
+        value,
     } = props;
 
     if (disabled === true) className.push(' bg-[#D9D9D9] cursor-not-allowed');
@@ -40,7 +41,7 @@ export default function Input(props) {
 }
 
 Input.propTypes = {
-    type: propTypes.oneOf(['text', 'number', 'email', 'password', 'tel', 'date']),
+    type: propTypes.oneOf(['text', 'number', 'email', 'password', 'tel', 'date', 'checkbox', "radio"]),
     label: propTypes.string,
     id: propTypes.string,
     name: propTypes.string,
@@ -48,5 +49,7 @@ Input.propTypes = {
     disabled: propTypes.bool,
     placeholder: propTypes.string,
     value: propTypes.string,
-    className: propTypes.string
+    className: propTypes.string,
+    checked: propTypes.bool,
+    register: propTypes.func
 }

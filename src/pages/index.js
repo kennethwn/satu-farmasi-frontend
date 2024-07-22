@@ -5,16 +5,17 @@ import { useState } from "react";
 import Button from "@/components/Button";
 import PrescribeIcon from "@/components/Icons/PrescribeIcon";
 import ContentLayout from "@/components/Layouts/Content";
-// import { Button } from "rsuite";
 import { IoMdArrowDropleft as ArrowLeftIcon } from "react-icons/io";
+import useUser from "./api/user";
+import { useUserContext } from "@/context/UserContext";
 
 const inter = Inter({ subsets: ["latin"] });
 
 export default function Home() {
   const [input, setInput] = useState("");
-
+  const { user } = useUserContext();
   return (
-    <Layouts>
+    <Layouts user={user}>
       <ContentLayout type="child" title="Home">
         <p>hello world</p>
         <div className="mt-2">

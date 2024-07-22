@@ -27,10 +27,10 @@ export default function Button(props) {
         <div className={`select-none rounded-lg font-semibold cursor-pointer ${className.join(" ")}`} disabled={isDisabled} onClick={onClick}>
             <div className='flex flex-row items-center gap-2 place-content-center '>
                 {
-                     prependIcon && (<div>{prependIcon}</div>)
+                    prependIcon && (<div>{prependIcon}</div>)
                 }
                 <div>{props.children}</div>
-                { 
+                {
                     isLoading ? (
                         <div className='transition-all duration-300'>
                             <svg className="w-5 h-5 text-white animate-spin" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
@@ -49,14 +49,14 @@ export default function Button(props) {
 }
 
 Button.propTypes = {
-    type: propTypes.oneOf(['primary','danger']),
+    type: propTypes.oneOf(['primary', 'danger']),
     href: propTypes.string,
     onClick: propTypes.func,
     target: propTypes.string,
     className: propTypes.string,
     prependIcon: propTypes.object,
     appendIcon: propTypes.object,
-    size: propTypes.oneOf(['small','medium','large','flex']),
+    size: propTypes.oneOf(['small', 'medium', 'large', 'flex']),
     isDisabled: propTypes.bool,
     isLoading: propTypes.bool
 }
