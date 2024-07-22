@@ -7,6 +7,8 @@ export const middleware = async (req) => {
     const isPublicUrl = path === '/auth/login' || path === '/auth/register'
     const cookieStore = cookies()
     const token = cookieStore.get('token')?.value
+    // const userStorage = localStorage.get("token")
+    // console.log("userStorage: ", userStorage);
     if (isPublicUrl && token) {
         try {
             await validateCookie(token)
