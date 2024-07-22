@@ -1,13 +1,15 @@
 import axios from '@/configs/axios/satufarmasi-service-axios';
+import { useRouter } from 'next/router';
 import { useState } from 'react'
 
-export default function useMedicineDropdownOption() {
+export default function useSubmitDiagnose() {
     const [isLoading, setIsLoading] = useState(null);
+    const router = useRouter()
 
-    const getMedicineDropdownOptions = async() => {
-        setIsLoading(true)
+    const submitDiagnose = async(data) => {
         try {
-            const response = await axios.get('/api/v1/medicines/dropdownOptions')
+            console.log(data)
+            const response = await axios.post('/api/v1/diagnose', {data})
             .then((response) => {
                 setIsLoading(false);
                 return response;
@@ -24,6 +26,6 @@ export default function useMedicineDropdownOption() {
 
     return {
         isLoading,
-        getMedicineDropdownOptions
+        submitDiagnose
     }
 }

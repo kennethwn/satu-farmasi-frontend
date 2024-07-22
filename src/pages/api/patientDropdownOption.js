@@ -1,13 +1,13 @@
 import axios from '@/configs/axios/satufarmasi-service-axios';
 import { useState } from 'react'
 
-export default function useMedicineDropdownOption() {
+export default function usePatientDropdownOption() {
     const [isLoading, setIsLoading] = useState(null);
 
-    const getMedicineDropdownOptions = async() => {
+    const getPatientDropdownOptions = async() => {
         setIsLoading(true)
         try {
-            const response = await axios.get('/api/v1/medicines/dropdownOptions')
+            const response = await axios.get('api/v1/patients/dropdownOptions')
             .then((response) => {
                 setIsLoading(false);
                 return response;
@@ -24,6 +24,6 @@ export default function useMedicineDropdownOption() {
 
     return {
         isLoading,
-        getMedicineDropdownOptions
+        getPatientDropdownOptions
     }
 }

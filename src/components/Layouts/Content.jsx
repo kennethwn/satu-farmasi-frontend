@@ -23,7 +23,7 @@ export default function ContentLayout(props) {
                     <span className='text-[32px] leading-9 text-dark font-bold py-[52px]'>{title}</span>
                 </div>
             </Panel>
-            <Panel bordered className='h-screen'>
+            <Panel bordered className='min-h-screen overflow-auto'>
                 {children}
             </Panel>
         </div>
