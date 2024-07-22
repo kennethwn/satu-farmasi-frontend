@@ -74,6 +74,9 @@ export default function Login() {
                             </ul>
                             : null
                     }
+                    <div>
+                        <p>Already have an account? <Link href="/auth/register">Sign up</Link> here</p>
+                    </div>
                     <button type='submit' className='w-full'>Login</button>
                 </form>
             </main>

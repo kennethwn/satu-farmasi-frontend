@@ -1,6 +1,5 @@
 import Layout from "@/components/Layouts";
 import ContentLayout from "@/components/Layouts/Content";
-import { useUserContext } from '@/context/UserContext';
 import { useEffect, useState } from "react";
 import SearchBar from "@/components/SearchBar";
 import { Checkbox, Pagination, SelectPicker, Table } from "rsuite";
@@ -9,6 +8,7 @@ import { toast } from "react-toastify";
 import formatDate from "@/helpers/dayHelper";
 import { MdOutlineEdit } from "react-icons/md";
 import { useRouter } from "next/router";
+import { useUserContext } from "@/pages/api/context/UserContext";
 
 export default function Index() {
     const { user } = useUserContext();
