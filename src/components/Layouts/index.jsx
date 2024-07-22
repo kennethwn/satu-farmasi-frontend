@@ -11,10 +11,15 @@ import propTypes from 'prop-types';
 import { useRouter } from 'next/router';
 
 export default function Layout(props) {
+    const { 
+        user, 
+        active = 'dashboard',
+    } = props;
+    
     const router = useRouter();
-    const { user, active } = props;
     const [activeKey, setActiveKey] = useState(active);
     const [expand, setExpand] = useState(true);
+    
 
     const iconStyle = {
         display: "inline-flex",
@@ -84,16 +89,14 @@ export default function Layout(props) {
                         >
                             {renderTitle("Dashboard", activeKey === "dashboard")}
                         </Nav.Item>
-                        {user?.role.toLowerCase() === 'admin' && 
-                            <Nav.Item 
-                                eventKey="diagnosis" 
-                                icon={<GroupIcon />}
-                                onClick={() => {
-                                    router.push("/diagnose", undefined,{ shallow: true });
-                                    setActiveKey("diagnose");
-                                }}
-                            >{renderTitle("Diagnosis", activeKey === "diagnose")}</Nav.Item>
-                        }
+                        <Nav.Item 
+                            eventKey="diagnosis" 
+                            icon={<GroupIcon />}
+                            onClick={() => {
+                                router.push("/diagnose", undefined,{ shallow: true });
+                                setActiveKey("diagnose");
+                            }}
+                        >{renderTitle("Diagnosis", activeKey === "diagnose")}</Nav.Item>
                         <Nav.Item 
                             eventKey="prescribe" 
                             icon={renderIcon("prescribe", activeKey === "prescribe")} 
@@ -194,10 +197,6 @@ export default function Layout(props) {
         </Container>
     );
 };
-
-Layout.defaultProps = { 
-    active: 'dashboard',
-}
 
 Layout.propTypes = {
     children: propTypes.node,
