@@ -3,22 +3,22 @@ import propTypes from 'prop-types'
 export default function Button(props) {
     const className = [props.className]
     const {
-        type,
+        type = 'primary',
         href,
         target,
-        size,
+        size = 'medium',
         appendIcon,
         prependIcon,
-        isDisabled,
+        isDisabled = false,
         isLoading,
     } = props
 
     if (type === 'primary') className.push(' bg-button-primary text-white hover:bg-hover-dark')
     if (type === 'danger') className.push(' bg-button-danger text-danger hover:bg-danger hover:text-white')
 
-    if (size === 'sm') className.push(` text-sm inline-block py-2 ${isLoading || appendIcon ? 'px-4' : 'px-8'}`)
-    if (size === 'md') className.push(`inline-block py-2.5 ${isLoading || appendIcon ? 'px-4' : 'px-8'}`)
-    Button
+    if (size === 'small') className.push(` text-sm inline-block py-2 ${isLoading || appendIcon ? 'px-4' : 'px-6'}`)
+    if (size === 'medium') className.push(`inline-block py-2.5 ${isLoading || appendIcon ? 'px-4' : 'px-6'}`)
+
     const onClick = () => {
         if (props.onClick && !isLoading) props.onClick()
     }
@@ -46,13 +46,6 @@ export default function Button(props) {
         </div>
     )
 
-}
-
-Button.defaultProps = {
-    type: 'primary',
-    size: 'sm',
-    isDisabled: false,
-    className: 'bg-button-primary hover:bg-hover-dark'
 }
 
 Button.propTypes = {

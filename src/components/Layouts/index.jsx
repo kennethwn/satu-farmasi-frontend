@@ -12,9 +12,13 @@ import { useRouter } from 'next/router';
 import useUser from '@/pages/api/user';
 
 export default function Layout(props) {
+    const { 
+        user, 
+        active = 'dashboard',
+    } = props;
+    
     const { deleteUser } = useUser()
     const router = useRouter();
-    const { user, active } = props;
     const [activeKey, setActiveKey] = useState(active);
     const [expand, setExpand] = useState(true);
     const [error, setError] = useState(null);
@@ -198,10 +202,6 @@ export default function Layout(props) {
         </Container>
     );
 };
-
-Layout.defaultProps = { 
-    active: 'dashboard',
-}
 
 Layout.propTypes = {
     children: propTypes.node,
