@@ -7,7 +7,7 @@ import PrescribeIcon from "@/components/Icons/PrescribeIcon";
 import ContentLayout from "@/components/Layouts/Content";
 import { IoMdArrowDropleft as ArrowLeftIcon } from "react-icons/io";
 import useUser from "./api/user";
-import { useUserContext } from "@/context/UserContext";
+import { useUserContext } from "./api/context/UserContext";
 
 const inter = Inter({ subsets: ["latin"] });
 
