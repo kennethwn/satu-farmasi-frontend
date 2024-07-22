@@ -7,7 +7,7 @@ export default function usePatientDropdownOption() {
     const getPatientDropdownOptions = async() => {
         setIsLoading(true)
         try {
-            const response = await axios.get('api/v1/patients/dropdownOptions')
+            const response = await axios.get('/api/v1/patients/dropdownOptions')
             .then((response) => {
                 setIsLoading(false);
                 return response;
