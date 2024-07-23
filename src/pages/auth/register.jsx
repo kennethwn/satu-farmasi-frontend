@@ -70,7 +70,7 @@ export default function Login() {
             if (data.role === "pharmacist") {
                 const response = await addPharmacist(data)
                 // TODO: need to check the status response
-                typeof response === 'object' ? router.push("/auth/login") : setError(response.message)
+                typeof response === 'object' ? router.push("/auth/login") : setError(response)
             } else {
                 const response = await addDoctor(data)
                 typeof response === 'object' ? router.push("/auth/login") : setError(response.message)

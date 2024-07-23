@@ -1,6 +1,6 @@
 import Layout from "@/components/Layouts";
 import ContentLayout from "@/components/Layouts/Content";
-import { useUserContext } from "@/context/UserContext";
+import { useUserContext } from "@/pages/api/context/UserContext";
 
 export default function index() {
     const { user } = useUserContext();
