@@ -11,10 +11,14 @@ module.exports = {
       fontFamily: {
         Nunito_Sans: ["Nunito Sans", "sans-serif"],
       },
+      fontSize: {
+        title: '20px',
+        body: '16px',
+      },
       backgroundImage: {
         "gradient-radial": "radial-gradient(var(--tw-gradient-stops))",
         "gradient-conic":
-        "conic-gradient(from 180deg at 50% 50%, var(--tw-gradient-stops))",
+          "conic-gradient(from 180deg at 50% 50%, var(--tw-gradient-stops))",
       },
       colors: {
         dark: '#333333',
