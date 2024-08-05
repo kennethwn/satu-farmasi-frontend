@@ -3,7 +3,8 @@ import propTypes from 'prop-types'
 export default function Button(props) {
     const className = [props.className]
     const {
-        type = 'primary',
+        appearance = 'primary',
+        type,
         href,
         target,
         size = 'medium',
@@ -13,8 +14,8 @@ export default function Button(props) {
         isLoading,
     } = props
 
-    if (type === 'primary') className.push('bg-button-primary text-white hover:bg-hover-dark')
-    if (type === 'danger') className.push('bg-button-danger text-danger hover:bg-danger hover:text-white')
+    if (appearance === 'primary') className.push('bg-button-primary text-white hover:bg-hover-dark')
+    if (appearance === 'danger') className.push('bg-button-danger text-danger hover:bg-danger hover:text-white')
 
     if (size === 'small') className.push(`text-sm inline-block py-2 ${isLoading || appendIcon ? 'px-4' : 'px-6'}`)
     if (size === 'medium') className.push(`inline-block py-2.5 ${isLoading || appendIcon ? 'px-4' : 'px-6'}`)
@@ -26,6 +27,7 @@ export default function Button(props) {
     return (
         <button 
             className={`select-none rounded-lg font-semibold cursor-pointer ${className.join(" ")}`} 
+            type={type}
             disabled={isDisabled} 
             onClick={onClick}
             {...(href ? { href, target } : {})}
@@ -53,7 +55,8 @@ export default function Button(props) {
 }
 
 Button.propTypes = {
-    type: propTypes.oneOf(['primary', 'danger']),
+    appearance: propTypes.oneOf(['primary', 'danger']),
+    type: propTypes.string,
     href: propTypes.string,
     onClick: propTypes.func,
     target: propTypes.string,
