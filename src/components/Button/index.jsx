@@ -13,10 +13,10 @@ export default function Button(props) {
         isLoading,
     } = props
 
-    if (type === 'primary') className.push(' bg-button-primary text-white hover:bg-hover-dark')
-    if (type === 'danger') className.push(' bg-button-danger text-danger hover:bg-danger hover:text-white')
+    if (type === 'primary') className.push('bg-button-primary text-white hover:bg-hover-dark')
+    if (type === 'danger') className.push('bg-button-danger text-danger hover:bg-danger hover:text-white')
 
-    if (size === 'small') className.push(` text-sm inline-block py-2 ${isLoading || appendIcon ? 'px-4' : 'px-6'}`)
+    if (size === 'small') className.push(`text-sm inline-block py-2 ${isLoading || appendIcon ? 'px-4' : 'px-6'}`)
     if (size === 'medium') className.push(`inline-block py-2.5 ${isLoading || appendIcon ? 'px-4' : 'px-6'}`)
 
     const onClick = () => {
@@ -24,8 +24,13 @@ export default function Button(props) {
     }
 
     return (
-        <div className={`select-none rounded-lg font-semibold cursor-pointer ${className.join(" ")}`} disabled={isDisabled} onClick={onClick}>
-            <div className='flex flex-row items-center gap-2 place-content-center '>
+        <button 
+            className={`select-none rounded-lg font-semibold cursor-pointer ${className.join(" ")}`} 
+            disabled={isDisabled} 
+            onClick={onClick}
+            {...(href ? { href, target } : {})}
+        >
+            <div className='flex flex-row items-center gap-2 place-content-center'>
                 {
                     prependIcon && (<div>{prependIcon}</div>)
                 }
@@ -43,9 +48,8 @@ export default function Button(props) {
                     )
                 }
             </div>
-        </div>
+        </button>
     )
-
 }
 
 Button.propTypes = {
@@ -54,8 +58,8 @@ Button.propTypes = {
     onClick: propTypes.func,
     target: propTypes.string,
     className: propTypes.string,
-    prependIcon: propTypes.object,
-    appendIcon: propTypes.object,
+    prependIcon: propTypes.node,
+    appendIcon: propTypes.node,
     size: propTypes.oneOf(['small', 'medium', 'large', 'flex']),
     isDisabled: propTypes.bool,
     isLoading: propTypes.bool
