@@ -86,7 +86,7 @@ export default function Layout(props) {
                     </div>
                 </Sidenav.Header>
                 <Sidenav 
-                    className='flex-grow overflow-auto bg-background-sidebar' 
+                    className={`flex-grow ${expand && "overflow-auto"} bg-background-sidebar`}
                     expanded={expand} 
                     appearance="subtle"
                 >
