@@ -4,10 +4,10 @@ import { useState } from "react";
 export default function usePackagingAPI() {
     const [isLoading, setIsLoading] = useState(false);
 
-    const GetAllPackaging = async () => {
+    const GetAllPackaging = async (page, limit) => {
         setIsLoading(true)
         try {
-            const response = await axios.get('/api/v1/packagings')
+            const response = await axios.get(`/api/v1/packagings?page=${page}&limit=${limit}`)
             .then((response) => {
                 setIsLoading(false);
                 return response;
@@ -22,10 +22,10 @@ export default function usePackagingAPI() {
         }
     }
 
-    const GetPackagingById = async (id) => {
+    const GetPackagingByLabel = async (label) => {
         setIsLoading(true)
         try {
-            const response = await axios.get(`/api/v1/packagings?id=${id}`)
+            const response = await axios.get(`/api/v1/packagings?label=${label}`)
             .then((response) => {
                 setIsLoading(false);
                 return response;
@@ -79,7 +79,7 @@ export default function usePackagingAPI() {
     return {
         isLoading,
         GetAllPackaging,
-        GetPackagingById,
+        GetPackagingByLabel,
         CreatePackaging,
         EditPackaging
     }

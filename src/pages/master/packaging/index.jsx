@@ -24,7 +24,7 @@ export default function index(props) {
     const { user } = useUserContext();
     const { Header, Body, Footer } = Modal;
     const { HeaderCell, Cell, Column } = Table;
-    const { isLoading, GetAllPackaging, CreatePackaging, EditPackaging } = usePackagingAPI();
+    const { isLoading, GetAllPackaging, GetPackagingByLabel, CreatePackaging, EditPackaging } = usePackagingAPI();
 
     const [data, setData] = useState([]);
     const [editInput, setEditInput] = useState({});
@@ -34,6 +34,11 @@ export default function index(props) {
         edit: false,
         delete: false,
     });
+
+    const [search, setSearch] = useState('');
+    const [page, setPage] = useState(1);
+    const [totalPage, setTotalPage] = useState(0);
+    const [limit, setLimit] = useState(10);
 
     const HandleOnChange = (e, action) => {
         switch (action) {
@@ -54,15 +59,50 @@ export default function index(props) {
         }
     }
 
+    const HandleClear = () => {
+        setData([]);
+        setEditInput({});
+        setPage(1);
+        setTotalPage(0);
+        setLimit(10);
+        setInput({ label: "", value: "" });
+        setOpen({
+            create: false,
+            edit: false,
+            delete: false,
+        });
+    }
+
     const HandeFetchPackagingData = async () => {
         try {
-            const res = await GetAllPackaging();
+            const res = await GetAllPackaging(page, limit);
             console.log(res);
             if (res.code !== 200) {
                 toast.error(res.message, { autoClose: 2000, position: "top-center" });
                 return;
             } 
-            setData(res.data);
+            setData(res.data.results);
+            setTotalPage(res.data.total);
+        } catch (error) {
+            console.error(error);
+        }
+    }
+
+    const HandleFetchPackagingByLabel = async () => {
+        try {
+            const res = await GetPackagingByLabel(search);
+            console.log(res);
+            if (res.code !== 200) {
+                toast.error(res.message, { autoClose: 2000, position: "top-center" });
+                return;
+            }
+
+            if (res.data !== null) {
+                let temp = [];
+                temp.push(res.data);
+                setData(temp);
+                setTotalPage(res.data?.length);
+            }
         } catch (error) {
             console.error(error);
         }
@@ -102,10 +142,14 @@ export default function index(props) {
 
     useEffect(() => {
         async function fetchData() {
-            await HandeFetchPackagingData();
+            if (search === '') {
+                await HandeFetchPackagingData();
+            } else {
+                await HandleFetchPackagingByLabel();
+            }
         }
         fetchData();
-    }, []);
+    }, [page, limit, search]);
 
     return (
         <Layout active="master-packaging" user={user}>
@@ -132,6 +176,7 @@ export default function index(props) {
                         size="md"
                         className="w-1/4"
                         placeholder="Search..."
+                        onChange={(value) => setSearch(value)}
                     />
                 </div>
                 <div className="w-full h-[500px]">
@@ -142,11 +187,7 @@ export default function index(props) {
                         shouldUpdateScroll={false}
                         affixHorizontalScrollbar
                         fillHeight={true}
-                        // sortColumn={sortColumn}
-                        // sortType={sortType}
-                        // onSortColumn={handleSortColumn}
                         loading={isLoading}
-                        // wordWrap
                     >
                         <Column width={100} fixed="left">
                             <HeaderCell className="text-center text-dark font-bold">No</HeaderCell>
@@ -216,13 +257,13 @@ export default function index(props) {
                             boundaryLinks
                             maxButtons={5}
                             size="xs"
-                            layout={["total", "-", "limit", "|", "pager", "skip"]}
-                            total={data.length || 0}
-                            limitOptions={[10, 30, 50]}
-                            // limit={limit}
-                            // activePage={page}
-                            // onChangePage={setPage}
-                            // onChangeLimit={handleChangeLimit}
+                            layout={["total", "-", "limit", "|", "pager"]}
+                            total={totalPage || 0}
+                            limitOptions={[5, 10, 15]}
+                            limit={limit}
+                            activePage={page}
+                            onChangePage={page => setPage(page)}
+                            onChangeLimit={limit => setLimit(limit)}
                         />
                     </div>
                 </div>
