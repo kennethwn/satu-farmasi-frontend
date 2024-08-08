@@ -12,9 +12,10 @@ import { toast } from "react-toastify";
 import { z } from "zod";
 import { isRequiredString } from "@/helpers/validation";
 import Input from "@/components/Input";
+import useGenericAPI from "@/pages/api/master/generic";
 import Toaster from "@/components/Modal/Toaster";
 
-const packagingSchema = z.object({
+const genericSchema = z.object({
     label: isRequiredString(),
     value: isRequiredString(),
 })
@@ -23,7 +24,7 @@ export default function index(props) {
     const { user } = useUserContext();
     const { Header, Body, Footer } = Modal;
     const { HeaderCell, Cell, Column } = Table;
-    // const { isLoading, GetAllPackaging, CreatePackaging, EditPackaging } = usePackagingAPI();
+    const { isLoading, GetAllGeneric, GetGenericByLabel, CreateGeneric, EditGeneric, DeleteGeneric } = useGenericAPI();
 
     const [data, setData] = useState([]);
     const [editInput, setEditInput] = useState({});
@@ -33,6 +34,11 @@ export default function index(props) {
         edit: false,
         delete: false,
     });
+
+    const [search, setSearch] = useState('');
+    const [page, setPage] = useState(1);
+    const [totalPage, setTotalPage] = useState(0);
+    const [limit, setLimit] = useState(10);
 
     const HandleOnChange = (e, action) => {
         switch (action) {
@@ -53,58 +59,108 @@ export default function index(props) {
         }
     }
 
-    // const HandeFetchPackagingData = async () => {
-    //     try {
-    //         const res = await GetAllPackaging();
-    //         console.log(res);
-    //         if (res.code !== 200) {
-    //             toast.error(res.message, { autoClose: 2000, position: "top-center" });
-    //             return;
-    //         } 
-    //         setData(res.data);
-    //     } catch (error) {
-    //         console.error(error);
-    //     }
-    // }
+    const HandleClear = () => {
+        setData([]);
+        setEditInput({});
+        setPage(1);
+        setTotalPage(0);
+        setLimit(10);
+        setInput({ label: "", value: "" });
+        setOpen({
+            create: false,
+            edit: false,
+            delete: false,
+        });
+    }
 
-    // const HandleCreatePackaging = async () => {
-    //     try {
-    //         const validatedData = packagingSchema.parse(input);
-    //         const res = await CreatePackaging(validatedData);
-    //         if (res.code !== 200) {
-    //             toast.error("Failed to create packaging", { autoClose: 2000, position: "top-center" });
-    //             return;
-    //         } 
-    //         toast.success("Successfully created packaging", { autoClose: 2000, position: "top-center" });
-    //         setOpen({...open, create: false});
-    //         HandeFetchPackagingData();
-    //     } catch (error) {
-    //         console.error(error);
-    //     }
-    // }
+    const HandeFetchGenericData = async () => {
+        try {
+            const res = await GetAllGeneric(page, limit);
+            console.log(res);
+            if (res.code !== 200) {
+                toast.error("Failed to fetch generic data", { autoClose: 2000, position: "top-center" });
+                return;
+            } 
+            setData(res.data.results);
+            setTotalPage(res.data.total);
+        } catch (error) {
+            console.error(error);
+        }
+    }
 
-    // const HandleEditPackaging = async (action) => {
-    //     try {
-    //         if (action === "delete") setEditInput({...editInput, isActive: false});
-    //         const res = await EditPackaging(editInput);
-    //         if (res.code !== 200) {
-    //             toast.error("Failed to edit packaging", { autoClose: 2000, position: "top-center" });
-    //             return;
-    //         }
-    //         toast.success(`${action === "delete" ? "Successfully deleted packaging" : "Successfully edited packaging"}`, { autoClose: 2000, position: "top-center" });
-    //         setOpen({...open, edit: false, delete: false});
-    //         HandeFetchPackagingData();
-    //     } catch (error) {
-    //         console.error(error);
-    //     }
-    // }
+    const HandleFetchGenericByLabel = async () => {
+        try {
+            const res = await GetGenericByLabel(search);
+            console.log(res);
+            if (res.code !== 200) {
+                toast.error("Failed to fetch generic data", { autoClose: 2000, position:    "top-center" });
+                return;
+            } 
+            setData(res.data.results);
+            setTotalPage(res.data.total);
+        } catch (error) {
+            console.error(error);
+        }
+    }
 
-    // useEffect(() => {
-    //     async function fetchData() {
-    //         await HandeFetchPackagingData();
-    //     }
-    //     fetchData();
-    // }, []);
+    const HandleCreateGeneric = async () => {
+        try {
+            const validatedData = genericSchema.parse(input);
+            const res = await CreateGeneric(validatedData);
+            if (res.code !== 200) {
+                toast.error("Failed to create generic name", { autoClose: 2000, position: "top-center" });
+                return;
+            } 
+            toast.success("Successfully created generic name", { autoClose: 2000, position: "top-center" });
+            setOpen({...open, create: false});
+            HandeFetchGenericData();
+        } catch (error) {
+            console.error(error);
+        }
+    }
+
+    const HandleEditGeneric = async (action) => {
+        try {
+            if (action === "delete") setEditInput({...editInput, isActive: false});
+            console.log(editInput);
+            const res = await EditGeneric(editInput);
+            if (res.code !== 200) {
+                toast.error("Failed to edit generic", { autoClose: 2000, position: "top-center" });
+                return;
+            }
+            toast.success(`${action === "delete" ? "Successfully deleted generic" : "Successfully edited generic"}`, { autoClose: 2000, position: "top-center" });
+            setOpen({...open, edit: false, delete: false});
+            HandeFetchGenericData();
+        } catch (error) {
+            console.error(error);
+        }
+    }
+
+    const HandleDeleteGeneric = async () => {
+        try {
+            const response = await DeleteGeneric(editInput);
+            if (response.code !== 200) {
+                toast.error("Failed to delete generic", { autoClose: 2000, position: "top-center" });
+                return;
+            }
+            toast.success("Successfully deleted generic", { autoClose: 2000, position: "top-center" });
+            setOpen({...open, delete: false});
+            HandeFetchGenericData();
+        } catch (error) {
+            console.error(error);
+        }
+    }
+
+    useEffect(() => {
+        async function fetchData() {
+            if (search === '') {
+                await HandeFetchGenericData();
+            } else {
+                await HandleFetchGenericByLabel();
+            }
+        }
+        fetchData();
+    }, [page, limit, search]);
 
     return (
         <Layout active="master-generic" user={user}>
@@ -131,6 +187,7 @@ export default function index(props) {
                         size="md"
                         className="w-1/4"
                         placeholder="Search..."
+                        onChange={(value) => setSearch(value)}
                     />
                 </div>
                 <div className="w-full h-[500px]">
@@ -141,11 +198,7 @@ export default function index(props) {
                         shouldUpdateScroll={false}
                         affixHorizontalScrollbar
                         fillHeight={true}
-                        // sortColumn={sortColumn}
-                        // sortType={sortType}
-                        // onSortColumn={handleSortColumn}
-                        // loading={isLoading}
-                        // wordWrap
+                        loading={isLoading}
                     >
                         <Column width={100} fixed="left">
                             <HeaderCell className="text-center text-dark font-bold">No</HeaderCell>
@@ -215,13 +268,13 @@ export default function index(props) {
                             boundaryLinks
                             maxButtons={5}
                             size="xs"
-                            layout={["total", "-", "limit", "|", "pager", "skip"]}
-                            total={data?.length || 0}
-                            limitOptions={[10, 30, 50]}
-                            // limit={limit}
-                            // activePage={page}
-                            // onChangePage={setPage}
-                            // onChangeLimit={handleChangeLimit}
+                            layout={["total", "-", "limit", "|", "pager"]}
+                            total={totalPage || 0}
+                            limitOptions={[5, 10, 15]}
+                            limit={limit}
+                            activePage={page}
+                            onChangePage={page => setPage(page)}
+                            onChangeLimit={limit => setLimit(limit)}
                         />
                     </div>
                 </div>
@@ -246,7 +299,7 @@ export default function index(props) {
                 <Footer className="pt-4">
                     <Button
                         appearance="primary"
-                        // onClick={() => HandleCreatePackaging()}
+                        onClick={() => HandleCreateGeneric()}
                     >
                         Simpan
                     </Button>
@@ -275,7 +328,7 @@ export default function index(props) {
                 <Footer className="pt-4">
                     <Button
                         appearance="primary"
-                        // onClick={() => HandleEditPackaging()}
+                        onClick={() => HandleEditGeneric()}
                     >
                         Simpan
                     </Button>
@@ -288,7 +341,7 @@ export default function index(props) {
                 onClose={() => setOpen({...open, delete: false})}
                 body="Apakah anda yakin untuk menghapus data ini?"
                 btnText="Hapus"
-                // onClick={() => HandleEditPackaging("delete")}
+                onClick={() => HandleDeleteGeneric()}
             />
         </Layout>
     )

@@ -12,6 +12,7 @@
     "@hookform/resolvers": "^3.9.0",
     "@rsuite/icons": "^1.0.3",
     "axios": "^1.7.2",
+    "cookies-next": "^4.2.1",
     "crypto-js": "^4.2.0",
     "dotenv": "^16.4.5",
     "eslint": "^9.6.0",
