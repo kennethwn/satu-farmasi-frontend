@@ -25,17 +25,25 @@ export default function Input(props) {
         return (
             <div className='flex justify-start items-center gap-x-3 px-4 w-full'>
                 <input type="checkbox" id={id} name={name} className='' {...register(name)} />
-                <Label name={name} label={label}/>
+                <Label name={name} label={label} />
             </div   >
         )
+    }
 
+    if (type === "radio") {
+        return (
+            <div className='flex justify-start items-center gap-x-3 px-4'>
+                <input type="radio" id={id} name={name} className='' {...register(name)} onChange={onChange} value={value} />
+                <Label id={id} label={label} />
+            </div>
+        )
     }
 
     return (
         <div className='w-full'>
             {
                 label &&
-                <Label name={name} label={label}/>
+                <Label id={id} label={label} />
             }
             <input
                 type={type}
@@ -59,13 +67,13 @@ export default function Input(props) {
     )
 }
 
-const Label = ({ name, label }) =>
-    <label htmlFor={name} className="block text-sm font-medium leading-6 text-dark">
+const Label = ({ id, label }) =>
+    <label htmlFor={id} className="block text-sm font-medium leading-6 text-dark">
         {label}
     </label>
 
 Label.propTypes = {
-    name: propTypes.string.isRequired,
+    id: propTypes.string.isRequired,
     label: propTypes.string.isRequired
 }
 

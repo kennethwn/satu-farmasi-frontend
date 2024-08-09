@@ -1,6 +1,6 @@
 import { useRouter } from 'next/router';
 import api from "../../components/configs/axios/satufarmasi-service-axios"
-import { useEffect, useState } from 'react';
+import { useState } from 'react';
 import { useUserContext } from './context/UserContext';
 
 export default function useUser() {

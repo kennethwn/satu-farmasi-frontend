@@ -40,10 +40,10 @@ export default function Login() {
     const submitForm = () => formRef.current.requestSubmit();
 
     return (
-        <main className="container flex justify-center items-center flex-col h-screen">
+        <main className="flex justify-center items-center flex-col h-screen">
             <form onSubmit={handleSubmit(LoginHandler)} className="flex justify-center items-center flex-col gap-3 p-8 rounded bg-background-light border border-border-auth" ref={formRef}>
                 <div className="text-center mb-4">
-                    <Text type="title">Welcome Back</Text>
+                    <Text type="heading_3">Welcome Back</Text>
                     <Text type="body">Sign in to access your pharmacy dashboard</Text>
                 </div>
                 {
