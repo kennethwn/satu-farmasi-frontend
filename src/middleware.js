@@ -1,6 +1,6 @@
 import { cookies } from 'next/headers'
 import { NextResponse } from 'next/server'
-import api from "./components/configs/axios/satufarmasi-service-axios"
+import api from "./configs/axios/satufarmasi-service-axios"
 
 export const middleware = async (req) => {
     const path = req.nextUrl.pathname
