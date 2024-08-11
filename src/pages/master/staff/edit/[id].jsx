@@ -252,7 +252,7 @@ export default function Index() {
                     <div className="flex justify-center gap-2 my-6 lg:justify-end">
                         {isLoading ?
                             <Button
-                                type="primary"
+                                appearance="primary"
                                 isDisabled={true}
                                 isLoading={isLoading}
                             >
@@ -260,7 +260,7 @@ export default function Index() {
                             </Button>
                             :
                             <Button
-                                type="primary"
+                                appearance="primary"
                                 onClick={() => {
                                     handleSubmit();
                                 }}

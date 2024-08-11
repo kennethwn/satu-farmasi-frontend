@@ -85,9 +85,9 @@ export default function Layout(props) {
                         }
                     </div>
                 </Sidenav.Header>
-                <Sidenav
-                    className='flex-grow overflow-auto bg-background-sidebar'
-                    expanded={expand}
+                <Sidenav 
+                    className={`flex-grow ${expand && "overflow-auto"} bg-background-sidebar`}
+                    expanded={expand} 
                     appearance="subtle"
                 >
                     <Sidenav.Body>
@@ -187,7 +187,7 @@ export default function Layout(props) {
                                 <span className='text-sm font-semibold text-dark'>{user?.name || "Kenneth William N"}</span>
                             </div>
                             <div className='px-[18px] overflow-hidden w-full whitespace-nowrap'>
-                                <Button type='danger' className='w-full' onClick={logoutHandler}>Logout</Button>
+                                <Button appearance='danger' className='w-full' onClick={logoutHandler}>Logout</Button>
                             </div>
                         </React.Fragment>
                         :
