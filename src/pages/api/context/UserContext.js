@@ -1,7 +1,7 @@
 import React, { createContext, useContext, useEffect, useState } from 'react';
 import PropTypes from 'prop-types';
 import CryptoJS from 'crypto-js';
-import api from "../../../components/configs/axios/satufarmasi-service-axios"
+import api from "../../../configs/axios/satufarmasi-service-axios"
 const secretKey = process.env.NEXT_PUBLIC_SECRET_KEY;
 import { useRouter } from 'next/router';
 const UserContext = createContext();
