@@ -6,6 +6,7 @@ import { ToastContainer } from "react-toastify";
 import 'react-toastify/dist/ReactToastify.min.css';
 import 'rsuite/dist/rsuite.min.css';
 import { UserProvider } from "./api/context/UserContext";
+import "../styles/globals.css";
 
 export default function App({ Component, pageProps }) {
   return (

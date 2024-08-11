@@ -7,8 +7,6 @@ export const middleware = async (req) => {
     const isPublicUrl = path === '/auth/login' || path === '/auth/register'
     const cookieStore = cookies()
     const token = cookieStore.get('token')?.value
-    // const userStorage = localStorage.get("token")
-    // console.log("userStorage: ", userStorage);
     if (isPublicUrl && token) {
         try {
             await validateCookie(token)
@@ -29,7 +27,6 @@ export const middleware = async (req) => {
 }
 
 export const config = {
-    // TODO: can anyone make the middleare will work for all routes except for /auth/login and /auth/register?
     matcher: [
         "/",
         "/prescribe/:path*",

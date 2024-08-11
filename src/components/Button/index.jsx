@@ -36,7 +36,7 @@ export default function Button(props) {
                 {
                     prependIcon && (<div>{prependIcon}</div>)
                 }
-                <div>{props.children}</div>
+                <div className='text-body'>{props.children}</div>
                 {
                     isLoading ? (
                         <div className='transition-all duration-300'>
