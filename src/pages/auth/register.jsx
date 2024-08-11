@@ -7,10 +7,11 @@ import { useForm } from "react-hook-form";
 import { zodResolver } from '@hookform/resolvers/zod';
 import { z } from "zod";
 import Link from 'next/link'
-import { isOptionalString, isPassword, isRequiredEmail, isRequiredString } from "@/helpers/validation";
+import { isOptionalString, isPassword, isRequiredBoolean, isRequiredEmail, isRequiredString } from "@/helpers/validation";
 import Text from "@/components/Text";
 import Button from "@/components/Button";
 import ArrowLeftIcon from '@rsuite/icons/ArrowLeft';
+import { RadioGroup } from 'rsuite';
 
 const registerSchema = z.object({
     email: isRequiredEmail(),
@@ -33,13 +34,19 @@ const registerSchema = z.object({
 });
 
 export default function Login() {
-    const { router, addDoctor } = useDoctor();
-    const { addPharmacist } = usePharmacist();
+    const { router, isLoading:doctorLoading, addDoctor } = useDoctor();
+    const { isLoading:pharmacistLoading, addPharmacist } = usePharmacist();
+    const [isLoading, setIsLoading] = useState(false);
+
     const [error, setError] = useState(null);
     const credentialsRef = useRef(null);
     const formRef = useRef(null);
     const biodataRef = useRef(null);
     const [selectedOption, setSelectedOption] = useState(null);
+
+    useEffect(() => {
+        setIsLoading(doctorLoading || pharmacistLoading)
+    }, [doctorLoading, pharmacistLoading])
 
     const { register, handleSubmit, formState: { errors } } = useForm({ resolver: zodResolver(registerSchema) })
 
@@ -72,14 +79,10 @@ export default function Login() {
 
     const RegisterHandler = async (data) => {
         try {
-            if (data.role === "pharmacist") {
-                const response = await addPharmacist(data)
-                // TODO: need to check the status response
-                typeof response === 'object' ? router.push("/auth/login") : setError(response)
-            } else {
-                const response = await addDoctor(data)
-                typeof response === 'object' ? router.push("/auth/login") : setError(response.message)
-            }
+            let status = 0, message = "";
+            if (data.role === "pharmacist") ({ status, message } = await addPharmacist(data));
+            else ({ status, message } = await addDoctor(data));
+            status === 200 ? router.push("/auth/login") : setError(message);
         } catch (error) {
             console.log("error: ", error);
         }
@@ -140,10 +143,10 @@ export default function Login() {
                             return (
                                 <>
                                     <Text type="body" className="w-full text-start">Role</Text>
-                                    <div key={input.name} className="flex jusitfy-start items-center gap-x-3 w-full">
-                                        <Input type="radio" name="role" register={register} value="doctor" onChange={e => setSelectedOption(e.target.value)} label="Doctor" id="doctor" />
-                                        <Input type="radio" name="role" register={register} value="pharmacist" onChange={e => setSelectedOption(e.target.value)} label="Pharmacist" id="pharmacist" />
-                                    </div>
+                                    <RadioGroup name="role-group" inline className="flex flex-row jusitfy-start items-start gap-x-3 w-full">
+                                        <Input type="radio" name="role" register={register} value="doctor" onChange={setSelectedOption} label="Doctor" id="doctor" />
+                                        <Input type="radio" name="role" register={register} value="pharmacist" onChange={setSelectedOption} label="Pharmacist" id="pharmacist" />
+                                    </RadioGroup>
                                     <Text type="danger" className="w-full text-start">{errors.role?.message}</Text>
                                 </>
                             )
@@ -153,11 +156,12 @@ export default function Login() {
                         )
                     })}
                     {selectedOption === 'doctor' && <RenderSpecialistInput register={register} errors={errors} />}
+                    { error ? <Text type="danger">{error}</Text> : null }
                     <div className="flex gap-x-5 w-full">
                         <Button type='primary' onClick={prevDataHandler} className='w-5 flex-none'>
-                            <ArrowLeftIcon />
+                            <ArrowLeftIcon className="text-2xl"/>
                         </Button>
-                        <Button type='primary' onClick={submitForm} className='w-full shrink'>Register</Button>
+                        <Button type='primary' isLoading={isLoading} onClick={submitForm} className='w-full shrink'>{isLoading ? '' : 'Register'}</Button>
                     </div>
                 </div>
             </section>

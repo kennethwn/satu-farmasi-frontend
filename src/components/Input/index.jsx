@@ -1,7 +1,7 @@
-import React from 'react'
+import React  from 'react'
 import propTypes from 'prop-types'
 import Text from '../Text';
-
+import { Radio, Checkbox } from 'rsuite';
 export default function Input(props) {
     const className = [props.className];
     const {
@@ -23,17 +23,17 @@ export default function Input(props) {
 
     if (type === "checkbox") {
         return (
-            <div className='flex justify-start items-center gap-x-3 px-4 w-full'>
-                <input type="checkbox" id={id} name={name} className='' {...register(name)} />
+            <div className='flex justify-start items-center w-full'>
+                <Checkbox id={id} name={name} {...register(name)} onChange={onChange} value={value} />
                 <Label name={name} label={label} />
-            </div   >
+            </div>
         )
     }
 
     if (type === "radio") {
         return (
-            <div className='flex justify-start items-center gap-x-3 px-4'>
-                <input type="radio" id={id} name={name} className='' {...register(name)} onChange={onChange} value={value} />
+            <div className='flex justify-start items-center'>
+                <Radio id={id} name={name} {...register(name)} onChange={() => onChange(value)} value={value} />
                 <Label id={id} label={label} />
             </div>
         )
@@ -68,7 +68,7 @@ export default function Input(props) {
 }
 
 const Label = ({ id, label }) =>
-    <label htmlFor={id} className="block text-sm font-medium leading-6 text-dark">
+    <label htmlFor={id} className="block text-body font-medium leading-6 text-dark">
         {label}
     </label>
 
@@ -91,5 +91,5 @@ Input.propTypes = {
     value: propTypes.string,
     className: propTypes.string,
     checked: propTypes.bool,
-    register: propTypes.func
+    register: propTypes.func,
 }

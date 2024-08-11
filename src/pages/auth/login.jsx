@@ -18,7 +18,7 @@ const loginSchema = z.object({
 const credentialInputField = [
     { label: "Email", type: "email", name: "email", placeholder: "johndoe@gmail.com", autofocus: true },
     { label: "Password", type: "password", name: "password", placeholder: "**********" },
-    { label: "Kepp Me Logged In", name: "isRemember", type: "checkbox" }
+    { label: "Keep Me Logged In", name: "isRemember", type: "checkbox" }
 ]
 
 export default function Login() {

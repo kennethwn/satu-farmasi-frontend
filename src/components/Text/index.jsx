@@ -8,7 +8,7 @@ export default function Text(props) {
         case "title":
             return <p className='text-title text-dark font-semibold'>{children}</p>
         case "body":
-            return <p className={`text-sm text-dark font-normal ${className}`}>{children}</p>
+            return <p className={`text-body text-dark font-normal ${className}`}>{children}</p>
         case "danger":
             return (
                 <ul className={`list-none ${className}`}>
