@@ -1,4 +1,4 @@
-import axios from "@/components/configs/axios/satufarmasi-service-axios"
+import axios from "@/configs/axios/satufarmasi-service-axios"
 import { useState } from "react";
 
 export default function usePackagingAPI() {
