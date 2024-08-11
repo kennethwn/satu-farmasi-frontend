@@ -8,6 +8,7 @@ import PatientForm from "@/components/DynamicForms/PatientForm";
 import usePatientDropdownOption from "../api/patientDropdownOption";
 import Input from "@/components/Input";
 import useSubmitDiagnose from "../api/submitDiagnose";
+import { Toggle } from "rsuite";
 
 export default function index() {
     const { user } = useUserContext();
@@ -37,6 +38,7 @@ export default function index() {
     const [patientDropdownOptions, setPatientDropdownOptions] = useState([])
     const [title, setTitle] = useState("")
     const [description, setDescription] = useState("")
+    const [existingPatient, setExistingPatient] = useState(true)
 
     const handleSubmitDiagnose = async (e) => {
         e.preventDefault()
@@ -46,7 +48,12 @@ export default function index() {
                 title : "",
                 description : "",
                 prescription : {
-                    patientId : -1,
+                    patient: {
+                        patientId: -1,
+                        patientName: "",
+                        credentialNum: "",
+                        phoneNum: ""
+                    },
                     medicineList : [{
                         medicineId : -1,
                         price: 0,
@@ -59,7 +66,7 @@ export default function index() {
             data.doctorId = 1,
             data.title = title
             data.description = description
-            data.prescription.patientId = selectedPatient.patientId
+            data.prescription.patient = selectedPatient
             data.prescription.medicineList.pop()
             const temp = [...formFields]
             console.log(temp)
@@ -115,11 +122,15 @@ export default function index() {
                         <p> Judul </p>
                         <Input type="text" id="title" name="title" onChange={(e) => setTitle(e.target.value)} placeholder="name" />
                     </div>
-                    <PatientForm
-                        patientDropdownOptions = {patientDropdownOptions}
-                        selectedPatient = {selectedPatient}
-                        setSelectedPatient = {setSelectedPatient}
-                    />
+                    <div className="flex flex-col gap-2">
+                        <Toggle size="lg" checkedChildren="Existing Patient" unCheckedChildren="New Patient" defaultChecked onChange={(e) => setExistingPatient(e)}/>
+                        <PatientForm
+                            patientDropdownOptions = {patientDropdownOptions}
+                            selectedPatient = {selectedPatient}
+                            setSelectedPatient = {setSelectedPatient}
+                            existingPatient = {existingPatient}
+                        />
+                    </div>
                     <PrescriptionForm 
                         medicineDropdownOptions={medicineDropdownOptions} 
                         formFields={formFields} 
