@@ -324,11 +324,12 @@ export default function index(props) {
                 </Footer>
             </Modal>
 
+            {/* TODO: Bold editInput.label */}
             <Toaster
                 type="warning"
                 open={open.delete} 
                 onClose={() => setOpen({...open, delete: false})}
-                body="Apakah anda yakin untuk menghapus data ini?"
+                body={`Apakah anda yakin untuk menghapus data ${editInput.label}?`}
                 btnText="Hapus"
                 onClick={() => HandleEditPackaging("delete")}
             />
