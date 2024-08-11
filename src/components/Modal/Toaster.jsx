@@ -1,8 +1,8 @@
 import { Modal } from "rsuite";
 import Button from "../Button";
 import propTypes from 'prop-types';
-import { useEffect } from "react";
 
+// Check another modal props -> https://rsuitejs.com/components/modal/#props
 export default function Toaster({
     title,
     body,
@@ -30,8 +30,8 @@ export default function Toaster({
             case 'warning':
                 return (
                     <div className="w-full flex flex-row items-center gap-4 justify-between">
-                        <Button className="w-full">Batalkan</Button>
-                        <Button className="w-full" type="danger" onClick={() => onClick()}>{btnText}</Button>
+                        <Button className="w-full" onClick={() => props.onClose()}>Batalkan</Button>
+                        <Button className="w-full" appearance="danger" onClick={() => onClick()}>{btnText}</Button>
                     </div>
                 )
             default:
@@ -62,5 +62,5 @@ Toaster.propTypes = {
     body: propTypes.string,
     type: propTypes.string,
     btnText: propTypes.string,
-    onClick: propTypes.func
+    onClick: propTypes.func,
 }

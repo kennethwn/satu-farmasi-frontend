@@ -19,7 +19,7 @@ export default function ContentLayout(props) {
                 <div className='flex flex-row items-center gap-5 max-h-16'>
                     {
                         type === 'child' 
-                        ? <Button type='primary' onClick={() => router.push(backpageUrl)} className='w-1'>{<ArrowLeftIcon size={'24px'} />}</Button>
+                        ? <Button appearance='primary' onClick={() => router.push(backpageUrl)} className='w-1'>{<ArrowLeftIcon size={'24px'} />}</Button>
                         : <></>
                     }
                     <span className='text-[32px] leading-9 text-dark font-bold py-[52px]'>{title}</span>
