@@ -76,11 +76,30 @@ export default function usePackagingAPI() {
         }
     }
 
+    const DeletePackaging = async (data) => {
+        setIsLoading(true)
+        try {
+            const response = await axios.post('/api/v1/packagings/delete', data)
+            .then((response) => {
+                setIsLoading(false);
+                return response;
+            })
+            .catch((error) => {
+                setIsLoading(false);
+                return error;
+            })
+            return response
+        } catch (error) {
+            console.error(error);
+        }
+    }
+
     return {
         isLoading,
         GetAllPackaging,
         GetPackagingByLabel,
         CreatePackaging,
-        EditPackaging
+        EditPackaging,
+        DeletePackaging
     }
 }

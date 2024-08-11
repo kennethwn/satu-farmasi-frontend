@@ -24,7 +24,7 @@ export default function index(props) {
     const { user } = useUserContext();
     const { Header, Body, Footer } = Modal;
     const { HeaderCell, Cell, Column } = Table;
-    const { isLoading, GetAllPackaging, GetPackagingByLabel, CreatePackaging, EditPackaging } = usePackagingAPI();
+    const { isLoading, GetAllPackaging, GetPackagingByLabel, CreatePackaging, EditPackaging, DeletePackaging } = usePackagingAPI();
 
     const [data, setData] = useState([]);
     const [editInput, setEditInput] = useState({});
@@ -96,13 +96,8 @@ export default function index(props) {
                 toast.error(res.message, { autoClose: 2000, position: "top-center" });
                 return;
             }
-
-            if (res.data !== null) {
-                let temp = [];
-                temp.push(res.data);
-                setData(temp);
-                setTotalPage(res.data?.length);
-            }
+            setData(res?.data.results);
+            setTotalPage(res.total);
         } catch (error) {
             console.error(error);
         }
@@ -117,23 +112,38 @@ export default function index(props) {
                 return;
             } 
             toast.success("Successfully created packaging", { autoClose: 2000, position: "top-center" });
-            setOpen({...open, create: false});
+            setOpen({...open, create: false, edit: false, delete: false});
             HandeFetchPackagingData();
         } catch (error) {
             console.error(error);
         }
     }
 
-    const HandleEditPackaging = async (action) => {
+    const HandleEditPackaging = async () => {
         try {
-            if (action === "delete") setEditInput({...editInput, isActive: false});
             const res = await EditPackaging(editInput);
             if (res.code !== 200) {
                 toast.error("Failed to edit packaging", { autoClose: 2000, position: "top-center" });
                 return;
             }
             toast.success(`${action === "delete" ? "Successfully deleted packaging" : "Successfully edited packaging"}`, { autoClose: 2000, position: "top-center" });
-            setOpen({...open, edit: false, delete: false});
+            setOpen({...open, create: false, edit: false, delete: false});
+            HandeFetchPackagingData();
+        } catch (error) {
+            console.error(error);
+        }
+    }
+
+    const HandleDeletePackaging = async () => {
+        try {
+            setEditInput({...editInput, isActive: false});
+            const res = await DeletePackaging(editInput);
+            if (res.code !== 200) {
+                toast.error("Failed to delete packaging", { autoClose: 2000, position: "top-center" });
+                return;
+            }
+            toast.success("Successfully deleted packaging", { autoClose: 2000, position: "top-center" });
+            setOpen({...open, create: false, edit: false, delete: false});
             HandeFetchPackagingData();
         } catch (error) {
             console.error(error);
@@ -154,23 +164,12 @@ export default function index(props) {
     return (
         <Layout active="master-packaging" user={user}>
             <ContentLayout title="List Kemasan">
-                <div className="w-full">
+                <div className="flex flex-row justify-between items-center w-full pb-6">
                     <Button 
                         prependIcon={<IoMdAdd size={24}/>} 
                         onClick={() => setOpen({...open, create: true})}>
                             Tambah
                     </Button>
-                </div>
-                <div className="flex flex-row justify-between w-full py-6">
-                    <SelectPicker
-                        style={{
-                            borderWidth: '0.5px',     
-                            color: '#DDDDDD',       
-                            borderColor: '#DDDDDD', 
-                            borderRadius: '0.4rem',
-                        }}
-                        label="Filter Name"
-                    />
 
                     <SearchBar 
                         size="md"
@@ -329,9 +328,9 @@ export default function index(props) {
                 type="warning"
                 open={open.delete} 
                 onClose={() => setOpen({...open, delete: false})}
-                body={`Apakah anda yakin untuk menghapus data ${editInput.label}?`}
+                body={<>Apakah anda yakin untuk menghapus data <span className="text-danger">{editInput.label}</span>?</>}
                 btnText="Hapus"
-                onClick={() => HandleEditPackaging("delete")}
+                onClick={() => HandleDeletePackaging()}
             />
         </Layout>
     )
