@@ -165,23 +165,12 @@ export default function index(props) {
     return (
         <Layout active="master-generic" user={user}>
             <ContentLayout title="List Generik Obat">
-                <div className="w-full">
+                <div className="flex flex-row justify-between w-full pb-6">
                     <Button 
                         prependIcon={<IoMdAdd size={24}/>} 
                         onClick={() => setOpen({...open, create: true})}>
                             Tambah
                     </Button>
-                </div>
-                <div className="flex flex-row justify-between w-full py-6">
-                    <SelectPicker
-                        style={{
-                            borderWidth: '0.5px',     
-                            color: '#DDDDDD',       
-                            borderColor: '#DDDDDD', 
-                            borderRadius: '0.4rem',
-                        }}
-                        label="Filter Name"
-                    />
 
                     <SearchBar 
                         size="md"
