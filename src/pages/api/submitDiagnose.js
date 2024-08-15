@@ -8,7 +8,6 @@ export default function useSubmitDiagnose() {
 
     const submitDiagnose = async(data) => {
         try {
-            console.log(data)
             const response = await axios.post('/api/v1/diagnose', {data})
             .then((response) => {
                 setIsLoading(false);

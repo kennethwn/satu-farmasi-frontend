@@ -1,4 +1,4 @@
-import React from 'react'
+import React, { useEffect } from 'react'
 import { SelectPicker } from 'rsuite'
 import Input from '../Input';
 
@@ -6,7 +6,8 @@ function PatientForm(props) {
     const {
         selectedPatient,
         setSelectedPatient,
-        patientDropdownOptions
+        patientDropdownOptions,
+        existingPatient
     } = props
 
     const styles = {
@@ -39,12 +40,43 @@ function PatientForm(props) {
         })
     }
 
+    const handleNameChange = (patientName) => {
+        setSelectedPatient({
+            ...selectedPatient,
+            patientName: patientName,
+        })
+    }
+
+    const handleCredentialNumChange = (credentialNum) => {
+        setSelectedPatient({
+            ...selectedPatient,
+            credentialNum: credentialNum,
+        })
+    }
+    
+    const handlePhoneNumChange = (phoneNum) => {
+        setSelectedPatient({
+            ...selectedPatient,
+            phoneNum: phoneNum,
+        })
+    }
+
+    useEffect(() => {
+        setSelectedPatient({
+            patientId: -1,
+            patientName: "",
+            credentialNum: "",
+            phoneNum: ""
+        })
+    }, [existingPatient])
+
   return (
     <>
         <div className='flex flex-col gap-4'>
             <div className='flex flex-col gap-2'>
                 <p> Nama Pasien </p>
                 <div className='col-span-2'>
+                    {existingPatient ? 
                     <SelectPicker
                         style={styles}
                         id='name' 
@@ -57,18 +89,21 @@ function PatientForm(props) {
                         block
                         cleanable={false}
                     />
+                    : 
+                    <Input type="text" id="name" name="name" onChange={(e) => handleNameChange(e.target.value)} placeholder="name" value={selectedPatient.PatientName} />
+                    }
                 </div>
             </div>
             <div className='flex flex-col gap-2'>
                 <p> Credential Number </p>
-                <Input type="text" id="name" name="name" onChange={(e) => setInput(e.target.value)} placeholder="name" value={selectedPatient.credentialNum} 
-                    disabled={selectedPatient.patientId !== -1}
+                <Input type="text" id="name" name="name" onChange={(e) => handleCredentialNumChange(e.target.value)} placeholder="name" value={selectedPatient.credentialNum} 
+                    disabled={existingPatient}
                 />
             </div>
             <div className='flex flex-col gap-2'>
                 <p> No Handphone </p>
-                <Input type="text" id="name" name="name" onChange={(e) => setInput(e.target.value)} placeholder="name" value={selectedPatient.phoneNum}
-                    disabled={selectedPatient.patientId !== -1}
+                <Input type="text" id="name" name="name" onChange={(e) => handlePhoneNumChange(e.target.value)} placeholder="name" value={selectedPatient.phoneNum}
+                    disabled={existingPatient}
                 />
             </div>
         </div>
