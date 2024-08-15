@@ -1,4 +1,3 @@
-import axios from "@/components/configs/axios/satufarmasi-service-axios"
 import api from "../../components/configs/axios/satufarmasi-service-axios"
 import { useState } from 'react'
 
