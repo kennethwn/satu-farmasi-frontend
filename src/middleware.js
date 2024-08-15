@@ -1,14 +1,12 @@
 import { cookies } from 'next/headers'
 import { NextResponse } from 'next/server'
-import api from "./components/configs/axios/satufarmasi-service-axios"
+import api from "./configs/axios/satufarmasi-service-axios"
 
 export const middleware = async (req) => {
     const path = req.nextUrl.pathname
     const isPublicUrl = path === '/auth/login' || path === '/auth/register'
     const cookieStore = cookies()
     const token = cookieStore.get('token')?.value
-    // const userStorage = localStorage.get("token")
-    // console.log("userStorage: ", userStorage);
     if (isPublicUrl && token) {
         try {
             await validateCookie(token)
@@ -29,7 +27,6 @@ export const middleware = async (req) => {
 }
 
 export const config = {
-    // TODO: can anyone make the middleare will work for all routes except for /auth/login and /auth/register?
     matcher: [
         "/",
         "/prescribe/:path*",

@@ -2,11 +2,16 @@ import Input from "@/components/Input";
 import useDoctor from "../api/doctor";
 import usePharmacist from "../api/pharmacist";
 import { useEffect, useRef, useState } from "react";
+import propTypes from 'prop-types'
 import { useForm } from "react-hook-form";
 import { zodResolver } from '@hookform/resolvers/zod';
-import  { z } from "zod";
+import { z } from "zod";
 import Link from 'next/link'
-import { isOptionalString, isPassword, isRequiredEmail, isRequiredString } from "@/helpers/validation";
+import { isOptionalString, isPassword, isRequiredBoolean, isRequiredEmail, isRequiredString } from "@/helpers/validation";
+import Text from "@/components/Text";
+import Button from "@/components/Button";
+import ArrowLeftIcon from '@rsuite/icons/ArrowLeft';
+import { RadioGroup } from 'rsuite';
 
 const registerSchema = z.object({
     email: isRequiredEmail(),
@@ -29,12 +34,19 @@ const registerSchema = z.object({
 });
 
 export default function Login() {
-    const { router, addDoctor } = useDoctor();
-    const { addPharmacist } = usePharmacist();
+    const { router, isLoading:doctorLoading, addDoctor } = useDoctor();
+    const { isLoading:pharmacistLoading, addPharmacist } = usePharmacist();
+    const [isLoading, setIsLoading] = useState(false);
+
     const [error, setError] = useState(null);
     const credentialsRef = useRef(null);
+    const formRef = useRef(null);
     const biodataRef = useRef(null);
     const [selectedOption, setSelectedOption] = useState(null);
+
+    useEffect(() => {
+        setIsLoading(doctorLoading || pharmacistLoading)
+    }, [doctorLoading, pharmacistLoading])
 
     const { register, handleSubmit, formState: { errors } } = useForm({ resolver: zodResolver(registerSchema) })
 
@@ -45,7 +57,7 @@ export default function Login() {
 
     useEffect(() => {
         if (Object.keys(errors).length !== 0 && errors.constructor === Object) {
-            if (errors. email || errors.password || errors.confirmPassword) {
+            if (errors.email || errors.password || errors.confirmPassword) {
                 credentialsRef.current.style.display = "block";
                 biodataRef.current.style.display = "none";
                 return;
@@ -67,119 +79,100 @@ export default function Login() {
 
     const RegisterHandler = async (data) => {
         try {
-            if (data.role === "pharmacist") {
-                const response = await addPharmacist(data)
-                // TODO: need to check the status response
-                typeof response === 'object' ? router.push("/auth/login") : setError(response)
-            } else {
-                const response = await addDoctor(data)
-                typeof response === 'object' ? router.push("/auth/login") : setError(response.message)
-            }
+            let status = 0, message = "";
+            if (data.role === "pharmacist") ({ status, message } = await addPharmacist(data));
+            else ({ status, message } = await addDoctor(data));
+            status === 200 ? router.push("/auth/login") : setError(message);
         } catch (error) {
             console.log("error: ", error);
         }
     }
 
     const credentialInputField = [
-        { label: "Email", type: "email", name: "email" , placeholder: "johndoe@gmail.com"},
-        { label: "Password", type: "password", name: "password" , placeholder: "**********"},
-        { label: "Confirm Password", type: "password", name: "confirmPassword" , placeholder: "**********"},
+        { label: "Email", type: "email", name: "email", placeholder: "johndoe@gmail.com", autofocus: true },
+        { label: "Password", type: "password", name: "password", placeholder: "**********" },
+        { label: "Confirm Password", type: "password", name: "confirmPassword", placeholder: "**********" },
     ]
 
     const biodataInputField = [
-        { label: "NIK", type: "text", name: "nik" , placeholder: "12345678"},
+        { label: "NIK", type: "text", name: "nik", placeholder: "12345678" },
         { name: "fullName" },
-        { label: "Phone Number", type: "number", name: "phoneNum" , placeholder: "+628xxxxxx"},
-        { label: "Date of Birth", type: "date", name: "dob" , placeholder: "01/01/2000"},
+        { label: "Phone Number", type: "number", name: "phoneNum", placeholder: "+628xxxxxx" },
+        { label: "Date of Birth", type: "date", name: "dob", placeholder: "01/01/2000" },
         { name: "role" },
     ]
 
-    const RenderSpecialistInput = () => {
-        return (
-            <div>
-                <p>Specialist</p>
-                <Input type="text" placeholder="Heart" name="specialist" register={register}/>
-                {errors.specialist?.message && <p className="text-danger">{errors.specialist?.message}</p>}
-            </div>
-        )
-    }
 
-            
+    const submitForm = () => formRef.current.requestSubmit();
+
     return (
-        <>
-            <form onSubmit={handleSubmit(RegisterHandler)}  className="container flex justify-center items-center flex-col h-screen">
-                <section ref={credentialsRef}>
-                    <div className="flex justify-center items-center flex-col gap-8 p-8 rounded bg-background-light border border-border-auth">
-                        <div>
-                            <h3>Create Your Account</h3>
-                            <p>Create new account to access the pharmacy dashboard</p>
-                        </div>
-                        {
-                            credentialInputField.map((input, index) => {
-                                return (
-                                    <div key={index}>
-                                        <p>{input.label}</p>
-                                        <Input type={input.type} placeholder={input.placeholder} name={input.name} register={register}/>
-                                        {errors[input.name]?.message && <p className="text-danger">{errors[input.name]?.message}</p>}
-                                    </div>
-                                )
-                            })
+        <form onSubmit={handleSubmit(RegisterHandler)} className="flex justify-center items-center flex-col h-screen" ref={formRef}>
+            <section ref={credentialsRef}>
+                <div className="flex justify-center items-center flex-col gap-3 p-8 rounded bg-background-light border border-border-auth">
+                    <div className="text-center mb-4">
+                        <Text type="heading_3">Create Your Account</Text>
+                        <Text type="body">Create new account to access the pharmacy dashboard</Text>
+                    </div>
+                    {
+                        credentialInputField.map((input) => {
+                            return (
+                                <Input key={input.name} type={input.type} placeholder={input.placeholder} name={input.name} register={register} label={input.label} error={errors[input.name]?.message} autofocus={input.autofocus} />
+                            )
+                        })
+                    }
+                    <Button type='primary' onClick={nextDataHandler} className='w-full'>Next</Button>
+                    <Text type="body">Don't have an account? <Link href="/auth/login">Sign in</Link> here</Text>
+                </div>
+            </section>
+            <section ref={biodataRef}>
+                <div className="flex justify-center items-center flex-col gap-3 p-8 rounded bg-background-light border border-border-auth">
+                    <div className="text-center mb-4">
+                        <Text type="heading_3">You are almost done</Text>
+                        <Text type="body">Please fill the data bellow</Text>
+                    </div>
+                    {biodataInputField.map((input) => {
+                        if (input.name === "fullName") {
+                            return (
+                                <div key={input.name} className="flex justify-center items-center gap-x-5">
+                                    <Input type="text" placeholder="John" name="firstName" register={register} label="First Name" error={errors.firstName?.message} />
+                                    <Input type="text" placeholder="Doe" name="lastName" register={register} label="Last Name" error={errors.lastName?.message} />
+                                </div>
+                            )
                         }
-                    <button type='button' onClick={nextDataHandler} className='w-full'>Next</button>
-                    <div>
-                        <p>Don't have an account? <Link href="/auth/login">Sign in</Link> here</p>
+                        if (input.name === "role") {
+                            return (
+                                <>
+                                    <Text type="body" className="w-full text-start">Role</Text>
+                                    <RadioGroup name="role-group" inline className="flex flex-row jusitfy-start items-start gap-x-3 w-full">
+                                        <Input type="radio" name="role" register={register} value="doctor" onChange={setSelectedOption} label="Doctor" id="doctor" />
+                                        <Input type="radio" name="role" register={register} value="pharmacist" onChange={setSelectedOption} label="Pharmacist" id="pharmacist" />
+                                    </RadioGroup>
+                                    <Text type="danger" className="w-full text-start">{errors.role?.message}</Text>
+                                </>
+                            )
+                        }
+                        return (
+                            <Input key={input.name} type={input.type} placeholder={input.placeholder} name={input.name} register={register} label={input.label} error={errors[input.name]?.message} />
+                        )
+                    })}
+                    {selectedOption === 'doctor' && <RenderSpecialistInput register={register} errors={errors} />}
+                    { error ? <Text type="danger">{error}</Text> : null }
+                    <div className="flex gap-x-5 w-full">
+                        <Button type='primary' onClick={prevDataHandler} className='w-5 flex-none'>
+                            <ArrowLeftIcon className="text-2xl"/>
+                        </Button>
+                        <Button type='primary' isLoading={isLoading} onClick={submitForm} className='w-full shrink'>{isLoading ? '' : 'Register'}</Button>
                     </div>
-                    </div>
-                </section>
-                <section ref={biodataRef}>
-                    <div className="flex justify-center items-center flex-col gap-8 p-8 rounded bg-background-light border border-border-auth">
-                        <div>
-                            <h3>You are almost done</h3>
-                            <p>Please fill the data bellow</p>
-                        </div>
-                            {biodataInputField.map((input, index) => {
-                                    if (input.name === "fullName") {
-                                        return (
-                                            <div key={index} className="flex justify-center items-center gap-x-5">
-                                                <div>
-                                                    <p>First Name</p>
-                                                    <Input type="text" placeholder="John" name="firstName" register={register}/>
-                                                    {errors.firstName?.message && <p className="text-danger">{errors.firstName?.message}</p>}
-                                                </div>
-                                                <div>
-                                                    <p>Last Name</p>
-                                                    <Input type="text" placeholder="DOe" name="lastName" register={register}/>
-                                                    {errors.lastName?.message && <p className="text-danger">{errors.lastName?.message}</p>}
-                                                </div>
-                                            </div>
-                                        )
-                                    }
-                                    if (input.name === "role") {
-                                        return (
-                                            <div key={index}>
-                                                <p>Role</p>
-                                                <input type="radio"  name="role" {...register("role")} value="doctor" onChange={e => setSelectedOption(e.target.value)}/>
-                                                <label htmlFor="">Doctor</label>
-                                                <input type="radio"  name="role" {...register("role")} value="pharmacist" onChange={e => setSelectedOption(e.target.value)}/>
-                                                <label htmlFor="">Pharmacist</label>
-                                                {errors[input.name]?.message && <p className="text-danger">{errors[input.name]?.message}</p>}
-                                            </div>
-                                        )
-                                    }
-                                    return (
-                                        <div key={index}>
-                                            <p>{input.label}</p>
-                                            <Input type={input.type} placeholder={input.placeholder} name={input.name} register={register}/>
-                                            {errors[input.name]?.message && <p className="text-danger">{errors[input.name]?.message}</p>}
-                                        </div>
-                                    )
-                            })}
-                            {selectedOption === 'doctor' && <RenderSpecialistInput />}
-                        <button type='button' onClick={prevDataHandler} className='w-full'>Back</button>
-                        <button type='submit' className='w-full'>register</button>
-                    </div>
-                </section>
-            </form>
-        </>
+                </div>
+            </section>
+        </form>
     )
 }
+
+const RenderSpecialistInput = ({ register, errors }) =>
+    <Input type="text" placeholder="Heart" name="specialist" register={register} label="Specialist" error={errors.specialist?.message} />
+
+RenderSpecialistInput.propTypes = {
+    register: propTypes.func.isRequired,
+    errors: propTypes.object.isRequired
+};

@@ -1,5 +1,5 @@
 import { useRouter } from 'next/router';
-import api from "../../components/configs/axios/satufarmasi-service-axios"
+import api from "../../configs/axios/satufarmasi-service-axios"
 import { useState } from 'react';
 import { convertToTimestampString } from '@/helpers/dayHelper';
 
