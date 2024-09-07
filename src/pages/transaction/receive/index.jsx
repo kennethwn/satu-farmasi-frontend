@@ -8,6 +8,7 @@ export default function index() {
         <Layout active="transaction-receive" user={user}>
             <ContentLayout title="Penerimaan Obat">
                 Halaman Penerimaan Obat
+        h
             </ContentLayout>
         </Layout>
     )

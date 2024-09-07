@@ -10,6 +10,7 @@ import PrescribeIcon from '../Icons/PrescribeIcon';
 import propTypes from 'prop-types';
 import { useRouter } from 'next/router';
 import useUser from '@/pages/api/user';
+import Toaster from "@/components/Modal/Toaster";
 
 export default function Layout(props) {
     const {
@@ -22,8 +23,9 @@ export default function Layout(props) {
     const [activeKey, setActiveKey] = useState(active);
     const [expand, setExpand] = useState(true);
     const [error, setError] = useState(null);
-    const [loggedOut, setLoggedOut] = useState(false);
     const userRole = user?.role?.toLowerCase();
+    const [askForLogout, setAskForLogout] = useState(false);
+
 
     const logoutHandler = async () => {
         try {
@@ -187,7 +189,7 @@ export default function Layout(props) {
                                 <span className='text-sm font-semibold text-dark'>{user?.name || "Kenneth William N"}</span>
                             </div>
                             <div className='px-[18px] overflow-hidden w-full whitespace-nowrap'>
-                                <Button appearance='danger' className='w-full' onClick={logoutHandler}>Logout</Button>
+                                <Button appearance='danger' className='w-full' onClick={() => setAskForLogout(true)}>Logout</Button>
                             </div>
                         </React.Fragment>
                         :
@@ -199,6 +201,15 @@ export default function Layout(props) {
                 </div>
             </Sidebar>
             <Content className='p-4 overflow-auto'>{props.children}</Content>
+
+            <Toaster
+              type="warning"
+              open={askForLogout}
+              onClose={() => setAskForLogout(false)}
+              body={ <> Apakah Anda yakin ingin logout? </> }
+              btnText="Hapus"
+              onClick={() => logoutHandler()}
+            />
         </Container>
     );
 };
