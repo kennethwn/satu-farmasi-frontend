@@ -28,7 +28,7 @@ function PrescriptionForm(props) {
 
   const data = medicineDropdownOptions.map((item) => ({
     label: item.name,
-    value: item.id - 1,
+    value: item.id,
   }));
 
   const handleMedicineChange = (formFieldId, medicineId) => {
@@ -64,6 +64,7 @@ function PrescriptionForm(props) {
       price: 0,
       totalPrice: 0,
       instruction: "",
+      insufficientStock: false
     };
     setFormFields([...formFields, newFormField]);
     console.log(formFields);
@@ -71,6 +72,10 @@ function PrescriptionForm(props) {
 
   const handleMedicineQuantity = (formFieldId, quantity) => {
     const medicineId = formFields[formFieldId].medicineId;
+    const checkIfStockIsInsufficient = (medicineDropdownOption, quantity) => {
+      return medicineDropdownOption.currStock - quantity < medicineDropdownOption.minStock
+    }
+
     let updatedData = {
       id: formFieldId,
       medicineId: medicineId,
@@ -78,6 +83,7 @@ function PrescriptionForm(props) {
       quantity: quantity,
       price: medicineDropdownOptions[medicineId].price,
       totalPrice: medicineDropdownOptions[medicineId].price * quantity,
+      insufficientStock: checkIfStockIsInsufficient(medicineDropdownOptions[medicineId], quantity)
     };
     let temp = [...formFields];
 
@@ -88,6 +94,7 @@ function PrescriptionForm(props) {
         item.quantity = updatedData.quantity;
         item.price = updatedData.price;
         item.totalPrice = updatedData.totalPrice;
+        item.insufficientStock = updatedData.insufficientStock
       }
     });
 
@@ -128,7 +135,7 @@ function PrescriptionForm(props) {
       </div>
       {formFields &&
         formFields.map((formField, index) => (
-          <div className="border flex flex-col gap-2">
+          <div className="flex flex-col gap-2">
             <div key={index} className="grid grid-cols-10 gap-4">
               <div className="flex justify-center">
                 {index == formFields.length - 1 && (
