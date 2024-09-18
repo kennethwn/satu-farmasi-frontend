@@ -40,6 +40,24 @@ export default function useGenericAPI() {
         }
     }
 
+    const GetGenericDropdown = async (data) => {
+        setIsLoading(true);
+        try {
+            const response = await axios.get('/api/v1/genericName/dropdown')
+            .then((response) => {
+                setIsLoading(false);
+                return response;
+            })
+            .catch((error) => {
+                setIsLoading(false);
+                return error;
+            })
+            return response;
+        } catch (error) {
+            console.error(error);
+        }
+    }
+
     const CreateGeneric = async (data) => {
         try {
             const response = await axios.post('/api/v1/genericName', data)
@@ -95,6 +113,7 @@ export default function useGenericAPI() {
         isLoading,
         GetAllGeneric,
         GetGenericByLabel,
+        GetGenericDropdown,
         CreateGeneric,
         EditGeneric,
         DeleteGeneric

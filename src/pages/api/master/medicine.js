@@ -1,13 +1,13 @@
 import axios from "@/configs/axios/satufarmasi-service-axios"
 import { useState } from "react";
 
-export default function usePackagingAPI() {
+export default function useMedicineAPI() {
     const [isLoading, setIsLoading] = useState(false);
 
-    const GetAllPackaging = async (page, limit) => {
+    const GetAllMedicines = async (page, limit) => {
         setIsLoading(true)
         try {
-            const response = await axios.get(`/api/v1/packagings?page=${page}&limit=${limit}`)
+            const response = await axios.get(`/api/v1/medicines?page=${page}&limit=${limit}`)
             .then((response) => {
                 setIsLoading(false);
                 return response;
@@ -22,10 +22,10 @@ export default function usePackagingAPI() {
         }
     }
 
-    const GetPackagingByLabel = async (label) => {
+    const SearchMedicine = async (page, limit, parameter) => {
         setIsLoading(true)
         try {
-            const response = await axios.get(`/api/v1/packagings?label=${label}`)
+            const response = await axios.get(`/api/v1/medicines?page=${page}&limit=${limit}&parameter=${parameter}`)
             .then((response) => {
                 setIsLoading(false);
                 return response;
@@ -40,28 +40,10 @@ export default function usePackagingAPI() {
         }
     }
 
-    const GetPackagingDropdown = async (data) => {
-        setIsLoading(true);
-        try {
-            const response = await axios.get('/api/v1/packagings/dropdown')
-            .then((response) => {
-                setIsLoading(false);
-                return response;
-            })
-            .catch((error) => {
-                setIsLoading(false);
-                return error;
-            })
-            return response;
-        } catch (error) {
-            console.error(error);
-        }
-    }
-
-    const CreatePackaging = async (data) => {
+    const CreateMedicine = async (data) => {
         setIsLoading(true)
         try {
-            const response = await axios.post('/api/v1/packagings', data)
+            const response = await axios.post('/api/v1/medicines', data)
             .then((response) => {
                 setIsLoading(false);
                 return response;
@@ -76,10 +58,10 @@ export default function usePackagingAPI() {
         }
     }
 
-    const EditPackaging = async (data) => {
+    const AddCurrentStock = async (data) => {
         setIsLoading(true)
         try {
-            const response = await axios.post('/api/v1/packagings/edit', data)
+            const response = await axios.post('/api/v1/medicines/add-stock', data)
             .then((response) => {
                 setIsLoading(false);
                 return response;
@@ -94,10 +76,62 @@ export default function usePackagingAPI() {
         }
     }
 
-    const DeletePackaging = async (data) => {
+    const CheckStock = async (data) => {
+        try {
+            const response = await axios.post('/api/v1/medicines/check-stock', data)
+            .then((response) => {
+                setIsLoading(false);
+                return response;
+            })
+            .catch((error) => {
+                setIsLoading(false);
+                return error;
+            })
+            return response
+        } catch (error) {
+            console.error(error);
+        }
+    }
+
+    const CheckExpirationByDate = async (date) => {
+        try {
+            const response = await axios.post('/api/v1/medicines/check-expiration', date)
+            .then((response) => {
+                setIsLoading(false);
+                return response;
+            })
+            .catch((error) => {
+                setIsLoading(false);
+                return error;
+            })
+            return response
+        } catch (error) {
+            console.error(error);
+        }
+    }
+
+    const EditMedicine = async (data) => {
         setIsLoading(true)
         try {
-            const response = await axios.post('/api/v1/packagings/delete', data)
+            const response = await axios.post('/api/v1/medicines/edit', data)
+            .then((response) => {
+                setIsLoading(false);
+                return response;
+            })
+            .catch((error) => {
+                setIsLoading(false);
+                return error;
+            })
+            return response
+        } catch (error) {
+            console.error(error);
+        }
+    }
+
+    const DeleteMedicine = async (id) => {
+        setIsLoading(true)
+        try {
+            const response = await axios.post('/api/v1/medicines/delete', id)
             .then((response) => {
                 setIsLoading(false);
                 return response;
@@ -114,11 +148,13 @@ export default function usePackagingAPI() {
 
     return {
         isLoading,
-        GetAllPackaging,
-        GetPackagingByLabel,
-        GetPackagingDropdown,
-        CreatePackaging,
-        EditPackaging,
-        DeletePackaging
+        GetAllMedicines,
+        SearchMedicine,
+        CreateMedicine,
+        AddCurrentStock,
+        CheckStock,
+        CheckExpirationByDate,
+        EditMedicine,
+        DeleteMedicine
     }
 }
