@@ -1,5 +1,5 @@
-import axios from "@/components/configs/axios/satufarmasi-service-axios"
-import React, { useState } from 'react'
+import axios from "@/configs/axios/satufarmasi-service-axios"
+import { useState } from 'react'
 
 export default function useStaffAPI() {
     const [isLoading, setIsLoading] = useState(false);
