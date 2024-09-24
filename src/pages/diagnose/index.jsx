@@ -2,16 +2,19 @@ import PrescriptionForm from "@/components/DynamicForms/PrescriptionForm";
 import Layout from "@/components/Layouts";
 import ContentLayout from "@/components/Layouts/Content";
 import { useUserContext } from "../api/context/UserContext";
-import { useEffect, useState } from "react";
-import useMedicineDropdownOption from "../api/medicineDropdownOption";
+import { useState } from "react";
 import PatientForm from "@/components/DynamicForms/PatientForm";
-import usePatientDropdownOption from "../api/patientDropdownOption";
 import Input from "@/components/Input";
 import useSubmitDiagnose from "../api/submitDiagnose";
 import { Toggle } from "rsuite";
 
 export default function index() {
     const { user } = useUserContext();
+    const { submitDiagnose } = useSubmitDiagnose();
+    const [title, setTitle] = useState("")
+    const [description, setDescription] = useState("")
+    const [existingPatient, setExistingPatient] = useState(true)
+
     const [formFields, setFormFields] = useState([
         {   
             medicineId: -1,
@@ -30,15 +33,6 @@ export default function index() {
             phoneNum: ""
         }
     )
-
-    const { getMedicineDropdownOptions } = useMedicineDropdownOption();
-    const { getPatientDropdownOptions } = usePatientDropdownOption();
-    const { submitDiagnose } = useSubmitDiagnose();
-    const [medicineDropdownOptions, setMedicineDropdownOptions] = useState([])
-    const [patientDropdownOptions, setPatientDropdownOptions] = useState([])
-    const [title, setTitle] = useState("")
-    const [description, setDescription] = useState("")
-    const [existingPatient, setExistingPatient] = useState(true)
 
     const handleSubmitDiagnose = async (e) => {
         e.preventDefault()
@@ -70,7 +64,7 @@ export default function index() {
             data.prescription.medicineList.pop()
             const temp = [...formFields]
             console.log(temp)
-            temp.map(item => data.prescription.medicineList.push({
+            [temp].map(item => data.prescription.medicineList.push({
                 medicineId: item.medicineId,
                 quantity: parseInt(item.quantity),
                 instruction: item.instruction,
@@ -84,28 +78,6 @@ export default function index() {
             console.log("error when #submitDiagnose")
         }
     }
-
-    useEffect(() => {
-        async function fetchMedicineDropdownOptionsData(){
-            try {
-                const response = await getMedicineDropdownOptions()
-                console.log(response)
-                setMedicineDropdownOptions(response)
-            } catch (error) {
-                console.log("error #getMedicineOptions")
-            }
-        }
-        async function fetchPatientDropdownOptionsData(){
-            try {
-                const response = await getPatientDropdownOptions()
-                setPatientDropdownOptions(response)
-            } catch (error) {
-                console.log("error #getPatientOptions")
-            }
-        }
-        fetchPatientDropdownOptionsData()
-        fetchMedicineDropdownOptionsData()
-    }, [])
 
     const styles = {
         userSelect: "none",
@@ -125,14 +97,12 @@ export default function index() {
                     <div className="flex flex-col gap-2">
                         <Toggle size="lg" checkedChildren="Existing Patient" unCheckedChildren="New Patient" defaultChecked onChange={(e) => setExistingPatient(e)}/>
                         <PatientForm
-                            patientDropdownOptions = {patientDropdownOptions}
                             selectedPatient = {selectedPatient}
                             setSelectedPatient = {setSelectedPatient}
                             existingPatient = {existingPatient}
                         />
                     </div>
                     <PrescriptionForm 
-                        medicineDropdownOptions={medicineDropdownOptions} 
                         formFields={formFields} 
                         setFormFields={setFormFields}
                     />
