@@ -287,6 +287,7 @@ export default function index(props) {
                 <Footer className="pt-4">
                     <Button
                         appearance="primary"
+                        isLoading={isLoading}
                         onClick={() => HandleCreatePackaging()}
                     >
                         Simpan
@@ -315,6 +316,7 @@ export default function index(props) {
                 </Body>
                 <Footer className="pt-4">
                     <Button
+                        isLoading={isLoading}
                         appearance="primary"
                         onClick={() => HandleEditPackaging()}
                     >

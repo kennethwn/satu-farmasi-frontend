@@ -9,6 +9,7 @@ export default function Toaster({
     type,
     btnText = 'Lanjutkan',
     onClick,
+    isLoading,
     ...props
 }) {
 
@@ -31,7 +32,7 @@ export default function Toaster({
                 return (
                     <div className="w-full flex flex-row items-center gap-4 justify-between">
                         <Button className="w-full" onClick={() => props.onClose()}>Batalkan</Button>
-                        <Button className="w-full" appearance="danger" onClick={() => onClick()}>{btnText}</Button>
+                        <Button className="w-full" isLoading={isLoading} appearance="danger" onClick={() => onClick()}>{btnText}</Button>
                     </div>
                 )
             default:
@@ -62,5 +63,6 @@ Toaster.propTypes = {
     body: propTypes.string,
     type: propTypes.string,
     btnText: propTypes.string,
+    isLoading: propTypes.bool,
     onClick: propTypes.func,
 }

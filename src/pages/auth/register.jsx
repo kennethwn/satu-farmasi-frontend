@@ -106,7 +106,7 @@ export default function Login() {
     const submitForm = () => formRef.current.requestSubmit();
 
     return (
-        <form onSubmit={handleSubmit(RegisterHandler)} className="flex justify-center items-center flex-col h-screen" ref={formRef}>
+        <form onSubmit={handleSubmit(RegisterHandler)} className="flex justify-center items-center flex-col py-16" ref={formRef}>
             <section ref={credentialsRef}>
                 <div className="flex justify-center items-center flex-col gap-3 p-8 rounded bg-background-light border border-border-auth">
                     <div className="text-center mb-4">

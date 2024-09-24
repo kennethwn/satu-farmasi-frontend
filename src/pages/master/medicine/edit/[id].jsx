@@ -444,6 +444,7 @@ export default function Index() {
                             </Button>
                             :
                             <Button
+                                isLoading={isLoading}
                                 appearance="primary"
                                 onClick={() => {
                                     handleSubmit();

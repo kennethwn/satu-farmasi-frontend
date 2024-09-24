@@ -323,7 +323,7 @@ export default function index(props) {
           />
         </Body>
         <Footer className="pt-4">
-          <Button appearance="primary" onClick={() => HandleCreateClassification()}>
+          <Button appearance="primary" isLoading={isLoading} onClick={() => HandleCreateClassification()}>
             Simpan
           </Button>
         </Footer>
@@ -349,13 +349,12 @@ export default function index(props) {
           />
         </Body>
         <Footer className="pt-4">
-          <Button appearance="primary" onClick={() => HandleEditClassification("edit")}>
+          <Button appearance="primary" isLoading={isLoading} onClick={() => HandleEditClassification("edit")}>
             Simpan
           </Button>
         </Footer>
       </Modal>
 
-      {/* TODO: Bold editInput.label */}
       <Toaster
         type="warning"
         open={open.delete}
@@ -367,6 +366,7 @@ export default function index(props) {
           </>
         }
         btnText="Hapus"
+        isLoading={isLoading}
         onClick={() => HandleDeleteClassification("delete")}
       />
     </Layout>

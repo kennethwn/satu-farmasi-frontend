@@ -287,6 +287,7 @@ export default function index(props) {
                 </Body>
                 <Footer className="pt-4">
                     <Button
+                        isLoading={isLoading}
                         appearance="primary"
                         onClick={() => HandleCreateGeneric()}
                     >
@@ -316,6 +317,7 @@ export default function index(props) {
                 </Body>
                 <Footer className="pt-4">
                     <Button
+                        isLoading={isLoading}
                         appearance="primary"
                         onClick={() => HandleEditGeneric()}
                     >

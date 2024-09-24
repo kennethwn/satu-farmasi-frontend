@@ -12,6 +12,7 @@ import {
   isRequiredString,
 } from "@/helpers/validation";
 import Text from "@/components/Text";
+import { toast } from "react-toastify";
 
 const loginSchema = z.object({
   email: isRequiredEmail(),
@@ -38,7 +39,7 @@ const credentialInputField = [
 
 export default function Login() {
   const { router, getUser } = useUser();
-  const [error, setError] = useState(null);
+  const [isLoading, setIsLoading] = useState(false);
   const formRef = useRef(null);
 
   const {
@@ -49,10 +50,15 @@ export default function Login() {
 
   const LoginHandler = async (data) => {
     try {
+      setIsLoading(true);
       const response = await getUser(data);
-      typeof response === "string"
-        ? router.push("/")
-        : setError(response.message);
+      setIsLoading(false);
+      if (typeof response !== "string") {
+        toast.error(response.message, { autoClose: 2000, position: 'top-center' });
+        return;
+      }
+      toast.success("Login successful!", { autoClose: 2000, position: 'top-center' });
+      router.push("/");
     } catch (error) {
       console.log("error: ", error);
     }
@@ -86,14 +92,16 @@ export default function Login() {
             />
           );
         })}
-        {error ? (
-          <ul>
-            <li className="text-danger">{error}</li>
-          </ul>
-        ) : null}
-        <Button type="primary" onClick={submitForm} className="w-full">
-          Login
-        </Button>
+        {
+          isLoading ?
+            <Button type="primary" isDisabled={true} isLoading={isLoading} className="w-full">
+              Login
+            </Button>
+            :
+            <Button type="primary" onClick={submitForm} isLoading={isLoading} className="w-full">
+              Login
+            </Button>
+        }
         <div className="mt-4">
           <Text type="body">
             Already have an account? <Link href="/auth/register">Sign up</Link>{" "}
