@@ -123,8 +123,8 @@ export default function Page() {
                 }]
             }
 
-            data.prescriptionId = id;
-            data.medicineList.pop()
+            data.prescriptionId = parseInt(id);
+            data.medicineList.pop() 
             const temp = [...formFields]
             console.log(temp)
             temp.map(item => data.medicineList.push({

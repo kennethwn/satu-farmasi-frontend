@@ -64,7 +64,6 @@ export default function usePrescription() {
     const getPrescriptionDetail = async (prescriptionId) => {
         setIsLoading(true)
         try {
-            console.log('API PATH: /api/v1/prescriptions/' + prescriptionId)
             const response = await api.get('/api/v1/prescriptions/' + prescriptionId)
             .then((response) => {
                 setIsLoading(false);
