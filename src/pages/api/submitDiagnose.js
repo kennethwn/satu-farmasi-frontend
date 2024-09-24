@@ -1,4 +1,4 @@
-import axios from "@/configs/axios/satufarmasi-service-axios"
+import api from "../../configs/axios/satufarmasi-service-axios"
 import { useRouter } from 'next/router';
 import { useState } from 'react'
 
@@ -8,7 +8,7 @@ export default function useSubmitDiagnose() {
 
     const submitDiagnose = async(data) => {
         try {
-            const response = await axios.post('/api/v1/diagnose', {data})
+            const response = await api.post('/api/v1/diagnose', {data})
             .then((response) => {
                 setIsLoading(false);
                 return response;

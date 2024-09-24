@@ -1,38 +1,39 @@
-import React, { useEffect } from "react";
+import React, { useEffect, useState } from "react";
 import Input from "../Input";
 import Button from "../Button";
 import { SelectPicker } from "rsuite";
 import { IoIosAdd } from "react-icons/io";
 import { MdDeleteOutline } from "react-icons/md";
+import useMedicineDropdownOption from "@/pages/api/medicineDropdownOption";
 
 function PrescriptionForm(props) {
-  const { formFields, setFormFields, medicineDropdownOptions } = props;
+  const { formFields, setFormFields } = props;
 
-  const styles = {
-    display: "block",
-    width: "100%",
-    borderRadius: "9999px",
-    paddingLeft: "1rem",
-    paddingRight: "1rem",
-    borderWidth: "1px",
-    paddingTop: "0.375rem",
-    paddingBottom: "0.375rem",
-    color: "var(--color-dark)",
-    borderColor: "var(--color-dark)",
-    "::placeholder": {
-      color: "var(--color-gray-400)",
-    },
-    fontSize: "1rem",
-    lineHeight: "1.5rem",
-  };
+  const { getMedicineDropdownOptions } = useMedicineDropdownOption();
+  const [medicineDropdownOptions, setMedicineDropdownOptions] = useState([])
 
-  const data = medicineDropdownOptions.map((item) => ({
+  const data = Object.entries(medicineDropdownOptions).map(([key, item]) => ({
     label: item.name,
-    value: item.id,
+    value: key,
   }));
 
+  useEffect(() => {
+    async function fetchMedicineDropdownOptionsData(){
+        try {
+            const response = await getMedicineDropdownOptions()
+            setMedicineDropdownOptions(response)
+        } catch (error) {
+            console.log("error #getMedicineOptions")
+        }
+    }
+    fetchMedicineDropdownOptionsData()
+  }, [])
+
+  useEffect(() => {
+    console.log(formFields)
+  }, [formFields])
+
   const handleMedicineChange = (formFieldId, medicineId) => {
-    console.log(medicineId);
     let updatedData = {
       medicineId: medicineId,
       medicineName: medicineDropdownOptions[medicineId].name,
@@ -53,7 +54,6 @@ function PrescriptionForm(props) {
     });
 
     setFormFields(temp);
-    console.log(formFields);
   };
 
   const handleAddFormFieldRow = () => {
@@ -67,7 +67,6 @@ function PrescriptionForm(props) {
       insufficientStock: false
     };
     setFormFields([...formFields, newFormField]);
-    console.log(formFields);
   };
 
   const handleMedicineQuantity = (formFieldId, quantity) => {
@@ -99,7 +98,6 @@ function PrescriptionForm(props) {
     });
 
     setFormFields(temp);
-    console.log(formFields);
   };
 
   const handleRemoveFormFieldRow = (formFieldId) => {
@@ -118,10 +116,6 @@ function PrescriptionForm(props) {
       }
     });
   };
-
-  useEffect(() => {
-    console.log("formField:", formFields);
-  }, [formFields]);
 
   return (
     <div className="flex flex-col gap-4">
@@ -146,7 +140,6 @@ function PrescriptionForm(props) {
               </div>
               <div className="col-span-2">
                 <SelectPicker
-                  style={styles}
                   id="name"
                   appearance="subtle"
                   size="small"
@@ -154,6 +147,7 @@ function PrescriptionForm(props) {
                   data={data}
                   onChange={(value) => handleMedicineChange(index, value)}
                   value={formField.medicineId}
+                  renderValue={formField.medicineId != -1 ? (value) => <div className="text-sm">{medicineDropdownOptions[value].name}</div> : null}
                   block
                   cleanable={false}
                 />
