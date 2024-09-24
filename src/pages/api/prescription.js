@@ -1,7 +1,6 @@
 import { useRouter } from 'next/router';
 import api from "../../configs/axios/satufarmasi-service-axios"
 import { useState } from 'react';
-import { convertToTimestampString } from '@/helpers/dayHelper';
 
 export default function usePrescription() {
     const [isLoading, setIsLoading] = useState(false);
@@ -45,9 +44,67 @@ export default function usePrescription() {
         }
     }
 
+    const addNewPrescription = async (data) => {
+        setIsLoading(true)
+        try {
+            const response = await api.post('/api/v1/prescriptions', {data})
+            .then((response) => {
+                setIsLoading(false);
+                return response;
+            })
+            .catch((error) => {
+                setIsLoading(false);
+                return error;
+            })
+            return response
+        } catch (error) {
+            console.error(error);
+        }
+    }
+
+    const getPrescriptionDetail = async (prescriptionId) => {
+        setIsLoading(true)
+        try {
+            console.log('API PATH: /api/v1/prescriptions/' + prescriptionId)
+            const response = await api.get('/api/v1/prescriptions/' + prescriptionId)
+            .then((response) => {
+                setIsLoading(false);
+                return response;
+            })
+            .catch((error) => {
+                setIsLoading(false);
+                return error;
+            })
+            return response;
+        } catch (error) {
+            console.error(error);
+        }
+    }
+
+    const updatePrescription = async (data) => {
+        setIsLoading(true)
+        try {
+            const response = await api.put('/api/v1/prescriptions', {data})
+            .then((response) => {
+                setIsLoading(false);
+                return response;
+            })
+            .catch((error) => {
+                setIsLoading(false);
+                return error;
+            })
+            return response;
+        } catch (error) {
+            console.error(error);
+        }
+    }
+
     return {
         isLoading,
         getAllPrescription,
-        getSearchedPrescription
+        getSearchedPrescription,
+        addNewPrescription,
+        getPrescriptionDetail,
+        updatePrescription
     }
 }
