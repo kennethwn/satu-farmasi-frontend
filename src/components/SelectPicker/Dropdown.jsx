@@ -1,12 +1,16 @@
 import { SelectPicker } from "rsuite";
 import propTypes from 'prop-types';
+import Label from "../Input/Label";
 
 export default function Dropdown({
     className,
     placeholder,
-    onChange, 
+    onChange,
+    label,
+    id,
     ...props
 }) {
+    className = [className];
 
     const styles = {
         display: 'flex',
@@ -20,13 +24,20 @@ export default function Dropdown({
         lineHeight: '1.5rem', // 24px
     };
 
+    if (label) className.push('my-2');
+
     return (
-        <SelectPicker
-            style={styles}
-            placeholder={placeholder}
-            onChange={onChange}
-            {...props}
-        />
+        <>
+            {label && <Label id={id} label={label} />}
+            <SelectPicker
+                style={styles}
+                placeholder={"BROKEN"}
+                onChange={onChange}
+                className={className}
+                defaultValue={"BROKEN"}
+                {...props}
+            />
+        </>
         // <div className="block w-full rounded-full px-4 border py-1.5 text-dark border-dark placeholder:text-gray-400 sm:text-base sm:leading-6 ">
         // </div>
     )
