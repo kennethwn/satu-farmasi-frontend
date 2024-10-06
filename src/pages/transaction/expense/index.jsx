@@ -12,7 +12,7 @@ import { MdOutlineEdit } from "react-icons/md";
 import { PiTrash } from "react-icons/pi";
 import { Pagination, Table } from "rsuite";
 import { toast } from "react-toastify";
-import { formatCalendar } from "@/helpers/dayHelper";
+import formatCalendar from "@/helpers/dayHelper";
 
 export default function index() {
     const { user } = useUserContext();
@@ -32,6 +32,8 @@ export default function index() {
     const [page, setPage] = useState(1);
     const [totalPage, setTotalPage] = useState(0);
     const [limit, setLimit] = useState(10);
+    const [sortColumn, setSortColumn] = useState();
+    const [sortType, setSortType] = useState();
 
     const HandleFetchMedicineData = async () => {
         try {
@@ -52,7 +54,6 @@ export default function index() {
   const HandleFetchMedicineByParams = async () => {
     try {
       const res = await GetMedicineByParams(search);
-      console.log(res);
       if (res.code !== 200) {
         toast.error(res.message, { autoClose: 2000, position: "top-center" });
         return;
@@ -69,6 +70,7 @@ export default function index() {
         try {
             setEditInput({ ...editInput, is_active: false });
             const res = await DeleteMedicine(editInput);
+            console.log("res: ", res)
             if (res.code !== 200) {
                 toast.error("Failed to delete Vendor", {
                     autoClose: 2000,
@@ -98,6 +100,13 @@ export default function index() {
         fetchData();
     }, [page, limit, search]);
 
+    const handleSortColumn = (sortColumn, sortType) => {
+        setTimeout(() => {
+            setSortColumn(sortColumn);
+            setSortType(sortType);
+        }, 500);
+    };
+
     return (
         <Layout active="master-expense" user={user}>
             <ContentLayout title="List Pengeluaran Obat">
@@ -124,6 +133,9 @@ export default function index() {
                         shouldUpdateScroll={false}
                         affixHorizontalScrollbar
                         fillHeight={true}
+                        sortColumn={sortColumn}
+                        sortType={sortType}
+                        onSortColumn={handleSortColumn}
                         loading={isLoading}
                     >
                         <Column width={100} fixed="left">
@@ -135,7 +147,7 @@ export default function index() {
                             </Cell>
                         </Column>
 
-                        <Column flexGrow={1}>
+                        <Column flexGrow={1} sortable>
                             <HeaderCell className="text-dark font-bold">
                                 Nama Obat
                             </HeaderCell>

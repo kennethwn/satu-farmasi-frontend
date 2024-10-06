@@ -1,10 +1,15 @@
 import { SelectPicker } from "rsuite";
 import propTypes from 'prop-types';
 import Label from "../Input/Label";
+import Text from "../Text";
 
 export default function Dropdown({
+    name,
+    error = "",
     className,
     placeholder,
+    value,
+    defaultValue,
     onChange,
     label,
     id,
@@ -25,18 +30,26 @@ export default function Dropdown({
     };
 
     if (label) className.push('my-2');
+    console.log("eror: ", error)
 
     return (
         <>
             {label && <Label id={id} label={label} />}
             <SelectPicker
                 style={styles}
-                placeholder={"BROKEN"}
+                placeholder={placeholder}
                 onChange={onChange}
                 className={className}
-                defaultValue={"BROKEN"}
+                defaultValue={defaultValue}
+                value={value}
                 {...props}
             />
+            <div style={{ minHeight: '22px' }}>
+                {
+                    error &&
+                    <Text type="danger">{error}</Text>
+                }
+            </div>
         </>
         // <div className="block w-full rounded-full px-4 border py-1.5 text-dark border-dark placeholder:text-gray-400 sm:text-base sm:leading-6 ">
         // </div>
@@ -46,5 +59,5 @@ export default function Dropdown({
 Dropdown.propTypes = {
     className: propTypes.string,
     placeholder: propTypes.string,
-    onChange: propTypes.func
+    onChange: propTypes.func,
 }

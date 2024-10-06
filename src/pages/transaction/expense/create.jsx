@@ -3,28 +3,26 @@ import Input from "@/components/Input";
 import Layout from "@/components/Layouts";
 import ContentLayout from "@/components/Layouts/Content";
 import { useRouter } from "next/router";
-import { useRef } from "react";
+import { useEffect, useState } from "react";
 import { toast, ToastContainer } from "react-toastify";
 import { Loader } from "rsuite";
-import { z } from "zod";
-import { useForm } from "react-hook-form";
-import { zodResolver } from "@hookform/resolvers/zod";
+import { z, ZodError } from "zod";
 import useExpenseMedicineAPI from "@/pages/api/transaction/expenseMedicine";
 import Dropdown from "@/components/SelectPicker/Dropdown";
-import { isRequiredString } from "@/helpers/validation";
-import Label from "@/components/Input/Label";
+import { isRequiredNumber, isRequiredString } from "@/helpers/validation";
+import useMedicineDropdownOption from "@/pages/api/medicineDropdownOption";
 
 const medicineSchema = z.object({
-    name: isRequiredString(),
-    quantity: isRequiredString(),
+    medicineId: isRequiredNumber(),
+    quantity: isRequiredNumber(),
     reasonOfDispose: isRequiredString(),
 });
 
-const createVendorField = [
+const createExpenseMedicineField = [
     {
         label: "Nama Obat",
         type: "text",
-        name: "name",
+        name: "medicineId",
         placeholder: "Nama Obat",
     },
     {
@@ -42,18 +40,24 @@ const createVendorField = [
 ];
 
 export default function create() {
+
     const router = useRouter();
     const { isLoading, CreateMedicine } = useExpenseMedicineAPI();
-    const formRef = useRef(null);
-    const {
-        register,
-        handleSubmit,
-        formState: { errors },
-    } = useForm({ resolver: zodResolver(medicineSchema) });
+    const { getMedicineDropdownOptions } = useMedicineDropdownOption();
+    const [medicineDropdownOptions, setMedicineDropdownOptions] = useState([])
+    const [formData, setFormData] = useState({
+        medicineId: "",
+        quantity: "",
+        reasonOfDispose: "",
+    });
+    const [errors, setErrors] = useState({});
 
-    const createHandler = async (data) => {
+    const createHandler = async (e) => {
+        e.preventDefault();
         try {
-            const res = await CreateMedicine(data);
+            setErrors({});
+            medicineSchema.parse(formData);
+            const res = await CreateMedicine(formData);
             if (res.code !== 200)
                 return toast.error(res.message, {
                     autoClose: 2000,
@@ -62,46 +66,101 @@ export default function create() {
             toast.success(res.message, { autoClose: 2000, position: "top-center" });
             router.push("/transaction/expense");
         } catch (error) {
-            console.error(error);
+            if (error instanceof ZodError) {
+                const newErrors = { ...errors };
+                error.issues.forEach((issue) => {
+                    if (issue.path.length > 0) {
+                        const fieldName = issue.path[0];
+                        newErrors[fieldName] = issue.message;
+                    }
+                });
+                setErrors(newErrors);
+            }
         }
     };
 
-    const reasonOfDisposeList = ["Broken", "Lost", "Expired"].map(
-        item => ({ label: item, value: item.toUpperCase() })
-    );
+    const reasonOfDisposeListData = ["Broken", "Lost", "Expired"].map(item => ({ label: item, value: item.toUpperCase() }));
+    const data = Object.entries(medicineDropdownOptions).map(([key, item]) => ({ label: item.name, value: key, }));
 
-    const submitForm = () => formRef.current.requestSubmit();
+    useEffect(() => {
+        async function fetchMedicineDropdownOptionsData() {
+            try {
+                const response = await getMedicineDropdownOptions()
+                setMedicineDropdownOptions(response)
+            } catch (error) {
+                console.log("error #getMedicineOptions")
+            }
+        }
+        fetchMedicineDropdownOptionsData()
+    }, [])
+
+    useEffect(() => {
+        console.log("erors: ", errors)
+    }, [errors])
+
+    const handleMedicineChange = (e) => {
+        setFormData({ ...formData, ["medicineId"]: Number(e) });
+        setErrors((prevErrors) => ({ ...prevErrors, ["medicineId"]: "" }));
+    };
+
+    const handleReasonOfDisposeChange = (e) => {
+        setFormData({ ...formData, ["reasonOfDispose"]: e });
+        setErrors((prevErrors) => ({ ...prevErrors, ["reasonOfDispose"]: "" }));
+    };
+
+    const handleInputChange = (e) => {
+        setFormData({ ...formData, [e.target.name]: Number(e.target.value) });
+        setErrors((prevErrors) => ({ ...prevErrors, [e.target.name]: "" }));
+    };
 
     return (
-        <Layout active="master-vendor">
+        <Layout active="master-expense-medicine">
             <ContentLayout
                 title="Tambah Pengeluaran Obat"
                 type="child"
                 backpageUrl="/transaction/expense"
             >
-                <form id="form" onSubmit={handleSubmit(createHandler)} ref={formRef}>
+                <form id="form" onSubmit={createHandler}>
                     <div className="grid grid-cols-1 gap-x-6 gap-y-6 sm:grid-cols-6">
-                        {createVendorField.map((input, index) => {
+                        {createExpenseMedicineField.map((input, index) => {
                             return (
                                 <div className="sm:col-span-6">
-                                    {input.name == "reasonOfDispose" ? (
+                                    {
+                                        input.name == "reasonOfDispose" &&
                                         <Dropdown
                                             id={index}
+                                            name={input.name}
                                             label={input.label}
-                                            data={reasonOfDisposeList}
+                                            data={reasonOfDisposeListData}
+                                            onChange={handleReasonOfDisposeChange}
                                             searchable={false}
-                                            placeholder="Select without search"
+                                            placeholder="Select Reason of Dispose"
+                                            error={errors[input.name]}
                                         />
-                                    ) : (
+                                    }
+                                    {
+                                        input.name == "medicineId" &&
+                                        <Dropdown
+                                            id={index}
+                                            name={input.name}
+                                            label={input.label}
+                                            data={data}
+                                            onChange={handleMedicineChange}
+                                            placeholder="Select Medicine Name"
+                                            error={errors[input.name]}
+                                        />
+                                    }
+                                    {
+                                        input.name == "quantity" &&
                                         <Input
                                             label={input.label}
-                                            register={register}
                                             type={input.type}
                                             name={input.name}
+                                            onChange={handleInputChange}
                                             placeholder={input.placeholder}
-                                            error={errors[input.name]?.message}
+                                            error={errors[input.name]}
                                         />
-                                    )}
+                                    }
                                 </div>
                             );
                         })}
@@ -117,7 +176,7 @@ export default function create() {
                                 Simpan
                             </Button>
                         ) : (
-                            <Button appearance="primary" onClick={() => submitForm()}>
+                            <Button appearance="primary" type="submit">
                                 Simpan
                             </Button>
                         )}
