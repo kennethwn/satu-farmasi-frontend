@@ -128,7 +128,7 @@ export default function index() {
                 Simpan
               </Button>
             ) : (
-              <Button appearance="primary" onClick={() => submitForm()}>
+              <Button appearance="primary" isLoading={isLoading} onClick={() => submitForm()}>
                 Simpan
               </Button>
             )}

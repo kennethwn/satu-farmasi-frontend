@@ -110,18 +110,18 @@ export default function index() {
     // }, [search])
 
     return (
-        <Layout active="prescribe" user={user}>
+        <Layout active="prescription" user={user}>
             <ContentLayout title="Resep">
-            <div className="flex flex-row justify-between w-full">
+            <div className="flex flex-col gap-2 md:flex-row justify-between w-full">
                 <div>
                     <Button
                         prependIcon={<IoMdAdd size={24} />}
-                        onClick={() => router.push(`/prescribe/create`)}
+                        onClick={() => router.push(`/prescription/create`)}
                     >
                         Tambah
                     </Button>
                 </div>
-                <div className="flex flex-row gap-4">
+                <div className="flex md:flex-row flex-col gap-4">
                     <SelectPicker
                         style={{
                             // borderWidth: '0.5px',     
@@ -169,24 +169,24 @@ export default function index() {
                             </Cell>
                         </Column>
 
-                        <Column width={150} resizable sortable>
+                        <Column flexGrow={1} resizable sortable>
                             <HeaderCell className="text-dark">Prescription ID</HeaderCell>
                             <Cell dataKey='prescriptionId'/>
                         </Column>
 
-                        <Column width={150} resizable sortable>
+                        <Column flexGrow={1} resizable sortable>
                             <HeaderCell className="text-dark">Timestamp</HeaderCell>
                             <Cell className="text-dark">
                                 {rowData => formatDate(rowData?.timestamps)}
                             </Cell>
                         </Column>
 
-                        <Column width={200} resizable sortable>
+                        <Column flexGrow={1} resizable sortable>
                             <HeaderCell className="text-dark">Patient Name</HeaderCell>
                             <Cell dataKey='patientName'/>
                         </Column>
 
-                        <Column width={200} resizable sortable>
+                        <Column flexGrow={1} resizable sortable>
                             <HeaderCell className="text-dark">Status</HeaderCell>
                             <Cell dataKey='status'/>
                         </Column>

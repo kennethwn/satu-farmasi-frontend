@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from 'react'
 import { SelectPicker } from 'rsuite'
-import Input from '../Input';
+import InputField from '../Input';
 import usePatientDropdownOption from '@/pages/api/patientDropdownOption';
 
 function PatientForm(props) {
@@ -15,7 +15,7 @@ function PatientForm(props) {
 
     const data = Object.entries(patientDropdownOptions).map(([key, patient]) => ({
         label: patient.credentialNumber + " - " + patient.name, 
-        value: key
+        value: parseInt(key)
     }))
 
     useEffect(() => {
@@ -54,14 +54,14 @@ function PatientForm(props) {
     const handleCredentialNumChange = (credentialNum) => {
         setSelectedPatient({
             ...selectedPatient,
-            credentialNum: credentialNum,
+            credentialNum: credentialNum?.replace(/[^0-9]/g, ''),
         })
     }
     
     const handlePhoneNumChange = (phoneNum) => {
         setSelectedPatient({
             ...selectedPatient,
-            phoneNum: phoneNum,
+            phoneNum: phoneNum?.replace(/[^0-9]/g, ''),
         })
     }
 
@@ -82,30 +82,29 @@ function PatientForm(props) {
                 <div className='col-span-2'>
                     {existingPatient ? 
                     <SelectPicker
-                        id='name' 
-                        appearance='subtle'
-                        size='small'
+                        id='name'
+                        size='lg'
                         name='name'
                         data={data} 
                         onChange={(value) => handlePatientChange(value)}
                         value={selectedPatient.patientId}
                         block
-                        cleanable={false}
+                        // cleanable={false}
                     />
                     : 
-                    <Input type="text" id="name" name="name" onChange={(e) => handleNameChange(e.target.value)} placeholder="name" value={selectedPatient.PatientName} />
+                    <InputField type="text" id="name" name="name" onChange={(e) => handleNameChange(e.target.value)} placeholder="name" value={selectedPatient.PatientName} />
                     }
                 </div>
             </div>
             <div className='flex flex-col gap-2'>
                 <p> Credential Number </p>
-                <Input type="text" id="name" name="name" onChange={(e) => handleCredentialNumChange(e.target.value)} placeholder="name" value={selectedPatient.credentialNum} 
+                <InputField type="text" id="name" name="name" onChange={(e) => handleCredentialNumChange(e.target.value)} placeholder="credential number" value={selectedPatient.credentialNum} 
                     disabled={existingPatient}
                 />
             </div>
             <div className='flex flex-col gap-2'>
                 <p> No Handphone </p>
-                <Input type="text" id="name" name="name" onChange={(e) => handlePhoneNumChange(e.target.value)} placeholder="name" value={selectedPatient.phoneNum}
+                <InputField type="text" id="name" name="name" onChange={(e) => handlePhoneNumChange(e.target.value)} placeholder="no handphone" value={selectedPatient.phoneNum}
                     disabled={existingPatient}
                 />
             </div>

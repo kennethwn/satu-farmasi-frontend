@@ -92,113 +92,113 @@ export default function index() {
     return (
         <Layout active="master-medicine" user={user}>
             <ContentLayout title="List Obat">
-                <div className="flex flex-row justify-end items-center w-full pb-6">
-                    <SearchBar 
-                        size="md"
-                        className="w-1/4"
-                        placeholder="Search..."
-                        onChange={(value) => setSearch(value)}
-                    />
-                </div>
                 <div className="w-full h-[500px]">
+                    <div className="flex flex-row justify-end items-center w-full pb-6">
+                        <SearchBar 
+                            size="md"
+                            className="w-1/4"
+                            placeholder="Search..."
+                            onChange={(value) => setSearch(value)}
+                        />
+                    </div>
                     <Table
                         data={data || []}
                         bordered
                         cellBordered
+                        height={400}
                         shouldUpdateScroll={false}
                         affixHorizontalScrollbar
-                        fillHeight={true}
                         loading={isLoading}
                     >
                         <Column width={50} fixed="left">
-                            <HeaderCell className="text-center text-dark font-bold">No</HeaderCell>
+                            <HeaderCell className="text-center text-dark ">No</HeaderCell>
                             <Cell className="text-center text-dark">
                                 {(rowData, index) => index + 1}
                             </Cell>
                         </Column>
 
                         <Column width={250} fullText resizable>
-                            <HeaderCell className="text-dark font-bold">Kode</HeaderCell>
+                            <HeaderCell className="text-dark ">Kode</HeaderCell>
                             <Cell dataKey='code'/>
                         </Column>
 
                         <Column width={250} fullText resizable>
-                            <HeaderCell className="text-dark font-bold">Nama</HeaderCell>
+                            <HeaderCell className="text-dark ">Nama</HeaderCell>
                             <Cell dataKey='name'/>
                         </Column>
 
                         <Column width={250} fullText resizable>
-                            <HeaderCell className="text-dark font-bold">Merk</HeaderCell>
+                            <HeaderCell className="text-dark ">Merk</HeaderCell>
                             <Cell dataKey='merk'/>
                         </Column>
 
                         <Column width={250} fullText resizable>
-                            <HeaderCell className="text-dark font-bold">Generik</HeaderCell>
+                            <HeaderCell className="text-dark ">Generik</HeaderCell>
                             <Cell>
                                 {(rowData) => rowData?.genericName?.label}
                             </Cell>
                         </Column>
 
                         <Column width={250} fullText resizable>
-                            <HeaderCell className="text-dark font-bold">Kemasan</HeaderCell>
+                            <HeaderCell className="text-dark ">Kemasan</HeaderCell>
                             <Cell>
                                 {(rowData) => rowData?.packaging?.label}
                             </Cell>
                         </Column>
 
                         <Column width={250} fullText resizable>
-                            <HeaderCell className="text-dark font-bold">Deskripsi</HeaderCell>
+                            <HeaderCell className="text-dark ">Deskripsi</HeaderCell>
                             <Cell dataKey='description'/>
                         </Column>
 
                         <Column width={250} fullText resizable>
-                            <HeaderCell className="text-dark font-bold">Satuan</HeaderCell>
+                            <HeaderCell className="text-dark ">Satuan</HeaderCell>
                             <Cell dataKey='unitOfMeasure'/>
                         </Column>
 
                         <Column width={250} fullText resizable>
-                            <HeaderCell className="text-dark font-bold">Harga</HeaderCell>
+                            <HeaderCell className="text-dark ">Harga</HeaderCell>
                             <Cell dataKey='price'>
                                 {(rowData) => formatRupiah(rowData?.price)}    
                             </Cell>
                         </Column>
 
                         <Column width={250} fullText resizable>
-                            <HeaderCell className="text-dark font-bold">Current Stock</HeaderCell>
+                            <HeaderCell className="text-dark ">Current Stock</HeaderCell>
                             <Cell dataKey='currStock'/>
                         </Column>
 
                         <Column width={250} fullText resizable>
-                            <HeaderCell className="text-dark font-bold">Minimum Stock</HeaderCell>
+                            <HeaderCell className="text-dark ">Minimum Stock</HeaderCell>
                             <Cell dataKey='minStock'/>
                         </Column>
 
                         <Column width={250} fullText resizable>
-                            <HeaderCell className="text-dark font-bold">Maximum Stock</HeaderCell>
+                            <HeaderCell className="text-dark ">Maximum Stock</HeaderCell>
                             <Cell dataKey='maxStock'/>
                         </Column>
 
                         <Column width={250} fullText resizable>
-                            <HeaderCell className="text-dark font-bold">Tanggal Masuk</HeaderCell>
+                            <HeaderCell className="text-dark ">Tanggal Masuk</HeaderCell>
                             <Cell dataKey='created_at'>
                                 {rowData => formatDate(rowData?.created_at)}
                             </Cell>
                         </Column>
 
                         <Column width={250} fullText resizable>
-                            <HeaderCell className="text-dark font-bold">Tanggal Expired</HeaderCell>
+                            <HeaderCell className="text-dark ">Tanggal Expired</HeaderCell>
                             <Cell dataKey='expiredDate'>
                                 {rowData => formatDate(rowData?.expiredDate)}
                             </Cell>
                         </Column>
 
                         <Column width={250} fullText resizable>
-                            <HeaderCell className="text-dark font-bold">Efek Samping</HeaderCell>
+                            <HeaderCell className="text-dark ">Efek Samping</HeaderCell>
                             <Cell dataKey='sideEffect'/>
                         </Column>
 
                         <Column width={150} fixed="right">
-                            <HeaderCell className="text-center text-dark font-bold">Action</HeaderCell>
+                            <HeaderCell className="text-center text-dark ">Action</HeaderCell>
                             <Cell className="text-center">
                                 {
                                     rowData => {
