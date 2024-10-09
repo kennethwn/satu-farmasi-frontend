@@ -185,7 +185,6 @@ export default function index(props) {
     }
   };
 
-
   useEffect(() => {
     async function fetchData() {
       if (search === "") {
@@ -198,31 +197,31 @@ export default function index(props) {
   }, [page, limit, search]);
 
   return (
-    <Layout active="master-Classification" user={user}>
+    <Layout active="master-classification" user={user}>
       <ContentLayout title="List Klasifikasi">
-        <div className="flex flex-row justify-between items-center w-full pb-6">
-          <Button
-            prependIcon={<IoMdAdd size={24} />}
-            onClick={() => setOpen({ ...open, create: true })}
-          >
-            Tambah
-          </Button>
-
-          <SearchBar
-            size="md"
-            className="w-1/4"
-            placeholder="Search..."
-            onChange={(value) => setSearch(value)}
-          />
-        </div>
         <div className="w-full h-[500px]">
+          <div className="flex flex-row justify-between items-center w-full pb-6">
+            <Button
+              prependIcon={<IoMdAdd size={24} />}
+              onClick={() => setOpen({ ...open, create: true })}
+            >
+              Tambah
+            </Button>
+
+            <SearchBar
+              size="md"
+              className="w-1/4"
+              placeholder="Search..."
+              onChange={(value) => setSearch(value)}
+            />
+          </div>
           <Table
             data={data || []}
             bordered
             cellBordered
             shouldUpdateScroll={false}
             affixHorizontalScrollbar
-            fillHeight={true}
+            height={400}
             loading={isLoading}
           >
             <Column width={100} fixed="left">

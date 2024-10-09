@@ -13,6 +13,7 @@ import {
 } from "@/helpers/validation";
 import Text from "@/components/Text";
 import { toast } from "react-toastify";
+import { Loader } from "rsuite";
 
 const loginSchema = z.object({
   email: isRequiredEmail(),
@@ -68,47 +69,60 @@ export default function Login() {
 
   return (
     <main className="flex justify-center items-center flex-col h-screen">
-      <form
-        onSubmit={handleSubmit(LoginHandler)}
-        className="flex justify-center items-center flex-col gap-3 p-8 rounded 
-        bg-background-light border border-border-auth"
-        ref={formRef}
-      >
-        <div className="text-center mb-4">
-          <Text type="heading_3">Welcome Back</Text>
-          <Text type="body">Sign in to access your pharmacy dashboard</Text>
-        </div>
-        {credentialInputField.map((input) => {
-          return (
-            <Input
-              key={input.name}
-              label={input.label}
-              type={input.type}
-              placeholder={input.placeholder}
-              name={input.name}
-              register={register}
-              error={errors[input.name]?.message}
-              autofocus={input.autofocus}
+      {
+        !isLoading ?
+          <form
+            onSubmit={handleSubmit(LoginHandler)}
+            className="flex justify-center items-center flex-col gap-3 p-8 rounded 
+            bg-background-light border border-border-auth"
+            ref={formRef}
+          >
+            <div className="text-center mb-4">
+              <Text type="heading_3">Welcome Back</Text>
+              <Text type="body">Sign in to access your pharmacy dashboard</Text>
+            </div>
+            {credentialInputField.map((input) => {
+              return (
+                <Input
+                  key={input.name}
+                  label={input.label}
+                  type={input.type}
+                  placeholder={input.placeholder}
+                  name={input.name}
+                  register={register}
+                  error={errors[input.name]?.message}
+                  autofocus={input.autofocus}
+                />
+              );
+            })}
+            {
+              isLoading ?
+                <Button type="primary" isDisabled={true} isLoading={isLoading} className="w-full">
+                  Login
+                </Button>
+                :
+                <Button type="primary" onClick={submitForm} isLoading={isLoading} className="w-full">
+                  Login
+                </Button>
+            }
+            <div className="mt-4">
+              <Text type="body">
+                Already have an account? <Link href="/auth/register">Sign up</Link>{" "}
+                here
+              </Text>
+            </div>
+          </form>
+          :
+          <div className="w-full h-full flex bg-blue-300 flex-row justify-center items-center">
+            <Loader 
+            size="lg" 
+            speed="slow" 
+            content="checking your credential..." 
+            inverse={true}
+            vertical={true}
             />
-          );
-        })}
-        {
-          isLoading ?
-            <Button type="primary" isDisabled={true} isLoading={isLoading} className="w-full">
-              Login
-            </Button>
-            :
-            <Button type="primary" onClick={submitForm} isLoading={isLoading} className="w-full">
-              Login
-            </Button>
-        }
-        <div className="mt-4">
-          <Text type="body">
-            Already have an account? <Link href="/auth/register">Sign up</Link>{" "}
-            here
-          </Text>
-        </div>
-      </form>
+          </div>
+      }
     </main>
   );
 }

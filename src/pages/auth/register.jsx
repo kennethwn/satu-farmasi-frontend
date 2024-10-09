@@ -1,4 +1,4 @@
-import Input from "@/components/Input";
+import InputField from "@/components/Input";
 import useDoctor from "../api/doctor";
 import usePharmacist from "../api/pharmacist";
 import { useEffect, useRef, useState } from "react";
@@ -116,7 +116,7 @@ export default function Login() {
                     {
                         credentialInputField.map((input) => {
                             return (
-                                <Input key={input.name} type={input.type} placeholder={input.placeholder} name={input.name} register={register} label={input.label} error={errors[input.name]?.message} autofocus={input.autofocus} />
+                                <InputField key={input.name} type={input.type} placeholder={input.placeholder} name={input.name} register={register} label={input.label} error={errors[input.name]?.message} autofocus={input.autofocus} />
                             )
                         })
                     }
@@ -134,8 +134,8 @@ export default function Login() {
                         if (input.name === "fullName") {
                             return (
                                 <div key={input.name} className="flex justify-center items-center gap-x-5">
-                                    <Input type="text" placeholder="John" name="firstName" register={register} label="First Name" error={errors.firstName?.message} />
-                                    <Input type="text" placeholder="Doe" name="lastName" register={register} label="Last Name" error={errors.lastName?.message} />
+                                    <InputField type="text" placeholder="John" name="firstName" register={register} label="First Name" error={errors.firstName?.message} />
+                                    <InputField type="text" placeholder="Doe" name="lastName" register={register} label="Last Name" error={errors.lastName?.message} />
                                 </div>
                             )
                         }
@@ -144,15 +144,15 @@ export default function Login() {
                                 <>
                                     <Text type="body" className="w-full text-start">Role</Text>
                                     <RadioGroup name="role-group" inline className="flex flex-row jusitfy-start items-start gap-x-3 w-full">
-                                        <Input type="radio" name="role" register={register} value="doctor" onChange={setSelectedOption} label="Doctor" id="doctor" />
-                                        <Input type="radio" name="role" register={register} value="pharmacist" onChange={setSelectedOption} label="Pharmacist" id="pharmacist" />
+                                        <InputField type="radio" name="role" register={register} value="doctor" onChange={setSelectedOption} label="Doctor" id="doctor" />
+                                        <InputField type="radio" name="role" register={register} value="pharmacist" onChange={setSelectedOption} label="Pharmacist" id="pharmacist" />
                                     </RadioGroup>
                                     <Text type="danger" className="w-full text-start">{errors.role?.message}</Text>
                                 </>
                             )
                         }
                         return (
-                            <Input key={input.name} type={input.type} placeholder={input.placeholder} name={input.name} register={register} label={input.label} error={errors[input.name]?.message} />
+                            <InputField key={input.name} type={input.type} placeholder={input.placeholder} name={input.name} register={register} label={input.label} error={errors[input.name]?.message} />
                         )
                     })}
                     {selectedOption === 'doctor' && <RenderSpecialistInput register={register} errors={errors} />}
@@ -170,7 +170,7 @@ export default function Login() {
 }
 
 const RenderSpecialistInput = ({ register, errors }) =>
-    <Input type="text" placeholder="Heart" name="specialist" register={register} label="Specialist" error={errors.specialist?.message} />
+    <InputField type="text" placeholder="Heart" name="specialist" register={register} label="Specialist" error={errors.specialist?.message} />
 
 RenderSpecialistInput.propTypes = {
     register: propTypes.func.isRequired,

@@ -1,10 +1,11 @@
 import React, { useEffect, useState } from "react";
-import Input from "../Input";
+import InputField from "../Input";
 import Button from "../Button";
 import { SelectPicker } from "rsuite";
 import { IoIosAdd } from "react-icons/io";
 import { MdDeleteOutline } from "react-icons/md";
 import useMedicineDropdownOption from "@/pages/api/medicineDropdownOption";
+import { formatRupiah } from "@/helpers/currency";
 
 function PrescriptionForm(props) {
   const { formFields, setFormFields } = props;
@@ -130,10 +131,10 @@ function PrescriptionForm(props) {
       {formFields &&
         formFields.map((formField, index) => (
           <div className="flex flex-col gap-2">
-            <div key={index} className="grid grid-cols-10 gap-4">
-              <div className="flex justify-center">
+            <div key={index} className="grid grid-cols-1 w-full lg:grid-cols-10 gap-4 mb-2">
+              <div className="flex max-lg:w-full justify-center">
                 {index == formFields.length - 1 && (
-                  <Button onClick={(e) => handleAddFormFieldRow()}>
+                  <Button size="small" onClick={(e) => handleAddFormFieldRow()}>
                     <IoIosAdd size={"1.6rem"} />
                   </Button>
                 )}
@@ -141,19 +142,20 @@ function PrescriptionForm(props) {
               <div className="col-span-2">
                 <SelectPicker
                   id="name"
-                  appearance="subtle"
-                  size="small"
+                  // appearance="subtle"
+                  size="lg"
                   name="name"
                   data={data}
                   onChange={(value) => handleMedicineChange(index, value)}
                   value={formField.medicineId}
                   renderValue={formField.medicineId != -1 ? (value) => <div className="text-sm">{medicineDropdownOptions[value].name}</div> : null}
                   block
-                  cleanable={false}
+                  style={{ }}
+                  // cleanable={false}
                 />
               </div>
               <div className="col-span-2">
-                <Input
+                <InputField
                   type="number"
                   id="quantity"
                   name="quantity"
@@ -165,27 +167,29 @@ function PrescriptionForm(props) {
                 />
               </div>
               <div className="col-span-2">
-                <Input
-                  type="number"
+                <InputField
+                  type="text"
                   id="price"
                   name="price"
                   placeholder="Harga Obat"
-                  value={formField.price}
+                  value={formatRupiah(formField.price)}
                   disabled
+                  currency="true"
                 />
               </div>
               <div className="col-span-2">
-                <Input
-                  type="number"
+                <InputField
+                  type="text"
                   id="subtotal"
                   name="subtotal"
                   placeholder="Total Harga Obat"
-                  value={formField.totalPrice}
+                  value={formatRupiah(formField.totalPrice)}
                   disabled
+                  currency="true"
                 />
               </div>
               <div className="flex justify-center">
-                <Button
+                {/* <Button
                   type="button"
                   id="action"
                   name="action"
@@ -194,17 +198,29 @@ function PrescriptionForm(props) {
                   onClick={(e) => handleRemoveFormFieldRow(index)}
                 >
                   <MdDeleteOutline size={"1.6rem"} color="maroon" />
-                </Button>
+                </Button> */}
+                <button
+                    className={`flex justify-center w-full rounded-md py-1.5 stroke-2 shadow-sm ${formFields.length > 1 ? 'stroke-white' : 'lg:stroke-gray-300 stroke-white'} lg:shadow-none lg:border-0 border-2 border-gray-300 placeholder:text-gray-400 sm:text-sm sm:leading-6`}
+                    disabled={formFields?.length > 1 ? false : true}
+                    onClick={(e) => handleRemoveFormFieldRow(index)}
+                >
+                    <MdDeleteOutline size={"1.6rem"} color="maroon" />
+                </button>
               </div>
             </div>
-            <Input
-              className="col-span-10"
-              type="text"
-              id="instruction"
-              name="instruction"
-              placeholder="Instruction"
-              onChange={(e) => handleInstructionField(index, e.target.value)}
-            />
+            <div className="grid grid-cols-10 gap-4 mb-6">
+              <div className="col-span-1 max-lg:hidden"></div> 
+              <div className="lg:col-span-8">
+                <InputField
+                  type="text"
+                  id="instruction"
+                  name="instruction"
+                  value={formField?.instruction} // TODO: fix handle change
+                  placeholder="Instruction"
+                  onChange={(e) => handleInstructionField(index, e.target.value)}
+                />
+              </div>
+            </div>
           </div>
         ))}
     </div>

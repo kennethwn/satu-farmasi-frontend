@@ -186,7 +186,7 @@ export default function index(props) {
                         cellBordered
                         shouldUpdateScroll={false}
                         affixHorizontalScrollbar
-                        fillHeight={true}
+                        height={400}
                         loading={isLoading}
                     >
                         <Column width={100} fixed="left">
