@@ -15,7 +15,7 @@ function PatientForm(props) {
 
     const data = Object.entries(patientDropdownOptions).map(([key, patient]) => ({
         label: patient.credentialNumber + " - " + patient.name, 
-        value: key
+        value: parseInt(key)
     }))
 
     useEffect(() => {

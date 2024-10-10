@@ -1,4 +1,4 @@
-import { Table } from "rsuite";
+import { Grid, Row, Table } from "rsuite";
 import { Cell, Column, HeaderCell } from "rsuite-table";
 import { useState } from "react";
 
@@ -35,13 +35,14 @@ export default function MedicineList(props) {
     }
 
     return(<div className="flex flex-col gap-4">
-        <p>Medicine List: </p>
         <Table
             data={getData()}
             bordered
             cellBordered
             shouldUpdateScroll={false}
-            height={400}
+            autoHeight
+            wordWrap="break-word"
+            // height={400}
             affixHorizontalScrollbar
             sortColumn={sortColumn}
             sortType={sortType}
@@ -55,7 +56,18 @@ export default function MedicineList(props) {
 
             <Column width={200} resizable sortable>
                 <HeaderCell className="text-dark">Nama Obat</HeaderCell>
-                <Cell dataKey='medicine.name'/>
+                <Cell>
+                    {(rowData) => 
+                        <Grid>
+                            <Row>
+                                {rowData.medicine.name}
+                            </Row>
+                            <Row>
+                                {rowData.instruction}
+                            </Row>
+                        </Grid>
+                    }
+                </Cell>
             </Column>
 
             <Column width={75} resizable sortable>
@@ -73,10 +85,10 @@ export default function MedicineList(props) {
                 <Cell dataKey='totalPrice'/>
             </Column>
 
-            <Column width={225} fixed="right">
+            {/* <Column width={225} fixed="right">
                 <HeaderCell className="text-center text-dark">Instruction</HeaderCell>
                 <Cell dataKey='instruction'/>
-            </Column>
+            </Column> */}
         </Table>
       </div>
     )

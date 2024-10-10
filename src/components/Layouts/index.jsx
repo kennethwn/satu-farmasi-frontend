@@ -129,9 +129,18 @@ export default function Layout(props) {
                                     eventKey="transaction"
                                     trigger="hover"
                                     title="Transaksi"
-                                    icon={renderIcon("transaction", activeKey === "transaction-receive" || activeKey === "transaction-expense")}
+                                    icon={renderIcon("transaction", activeKey === "transaction-dashboard"
+                                        || activeKey === "transaction-receive" 
+                                        || activeKey === "transaction-expense")}
                                     placement="rightStart"
                                 >
+                                    <Nav.Item
+                                        onClick={() => {
+                                            router.push("/transaction/dashboard", undefined, { shallow: true });
+                                            setActiveKey("transaction-dashboard");
+                                        }}
+                                        eventKey="transaction-dashboard"
+                                    >{renderTitle("Riwayat Transaksi", activeKey === "transaction-dashboard")}</Nav.Item>
                                     <Nav.Item
                                         onClick={() => {
                                             router.push("/transaction/receive", undefined, { shallow: true });
