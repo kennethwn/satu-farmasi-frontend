@@ -5,15 +5,19 @@ import MedicineList from "../MedicineLIst/MedicineList";
 import { Modal } from "rsuite";
 import Button from "../Button";
 import { useRouter } from "next/router";
+import useTransaction from "@/pages/api/transaction/transaction";
+import { toast } from "react-toastify";
 
 export default function PrescriptionDetail(props) {
     const { prescriptionId, openModal, setOpenModal } = props
     const { Header, Body, Footer } = Modal;
     const router = useRouter();
+    const { createTransaction, publishNotification } = useTransaction();
 
     const { getPrescriptionDetail } = usePrescription();
     const [ prescriptionData, setPrescriptionsData ] = useState({
         id: -1,
+        status: "",
         patient: {
             id: -1,
             name: "",
@@ -45,6 +49,30 @@ export default function PrescriptionDetail(props) {
             }
         }]
     })
+
+    const handleProcess = async () => {
+        try {
+            const data = {
+                patientId: prescriptionData.patient.id,
+                prescriptionId: prescriptionData.id
+            }
+            const res = await createTransaction(data);
+            console.log(res)
+            if (res.code !== 200) {
+                toast.error(res.message, { autoClose: 2000, position: "top-center" });
+                return;
+            } else {
+                toast.success(`Status Change to Waiting for Payment`, { autoClose: 2000, position: "top-center" });
+                setPrescriptionsData(prescriptionData => ({
+                    ...prescriptionData,
+                    status: "WAITING_FOR_PAYMENT"
+                }))
+                publishNotification()
+            }
+        } catch (error) {
+            console.error(error)
+        }
+    }
 
     useEffect(() => {
         console.log("PRESCRIPTION DATA: ", prescriptionData)
@@ -97,9 +125,12 @@ export default function PrescriptionDetail(props) {
                 <Button appearance="primary" onClick={() => router.push(`/prescription/edit/` + prescriptionData.id)}>
                     Edit
                 </Button>
-                <Button appearance="primary" onClick={() => HandleEditClassification("prodces")}>
-                    Process
-                </Button>
+                {
+                    prescriptionData?.status == "UNPROCESSED" && 
+                    <Button appearance="primary" onClick={handleProcess}>
+                        Proceed to Payment
+                    </Button>
+                }
             </Footer>
         </Modal>
     )
