@@ -7,10 +7,12 @@ import { Toggle } from "rsuite";
 import PatientForm from "@/components/DynamicForms/PatientForm";
 import PrescriptionForm from "@/components/DynamicForms/PrescriptionForm";
 import { useRouter } from "next/router";
+import Button from "@/components/Button";
+import { toast } from "react-toastify";
 
 export default function create() {
     const { user } = useUserContext();
-    const { addNewPrescription } = usePrescription();
+    const { isLoading, addNewPrescription } = usePrescription();
     const [existingPatient, setExistingPatient] = useState(true)
     const router = useRouter();
 
@@ -56,7 +58,7 @@ export default function create() {
             const temp = [...formFields]
             console.log(temp)
             temp.map(item => data.medicineList.push({
-                medicineId: item.medicineId,
+                medicineId: parseInt(item.medicineId),
                 quantity: parseInt(item.quantity),
                 instruction: item.instruction,
                 price: item.totalPrice,
@@ -64,8 +66,14 @@ export default function create() {
 
             console.log(data)
 
-            await addNewPrescription(data)
-                .then(router.push(`/prescribe`))
+            const res = await addNewPrescription(data);
+            console.log(res)
+            if (res == undefined || res == null || res.status != 200 || res.code != 200) {
+                toast.error(res.message, { autoClose: 2000, position: "top-center" });
+                return
+            }
+            toast.success(res.message, { autoClose: 2000, position: "top-center" });
+            router.push(`/prescription`);
         } catch (error) {
             console.log("error when #submitPrescription")
         }
@@ -73,7 +81,7 @@ export default function create() {
 
     return (
         <Layout active="prescription" user={user}>
-            <ContentLayout title="Create Prescription">
+            <ContentLayout title="Create Prescription" type="child" backpageUrl="/prescription">
                 <form onSubmit={handleSubmitPrescription} className="flex flex-col gap-6">
                     <div className="flex flex-col gap-2">
                         <Toggle size="lg" checkedChildren="Existing Patient" unCheckedChildren="New Patient" defaultChecked onChange={(e) => setExistingPatient(e)}/>
@@ -87,10 +95,30 @@ export default function create() {
                         formFields={formFields} 
                         setFormFields={setFormFields}
                     />
-                    <input
+                    {/* <input
                         type="submit"
                         value="Submit Prescription"
-                    />
+                    /> */}
+
+                    <div className="flex justify-center gap-2 mt-6 lg:justify-end">
+                        {isLoading ?
+                            <Button
+                                appearance="primary"
+                                isDisabled={true}
+                                isLoading={isLoading}
+                            >
+                                Simpan
+                            </Button>
+                            :
+                            <Button
+                                isLoading={isLoading}
+                                appearance="primary"
+                                type="submit"
+                            >
+                                Simpan
+                            </Button>
+                        }
+                    </div>
                 </form>
             </ContentLayout>
         </Layout>

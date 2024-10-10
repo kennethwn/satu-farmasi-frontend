@@ -2,6 +2,8 @@ import React  from 'react'
 import propTypes from 'prop-types'
 import Text from '../Text';
 import { Radio, Checkbox } from 'rsuite';
+import Label from './Label';
+
 export default function Input(props) {
     const className = [props.className];
     const {
@@ -15,10 +17,11 @@ export default function Input(props) {
         placeholder = 'john doe',
         register = () => { },
         value,
-        autofocus = false
+        autofocus = false,
+        currency = false
     } = props;
 
-    if (disabled === true) className.push(' bg-[#D9D9D9] cursor-not-allowed');
+    if (disabled === true) className.push(' cursor-not-allowed');
     if (label) className.push('my-2');
 
     if (type === "checkbox") {
@@ -45,19 +48,44 @@ export default function Input(props) {
                 label &&
                 <Label id={id} label={label} />
             }
-            <input
-                type={type}
-                id={id}
-                name={name}
-                onChange={onChange}
-                disabled={disabled}
-                placeholder={placeholder}
-                value={value}
-                className={`block w-full rounded-full px-4 border py-1.5 text-dark border-dark placeholder:text-gray-400 sm:text-base sm:leading-6 ${className.join(" ")}`}
-                autoFocus={autofocus}
-                {...register(name)}
-            />
-            <div style={{ minHeight: '22px' }}>
+            {
+                currency ?
+                    <div className="relative">
+                        <div className="py-2 text-sm absolute px-4"
+                        >
+                            <span className='text-gray-400'>IDR</span>
+                            <span className="mx-2 text-base text-gray-300">|</span>
+                        </div>
+                        <input
+                            type={type}
+                            id={id}
+                            name={name}
+                            onChange={onChange}
+                            disabled={disabled}
+                            placeholder={placeholder}
+                            value={value}
+                            className={`block w-full rounded-md px-14 border py-2 text-dark border-gray-300 shadow-sm placeholder:text-gray-400 sm:text-md sm:leading-6 ${className.join(" ")}`}
+                            // className={`block w-full rounded-full px-4 border py-1.5 text-dark border-dark placeholder:text-gray-400 sm:text-base sm:leading-6 ${className.join(" ")}`}
+                            autoFocus={autofocus}
+                            {...register(name)}
+                        />
+                    </div>
+                    :
+                    <input
+                        type={type}
+                        id={id}
+                        name={name}
+                        onChange={onChange}
+                        disabled={disabled}
+                        placeholder={placeholder}
+                        value={value}
+                        className={`block w-full rounded-md px-4 border py-2 text-dark border-gray-300 shadow-sm placeholder:text-gray-400 sm:text-md sm:leading-6 ${className.join(" ")}`}
+                        // className={`block w-full rounded-full px-4 border py-1.5 text-dark border-dark placeholder:text-gray-400 sm:text-base sm:leading-6 ${className.join(" ")}`}
+                        autoFocus={autofocus}
+                        {...register(name)}
+                    />
+            }
+            <div>
                 {
                     error &&
                     <Text type="danger">{error}</Text>
@@ -66,17 +94,6 @@ export default function Input(props) {
         </div>
     )
 }
-
-const Label = ({ id, label }) =>
-    <label htmlFor={id} className="block text-body font-medium leading-6 text-dark">
-        {label}
-    </label>
-
-Label.propTypes = {
-    id: propTypes.string.isRequired,
-    label: propTypes.string.isRequired
-}
-
 
 Input.propTypes = {
     type: propTypes.oneOf(['text', 'number', 'email', 'password', 'tel', 'date', 'checkbox', "radio"]),
@@ -92,4 +109,5 @@ Input.propTypes = {
     className: propTypes.string,
     checked: propTypes.bool,
     register: propTypes.func,
+    currency: propTypes.string
 }

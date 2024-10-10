@@ -1,5 +1,5 @@
 import Button from "@/components/Button";
-import Input from "@/components/Input";
+import InputField from "@/components/Input";
 import Layout from "@/components/Layouts";
 import ContentLayout from "@/components/Layouts/Content";
 import Select from "@/components/Select";
@@ -11,16 +11,18 @@ import { useRouter } from "next/router";
 import { useEffect, useState } from "react";
 import { toast } from "react-toastify";
 import MedicineClassificationForm from "@/components/DynamicForms/MedicineClassificationForm";
+import { SelectPicker } from "rsuite";
 
 export default function Index() {
     const router = useRouter();
     const id = router.query.id;
     const { user } = useUserContext();
-    const { isLoading, EditMedicine, GetMedicineByCode } = useMedicineAPI();
+    const { isLoading, EditMedicine, SearchMedicine } = useMedicineAPI();
     const { GetPackagingDropdown } = usePackagingAPI();
-    const { GetGenericDropdown} = useGenericAPI();
+    const { GetGenericDropdown } = useGenericAPI();
 
     const [input, setInput] = useState({});
+    const [error, setError] = useState({});
     const [packagings, setPackagings] = useState([]);
     const [generics, setGenerics] = useState([]);
     const [formFields, setFormFields] = useState([{id: 0, label: '', value: ''}]);
@@ -41,7 +43,7 @@ export default function Index() {
 
     const handleFetchMedicineByCode = async () => {
         try {
-            const res = await GetMedicineByCode(id);
+            const res = await SearchMedicine(1, 1, id);
             console.log(res);
             if (res.code !== 200) {
                 toast.error(res.message, { autoClose: 2000, position: "top-center" });
@@ -148,37 +150,32 @@ export default function Index() {
         }
     }, [id, router]);
 
-    useEffect(() => {
-        console.log(formFields);
-    });
-
     return (
         <Layout active="master-medicine" user={user}>
             <ContentLayout title="Edit Obat" type="child" backpageUrl="/master/medicine">
             <form id="form">
                     <div className="grid grid-cols-1 gap-x-6 gap-y-2 sm:grid-cols-6">
                         <div className="sm:col-span-6">
-                            <label htmlFor="medicine_name" className="block text-sm font-medium leading-6 text-dark">
-                                Nama Obat
-                            </label>
                             <div className="mt-2">
                                 {isLoading ?
-                                    <Input 
+                                    <InputField 
                                         type="text" 
                                         id="medicine_name" 
                                         name="medicine_name" 
                                         disabled={true}
+                                        label="Nama Obat"
                                         placeholder="nama obat" 
                                         value={input?.name}
                                     />
                                     :
-                                    <Input 
+                                    <InputField 
                                         type="text" 
                                         id="medicine_name" 
                                         name="medicine_name" 
                                         onChange={
                                             (e) => setInput({...input, name: e.target.value})
                                         } 
+                                        label="Nama Obat"
                                         placeholder="nama obat" 
                                         value={input?.name}
                                     />
@@ -186,24 +183,23 @@ export default function Index() {
                             </div>
                         </div>
                         <div className="sm:col-span-6">
-                            <label htmlFor="merk" className="block text-sm font-medium leading-6 text-dark">
-                                Merek
-                            </label>
                             <div className="mt-2">
                                 {isLoading ?
-                                    <Input 
+                                    <InputField 
                                         type="text" 
                                         id="merk" 
                                         name="merk" 
+                                        label="Merek"
                                         disabled={true}
                                         placeholder="merek" 
                                         value={input?.merk}
                                     />
                                     :
-                                    <Input 
+                                    <InputField 
                                         type="text" 
                                         id="merk" 
                                         name="merk" 
+                                        label="Merek"
                                         onChange={
                                             (e) => setInput({...input, merk: e.target.value})
                                         } 
@@ -214,26 +210,21 @@ export default function Index() {
                             </div>
                         </div>
                         <div className="sm:col-span-6">
-                            <label htmlFor="price" className="block text-sm font-medium leading-6 text-dark">
-                                Harga Jual Obat
-                            </label>
-                            <div className="relative mt-2">
-                                {/* <div className="py-1.5 text-sm absolute px-4">
-                                    <span>IDR</span>
-                                    <span className="mx-2 text-base text-gray-300">|</span>
-                                </div> */}
+                            <div className="mt-2">
                                 {isLoading ?
-                                    <Input 
+                                    <InputField 
                                         className="sm:leading-6 px-16"
                                         type="number" 
                                         id="price" 
                                         name="price" 
                                         disabled={true}
                                         placeholder="0" 
+                                        label="Harga Jual Obat"
                                         value={input?.price}
+                                        currency={true}
                                     />
                                     :
-                                    <Input 
+                                    <InputField 
                                         className="sm:leading-6 px-16"
                                         type="number" 
                                         id="price" 
@@ -242,31 +233,32 @@ export default function Index() {
                                             (e) => setInput({...input, price: e.target.value})
                                         }
                                         placeholder="0" 
+                                        label="Harga Jual Obat"
                                         value={input?.price}
+                                        currency={true}
                                     />
                                 }
                             </div>
                         </div>
                         <div className="sm:col-span-2">
-                            <label htmlFor="currStock" className="block text-sm font-medium leading-6 text-dark">
-                                Stok Sekarang
-                            </label>
                             <div className="mt-2">
                                 {isLoading ?
-                                    <Input 
+                                    <InputField 
                                         type="number" 
                                         id="currStock" 
                                         name="currStock"
                                         placeholder="0" 
+                                        label="Stok Sekarang"
                                         value={input?.currStock}
                                         disabled={true}
                                     />
                                     :
-                                    <Input 
+                                    <InputField 
                                         type="number" 
                                         id="currStock" 
                                         name="currStock"
                                         placeholder="0" 
+                                        label="Stok Sekarang"
                                         value={input?.currStock}
                                         onChange={(e) => setInput({...input, currStock: e.target.value})}
                                     />
@@ -274,25 +266,24 @@ export default function Index() {
                             </div>
                         </div>
                         <div className="sm:col-span-2">
-                            <label htmlFor="minStock" className="block text-sm font-medium leading-6 text-dark">
-                                Stok Minimum
-                            </label>
                             <div className="mt-2">
                                 {isLoading ?
-                                    <Input 
+                                    <InputField 
                                         type="number" 
                                         id="minStock" 
                                         name="minStock"
-                                        placeholder="0" 
+                                        placeholder="0"
+                                        label="Stok Minimum" 
                                         value={input?.minStock}
                                         disabled={true}
                                     />
                                     :
-                                    <Input 
+                                    <InputField 
                                         type="number" 
                                         id="minStock" 
                                         name="minStock"
                                         placeholder="0" 
+                                        label="Stok Minimum"
                                         value={input?.minStock}
                                         onChange={(e) => setInput({...input, minStock: e.target.value})}
                                     />
@@ -300,25 +291,24 @@ export default function Index() {
                             </div>
                         </div>
                         <div className="sm:col-span-2">
-                            <label htmlFor="maxStock" className="block text-sm font-medium leading-6 text-dark">
-                                Stok Maksimum
-                            </label>
                             <div className="mt-2">
                                 {isLoading ?
-                                    <Input 
+                                    <InputField 
                                         type="number" 
                                         id="maxStock" 
                                         name="maxStock"
                                         placeholder="0" 
+                                        label="Stok Maksimum"
                                         value={input?.maxStock}
                                         disabled={true}
                                     />
                                     :
-                                    <Input 
+                                    <InputField 
                                         type="number" 
                                         id="maxStock" 
                                         name="maxStock"
                                         placeholder="0" 
+                                        label="Stok Maksimum"
                                         value={input?.maxStock}
                                         onChange={(e) => setInput({...input, maxStock: e.target.value})}
                                     />
@@ -326,53 +316,69 @@ export default function Index() {
                             </div>
                         </div>
                         <div className="sm:col-span-3">
-                            <label htmlFor="genericName" className="block text-sm font-medium leading-6 text-dark">
+                            <label htmlFor="genericName" className="block text-sm font-medium leading-6 pt-2 text-dark">
                                 Nama Generik
                             </label>
                             <div className="mt-2">
                                 {isLoading ?
-                                    <Select 
+                                    <SelectPicker 
                                         id="genericName"
                                         name="genericName"
                                         placeholder="nama generik"
+                                        size='lg'
                                         disabled={true}
                                         value={input?.genericName?.id}
-                                        options={generics}
+                                        valueKey="id"
+                                        labelKey="label"
+                                        data={generics}
+                                        block
                                     />
                                     :
-                                    <Select 
+                                    <SelectPicker 
                                         id="genericName"
                                         name="genericName"
                                         placeholder="nama generik"
+                                        size='lg'
                                         value={input?.genericName?.id}
-                                        onChange={(e) => setInput({...input, genericName: e.target.value})}
-                                        options={generics}
+                                        valueKey="id"
+                                        labelKey="label"
+                                        onChange={(value) => setInput({...input, genericName: value})}
+                                        data={generics}
+                                        block
                                     />
                                 }
                             </div>
                         </div>
                         <div className="sm:col-span-3">
-                            <label htmlFor="packaging" className="block text-sm font-medium leading-6 text-dark">
+                            <label htmlFor="packaging" className="block text-sm font-medium leading-6 pt-2 text-dark">
                                 Kemasan
                             </label>
                             <div className="mt-2">
                                 {isLoading ?
-                                    <Select 
+                                    <SelectPicker
                                         id="packaging"
                                         name="packaging"
                                         placeholder="kemasan"
                                         disabled={true}
+                                        size='lg'
                                         value={input?.packaging?.id}
-                                        options={packagings}
+                                        labelKey="label"
+                                        valueKey="id"
+                                        data={packagings}
+                                        block
                                     />
                                     :
-                                    <Select 
+                                    <SelectPicker 
                                         id="packaging"
                                         name="packaging"
                                         placeholder="kemasan"
                                         value={input?.packaging?.id}
-                                        onChange={(e) => setInput({...input, packaging: e.target.value})}
-                                        options={packagings}
+                                        labelKey="label"
+                                        size='lg'
+                                        valueKey="id"
+                                        onChange={(value) => setInput({...input, packaging: value})}
+                                        data={packagings}
+                                        block
                                     />
                                 }
                             </div>
@@ -387,31 +393,42 @@ export default function Index() {
                             </label>
                             <div className="mt-2">
                                 {isLoading ?
-                                    <Select 
-                                        id="unitOfMeasure"
-                                        name="unitOfMeasure"
-                                        placeholder="satuan"
-                                        disabled={true}
-                                        options={unitOfMeasure}
+                                    <SelectPicker 
+                                    id="unitOfMeasure"
+                                    name="unitOfMeasure"
+                                    placeholder="satuan"
+                                    disabled={true}
+                                    size='lg'
+                                    block
+                                    data={unitOfMeasure}
+                                    value={input?.unitOfMeasure}
+                                    valueKey="value"
+                                    labelKey="label"
                                     />
                                     :
-                                    <Select 
-                                        id="unitOfMeasure"
-                                        name="unitOfMeasure"
-                                        placeholder="satuan"
-                                        options={unitOfMeasure}
-                                        onChange={(e) => setInput({...input, unitOfMeasure: e.target.value})}
+                                    <SelectPicker 
+                                    id="unitOfMeasure"
+                                    name="unitOfMeasure"
+                                    placeholder="satuan"
+                                    size='lg'
+                                    data={unitOfMeasure}
+                                    block
+                                    onChange={(value) => setInput({...input, unitOfMeasure: value})}
+                                    value={input?.unitOfMeasure}
+                                    valueKey="value"
+                                    labelKey="label"
                                     />
                                 }
                             </div>
+                            {error?.unitOfMeasure && <Text type="danger">{error?.unitOfMeasure}</Text>}
                         </div>
                         <div className="sm:col-span-6">
-                            <label htmlFor="sideEffect" className="block text-sm font-medium leading-6 text-dark">
+                            <label htmlFor="sideEffect" className="block mt-4 text-sm font-medium leading-6 text-dark">
                                 Efek Samping
                             </label>
                             <div className="mt-2">
                                 {isLoading ?
-                                    <Input 
+                                    <InputField 
                                         type="text" 
                                         id="sideEffect" 
                                         name="sideEffect"
@@ -420,7 +437,7 @@ export default function Index() {
                                         disabled={true}
                                     />
                                     :
-                                    <Input 
+                                    <InputField 
                                         type="text" 
                                         id="sideEffect" 
                                         name="sideEffect"
@@ -430,6 +447,7 @@ export default function Index() {
                                     />
                                 }
                             </div>
+                            {error?.sideEffect && <Text type="danger">{error?.unitOfMeasure}</Text>}
                         </div>
                     </div>
 
@@ -444,6 +462,7 @@ export default function Index() {
                             </Button>
                             :
                             <Button
+                                isLoading={isLoading}
                                 appearance="primary"
                                 onClick={() => {
                                     handleSubmit();

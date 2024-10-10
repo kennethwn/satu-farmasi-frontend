@@ -122,7 +122,7 @@ export default function PrescriptionDetail(props) {
                 />
             </Body>
             <Footer className="flex flex-row justify-end gap-4">
-                <Button appearance="primary" onClick={() => router.push(`/prescribe/edit/` + prescriptionData.id)}>
+                <Button appearance="primary" onClick={() => router.push(`/prescription/edit/` + prescriptionData.id)}>
                     Edit
                 </Button>
                 {

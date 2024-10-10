@@ -54,7 +54,7 @@ export default function Layout(props) {
                 return <DashboardIcon size="1.2em" style={{ ...iconStyle, color }} />;
             case "diagnose":
                 return <PrescribeIcon stroke={color} style={{ ...iconStyle, color }} />;
-            case "prescribe":
+            case "prescription":
                 return <PrescribeIcon stroke={color} style={{ ...iconStyle, color }} />;
             case "transaction":
                 return <TransactionIcon size="1.2em" style={{ ...iconStyle, color }} />;
@@ -116,13 +116,13 @@ export default function Layout(props) {
                             }
                             {(userRole === 'pharmacist' || userRole === 'doctor') &&
                                 <Nav.Item
-                                    eventKey="prescribe"
-                                    icon={renderIcon("prescribe", activeKey === "prescribe")}
+                                    eventKey="prescription"
+                                    icon={renderIcon("prescription", activeKey === "prescription")}
                                     onClick={() => {
-                                        router.push("/prescribe", undefined, { shallow: true });
-                                        setActiveKey("prescribe");
+                                        router.push("/prescription", undefined, { shallow: true });
+                                        setActiveKey("prescription");
                                     }}
-                                >{renderTitle("Resep", activeKey === "prescribe")}</Nav.Item>
+                                >{renderTitle("Resep", activeKey === "prescription")}</Nav.Item>
                             }
                             {userRole === 'pharmacist' &&
                                 <Nav.Menu
@@ -216,7 +216,7 @@ export default function Layout(props) {
               open={askForLogout}
               onClose={() => setAskForLogout(false)}
               body={ <> Apakah Anda yakin ingin logout? </> }
-              btnText="Hapus"
+              btnText="Logout"
               onClick={() => logoutHandler()}
             />
         </Container>
