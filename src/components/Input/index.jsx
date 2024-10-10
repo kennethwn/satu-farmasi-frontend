@@ -3,6 +3,7 @@ import propTypes from 'prop-types'
 import Text from '../Text';
 import { Radio, Checkbox } from 'rsuite';
 import Label from './Label';
+
 export default function Input(props) {
     const className = [props.className];
     const {
@@ -93,17 +94,6 @@ export default function Input(props) {
         </div>
     )
 }
-
-const Label = ({ id, label }) =>
-    <label htmlFor={id} className="block text-sm font-medium leading-2 text-dark">
-        {label}
-    </label>
-
-Label.propTypes = {
-    id: propTypes.string.isRequired,
-    label: propTypes.string.isRequired
-}
-
 
 Input.propTypes = {
     type: propTypes.oneOf(['text', 'number', 'email', 'password', 'tel', 'date', 'checkbox', "radio"]),
