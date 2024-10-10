@@ -2,6 +2,7 @@ import React  from 'react'
 import propTypes from 'prop-types'
 import Text from '../Text';
 import { Radio, Checkbox } from 'rsuite';
+import Label from './Label';
 export default function Input(props) {
     const className = [props.className];
     const {

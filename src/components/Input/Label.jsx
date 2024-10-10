@@ -4,33 +4,18 @@ import propTypes from 'prop-types'
 export default function Label(props) {
     const className = [props.className];
     const {
-        text,
-        htmlFor
+        id,
+        label,
     } = props;
 
-
     return (
-        <label htmlFor={htmlFor}>
-            {text}
+        <label htmlFor={id} className={`block text-body font-medium leading-6 text-dark ${className}`}>
+            {label}
         </label>
     )
 }
 
-// Input.defaultProps = {
-//     type: 'text',
-//     disabled: false,
-//     placeholder: 'field name',
-// }
-
-// Input.propTypes = {
-//     type: propTypes.oneOf(['text', 'number', 'email', 'password', 'tel', 'date', 'checkbox', "radio"]),
-//     id: propTypes.string,
-//     name: propTypes.string,
-//     onChange: propTypes.func,
-//     disabled: propTypes.bool,
-//     placeholder: propTypes.string,
-//     value: propTypes.string,
-//     className: propTypes.string,
-//     checked: propTypes.bool,
-//     register: propTypes.func
-// }
+Label.propTypes = {
+    id: propTypes.string.isRequired,
+    label: propTypes.string.isRequired
+}
