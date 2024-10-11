@@ -11,6 +11,7 @@ import useExpenseMedicineAPI from "@/pages/api/transaction/expenseMedicine";
 import Dropdown from "@/components/SelectPicker/Dropdown";
 import { isRequiredNumber, isRequiredString } from "@/helpers/validation";
 import useMedicineDropdownOption from "@/pages/api/medicineDropdownOption";
+import { useUserContext } from "@/pages/api/context/UserContext";
 
 const medicineSchema = z.object({
     medicineId: isRequiredNumber(),
@@ -41,15 +42,16 @@ const createExpenseMedicineField = [
 
 export default function index() {
     const router = useRouter();
+    const { user } = useUserContext();
     const id = router.query.id;
     const { isLoading, GetMedicineById, EditMedicine } = useExpenseMedicineAPI();
     const { getMedicineDropdownOptions } = useMedicineDropdownOption();
     const [medicineDropdownOptions, setMedicineDropdownOptions] = useState([])
     const [formData, setFormData] = useState({
-        medicineId: "",
-        quantity: "",
+        medicineId: 0,
+        quantity: 0,
         reasonOfDispose: "",
-        oldQuantity: "",
+        oldQuantity: 0,
     });
     const [errors, setErrors] = useState({});
 
@@ -64,7 +66,7 @@ export default function index() {
             setFormData({
                 ...res.data,
                 medicineId: res.data.medicine.id,
-                oldQuantity: res.data.quantity,
+                oldQuantity: parseInt(res.data.quantity),
             })
         } catch (error) {
             console.error(error);
@@ -112,33 +114,24 @@ export default function index() {
                 const response = await getMedicineDropdownOptions()
                 setMedicineDropdownOptions(response)
             } catch (error) {
-                console.log("error #getMedicineOptions")
+				console.error(error);
             }
         }
         fetchMedicineDropdownOptionsData()
     }, [])
 
-    useEffect(() => {
-        console.log("erors: ", errors)
-    }, [errors])
-
-    const handleMedicineChange = (e) => {
-        setFormData({ ...formData, ["medicineId"]: Number(e) });
-        setErrors((prevErrors) => ({ ...prevErrors, ["medicineId"]: "" }));
-    };
-
-    const handleReasonOfDisposeChange = (e) => {
-        setFormData({ ...formData, ["reasonOfDispose"]: e });
-        setErrors((prevErrors) => ({ ...prevErrors, ["reasonOfDispose"]: "" }));
-    };
-
-    const handleInputChange = (e) => {
-        setFormData({ ...formData, [e.target.name]: Number(e.target.value) });
-        setErrors((prevErrors) => ({ ...prevErrors, [e.target.name]: "" }));
+    const inputOnChangeHandler = (e, name) => {
+        if (name === "medicineId" || name === "reasonOfDispose") {
+            setFormData({ ...formData, [name]: name === "medicineId" ? parseInt(e) : e });
+            setErrors((prevErrors) => ({ ...prevErrors, [name]: "" }));
+        } else {
+            setFormData({ ...formData, [e.target.name]: Number(e.target.value) });
+            setErrors((prevErrors) => ({ ...prevErrors, [e.target.name]: "" }));
+        }
     };
 
     return (
-        <Layout active="master-expense-medicine">
+        <Layout active="master-expense-medicine" user={user}>
             <ContentLayout
                 title="Ubah Pengeluaran Obat"
                 type="child"
@@ -157,7 +150,7 @@ export default function index() {
                                             label={input.label}
                                             data={reasonOfDisposeListData}
                                             value={formData.reasonOfDispose}
-                                            onChange={handleReasonOfDisposeChange}
+                                            onChange={e => inputOnChangeHandler(e, input.name)}
                                             searchable={false}
                                             placeholder="Select Reason of Dispose"
                                             error={errors[input.name]}
@@ -171,7 +164,7 @@ export default function index() {
                                             label={input.label}
                                             data={data}
                                             value={formData.medicineId.toString()}
-                                            onChange={handleMedicineChange}
+                                            onChange={e => inputOnChangeHandler(e, input.name)}
                                             placeholder="Select Medicine Name"
                                             error={errors[input.name]}
                                         />
@@ -183,7 +176,7 @@ export default function index() {
                                             type={input.type}
                                             name={input.name}
                                             value={formData.quantity}
-                                            onChange={handleInputChange}
+                                            onChange={e => inputOnChangeHandler(e, input.name)}
                                             placeholder={input.placeholder}
                                             error={errors[input.name]}
                                         />
