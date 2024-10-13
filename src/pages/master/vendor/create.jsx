@@ -11,6 +11,7 @@ import { z } from "zod";
 import { isRequiredString } from "@/helpers/validation";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
+import { useUserContext } from "@/pages/api/context/UserContext";
 
 const vendorSchema = z.object({
   name: isRequiredString(),
@@ -47,6 +48,7 @@ const createVendorField = [
 ];
 
 export default function create() {
+  const { user } = useUserContext();
   const router = useRouter();
   const { isLoading, CreateVendor } = useVendorAPI();
   const formRef = useRef(null);
@@ -74,7 +76,7 @@ export default function create() {
   const submitForm = () => formRef.current.requestSubmit();
 
   return (
-    <Layout active="master-vendor">
+    <Layout active="master-vendor" user={user}>
       <ContentLayout
         title="Tambah Vendor"
         type="child"
