@@ -77,7 +77,7 @@ export default function Login() {
 	]
 
 	const biodataInputField = [
-		{ label: "NIK", type: "text", name: "nik", placeholder: "12345678" },
+		{ label: "NIK", type: "number", name: "nik", placeholder: "12345678" },
 		{ name: "fullName" },
 		{ label: "Phone Number", type: "number", name: "phoneNum", placeholder: "+628xxxxxx" },
 		{ label: "Date of Birth", type: "date", name: "dob", placeholder: "01/01/2000" },
