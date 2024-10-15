@@ -50,7 +50,6 @@ export default function index() {
   const HandleFetchVendorByLabel = async () => {
     try {
       const res = await GetVendorByLabel(search);
-      console.log(res);
       if (res.code !== 200) {
         toast.error(res.message, { autoClose: 2000, position: "top-center" });
         return;
