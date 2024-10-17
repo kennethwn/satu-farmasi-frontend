@@ -38,7 +38,7 @@ export default function index(props) {
 		delete: false,
 	});
 
-	const { register, handleSubmit, formState: { errors }, setValue } = useForm({
+	const { register, handleSubmit, formState: { errors }, setValue, clearErrors } = useForm({
 		resolver: zodResolver(genericSchema), defaultValues: {
 			id: "",
 			label: "",
@@ -288,7 +288,10 @@ export default function index(props) {
 			<Modal
 				backdrop="static"
 				open={open.create}
-				onClose={() => setOpen({ ...open, create: false })}
+				onClose={() => {
+					clearErrors("label");
+					setOpen({ ...open, create: false });
+				}}
 				size="lg"
 			>
 				<Header className="text-2xl font-bold">Tambah Generik Obat</Header>
@@ -298,6 +301,7 @@ export default function index(props) {
 							type="text"
 							label="Nama Generik"
 							name="label"
+							autofocus={true}
 							placeholder="Nama Generik"
 							register={register}
 							error={errors["label"]?.message}
@@ -321,6 +325,7 @@ export default function index(props) {
 				backdrop="static"
 				open={open.edit}
 				onClose={() => {
+					onclose("label");
 					setOpen({ ...open, edit: false })
 				}}
 				size="lg"
@@ -331,6 +336,7 @@ export default function index(props) {
 						<Input
 							type="text"
 							label="Nama Generik"
+							autofocus={true}
 							name="label"
 							placeholder="Nama Generik"
 							register={register}
@@ -355,7 +361,12 @@ export default function index(props) {
 				type="warning"
 				open={open.delete}
 				onClose={() => setOpen({ ...open, delete: false })}
-				body="Apakah anda yakin untuk menghapus data ini?"
+				body={
+					<>
+						Apakah anda yakin untuk menghapus data{" "}
+						<span className="text-danger">{editInput.label}</span>?
+					</>
+				}
 				btnText="Hapus"
 				onClick={() => HandleDeleteGeneric()}
 			/>

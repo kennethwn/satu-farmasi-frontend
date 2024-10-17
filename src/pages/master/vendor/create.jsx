@@ -25,24 +25,28 @@ const createVendorField = [
 		label: "Nama Vendor",
 		type: "text",
 		name: "name",
+		autofocus: true,
 		placeholder: "Nama Vendor",
 	},
 	{
 		label: "No Handphone",
 		type: "number",
 		name: "phoneNum",
+		autofocus: false,
 		placeholder: "628XXXXXXXXX",
 	},
 	{
 		label: "Alamat",
 		type: "text",
 		name: "address",
+		autofocus: false,
 		placeholder: "Alamat",
 	},
 	{
 		label: "Kota",
 		type: "text",
 		name: "city",
+		autofocus: false,
 		placeholder: "Kota",
 	},
 ];
@@ -91,6 +95,7 @@ export default function create() {
 										label={input.label}
 										register={register}
 										type={input.type}
+										autofocus={input.autofocus}
 										name={input.name}
 										placeholder={input.placeholder}
 										error={errors[input.name]?.message}
