@@ -15,7 +15,7 @@ import { useUserContext } from "@/pages/api/context/UserContext";
 
 const vendorSchema = z.object({
 	name: isRequiredString(),
-	phoneNum: isRequiredNumber(),
+	phoneNum: isRequiredString(),
 	address: isRequiredString(),
 	city: isRequiredString(),
 });
@@ -55,6 +55,7 @@ export default function index() {
 	const formRef = useRef(null);
 	const {
 		register,
+		getValues,
 		handleSubmit,
 		formState: { errors },
 		setValue,
@@ -101,7 +102,10 @@ export default function index() {
 		}
 	};
 
-	const submitForm = () => formRef.current.requestSubmit();
+	const submitForm = () => {
+		setValue("phoneNum", getValues("phoneNum").toString());
+		formRef.current.requestSubmit();
+	}
 
 	useEffect(() => {
 		const fetchData = async () => await handleFetchVendorById();

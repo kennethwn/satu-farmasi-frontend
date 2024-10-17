@@ -115,11 +115,11 @@ export default function index(props) {
     }
   };
 
-  // NOTE: Create
   const HandleCreateClassification = async () => {
     try {
       const validatedData = classificationSchema.parse(input);
       const res = await CreateClassification(validatedData);
+		console.log("create res: ", res);
       if (res.code !== 200) {
         toast.error("Failed to create classification", {
           autoClose: 2000,

@@ -94,7 +94,7 @@ export default function useGenericAPI() {
 
     const DeleteGeneric = async (data) => {
         try {
-            const response = await axios.delete(`/api/v1/genericName/${data.id}`)
+            const response = await axios.delete(`/api/v1/genericName/${data.id}`, { data: data })
                 .then((response) => {
                     setIsLoading(false);
                     return response;
