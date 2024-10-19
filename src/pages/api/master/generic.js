@@ -100,6 +100,7 @@ export default function useGenericAPI() {
                     return response;
                 })
                 .catch((error) => {
+					console.log("error: ", error);
                     setIsLoading(false);
                     return error;
                 })

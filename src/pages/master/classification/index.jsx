@@ -50,7 +50,7 @@ export default function index(props) {
 	const createFormRef = useRef();
 	const editFormRef = useRef();
 
-	const { register, handleSubmit, formState: { errors }, setValue, clearErrors } = useForm({
+	const { register, handleSubmit, formState: { errors }, setValue, reset } = useForm({
 		resolver: zodResolver(classificationSchema), defaultValues: {
 			id: "",
 			label: "",
@@ -59,7 +59,6 @@ export default function index(props) {
 	});
 
 	const HandleOnChange = (e, action) => {
-		console.log("action: ", action);
 		switch (action) {
 			case "create":
 				setInput({
@@ -96,7 +95,6 @@ export default function index(props) {
 	const HandleFetchClassificationData = async () => {
 		try {
 			const res = await GetAllClassification(page, limit);
-			console.log("result: ", res);
 			if (res.code !== 200) {
 				toast.error(res.message, { autoClose: 2000, position: "top-center" });
 				return;
@@ -111,7 +109,6 @@ export default function index(props) {
 	const HandleFetchClassificationByLabel = async () => {
 		try {
 			const res = await GetClassificationByLabel(search);
-			console.log(res);
 			if (res.code !== 200) {
 				toast.error(res.message, { autoClose: 2000, position: "top-center" });
 				return;
@@ -127,7 +124,6 @@ export default function index(props) {
 		try {
 			data = { ...data, value: data.label };
 			const res = await CreateClassification(data);
-			console.log("create res: ", res);
 			if (res.code !== 200) {
 				toast.error("Failed to create classification", {
 					autoClose: 2000,
@@ -164,15 +160,12 @@ export default function index(props) {
 			setOpen({ ...open, create: false, edit: false, delete: false });
 			HandleFetchClassificationData();
 		} catch (error) {
-			//console.error(error);
-			console.log("Error: ", error)
+			console.error(error);
 		}
 	};
 
 	const HandleDeleteClassification = async () => {
 		try {
-			setEditInput({ ...editInput, is_active: false });
-			console.log("input : ", editInput);
 			const res = await DeleteClassification(editInput);
 			if (res.code !== 200) {
 				toast.error("Failed to delete Classification", {
@@ -273,7 +266,6 @@ export default function index(props) {
 											<button
 												className="inline-flex items-center justify-center w-8 h-8 text-center bg-transparent border-0 rounded-lg"
 												onClick={() => {
-													console.log("rowData: ", rowData);
 													setEditInput(rowData);
 													setValue("id", rowData.id);
 													setValue("label", rowData.label);
@@ -287,7 +279,6 @@ export default function index(props) {
 											<button
 												className="inline-flex items-center justify-center w-8 h-8 text-center bg-transparent border-0 rounded-lg"
 												onClick={() => {
-													console.log(rowData);
 													setEditInput({ ...rowData, is_active: false, id: parseInt(rowData.id) });
 													setOpen({ ...open, delete: true });
 												}}
@@ -326,7 +317,7 @@ export default function index(props) {
 				backdrop="static"
 				open={open.create}
 				onClose={() => {
-					clearErrors("label");
+					reset();
 					setOpen({ ...open, create: false });
 				}}
 				size="lg"
@@ -358,7 +349,7 @@ export default function index(props) {
 				backdrop="static"
 				open={open.edit}
 				onClose={() => {
-					clearErrors("label");
+					reset();
 					setOpen({ ...open, edit: false });
 				}}
 				size="lg"
@@ -397,7 +388,7 @@ export default function index(props) {
 				}
 				btnText="Hapus"
 				isLoading={isLoading}
-				onClick={() => HandleDeleteClassification("delete")}
+				onClick={HandleDeleteClassification}
 			/>
 		</Layout>
 	);

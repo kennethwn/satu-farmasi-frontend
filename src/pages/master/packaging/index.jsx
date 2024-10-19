@@ -3,7 +3,7 @@ import Layout from "@/components/Layouts";
 import ContentLayout from "@/components/Layouts/Content";
 import SearchBar from "@/components/SearchBar";
 import { useUserContext } from "@/pages/api/context/UserContext";
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { IoMdAdd } from "react-icons/io";
 import { Pagination, SelectPicker, Table, Modal } from "rsuite";
 import { MdOutlineEdit } from "react-icons/md";
@@ -14,326 +14,353 @@ import { isRequiredString } from "@/helpers/validation";
 import Input from "@/components/Input";
 import usePackagingAPI from "@/pages/api/master/packaging";
 import Toaster from "@/components/Modal/Toaster";
+import { useForm } from "react-hook-form";
+import { zodResolver } from "@hookform/resolvers/zod";
 
 const packagingSchema = z.object({
-    label: isRequiredString(),
-    value: isRequiredString(),
+	label: isRequiredString(),
 })
 
 export default function index(props) {
-    const { user } = useUserContext();
-    const { Header, Body, Footer } = Modal;
-    const { HeaderCell, Cell, Column } = Table;
-    const { isLoading, GetAllPackaging, GetPackagingByLabel, CreatePackaging, EditPackaging, DeletePackaging } = usePackagingAPI();
+	const { user } = useUserContext();
+	const { Header, Body, Footer } = Modal;
+	const { HeaderCell, Cell, Column } = Table;
+	const { isLoading, GetAllPackaging, GetPackagingByLabel, CreatePackaging, EditPackaging, DeletePackaging } = usePackagingAPI();
 
-    const [data, setData] = useState([]);
-    const [editInput, setEditInput] = useState({});
-    const [input, setInput] = useState({ label: "", value: "" });
-    const [open, setOpen] = useState({
-        create: false,
-        edit: false,
-        delete: false,
-    });
+	const [data, setData] = useState([]);
+	const [editInput, setEditInput] = useState({});
+	const [input, setInput] = useState({ label: "", value: "" });
+	const [open, setOpen] = useState({
+		create: false,
+		edit: false,
+		delete: false,
+	});
 
-    const [search, setSearch] = useState('');
-    const [page, setPage] = useState(1);
-    const [totalPage, setTotalPage] = useState(0);
-    const [limit, setLimit] = useState(10);
+	const [search, setSearch] = useState('');
+	const [page, setPage] = useState(1);
+	const [totalPage, setTotalPage] = useState(0);
+	const [limit, setLimit] = useState(10);
+	const createFormRef = useRef();
+	const editFormRef = useRef();
 
-    const HandleOnChange = (e, action) => {
-        switch (action) {
-            case "create":
-                setInput({
-                    ...input,
-                    label: e.target.value,
-                    value: e.target.value
-                });
-                break;
-            case "edit":
-                setEditInput({
-                    ...editInput,
-                    label: e.target.value,
-                    value: e.target.value
-                });
-                break;
-        }
-    }
+	const { register, handleSubmit, formState: { errors }, setValue, reset  } = useForm({
+		resolver: zodResolver(packagingSchema), defaultValues: {
+			id: "",
+			label: "",
+			value: ""
+		}
+	});
 
-    const HandleClear = () => {
-        setData([]);
-        setEditInput({});
-        setPage(1);
-        setTotalPage(0);
-        setLimit(10);
-        setInput({ label: "", value: "" });
-        setOpen({
-            create: false,
-            edit: false,
-            delete: false,
-        });
-    }
+	const HandleOnChange = (e, action) => {
+		switch (action) {
+			case "create":
+				setInput({
+					...input,
+					label: e.target.value,
+					value: e.target.value
+				});
+				break;
+			case "edit":
+				setEditInput({
+					...editInput,
+					label: e.target.value,
+					value: e.target.value
+				});
+				break;
+		}
+	}
 
-    const HandeFetchPackagingData = async () => {
-        try {
-            const res = await GetAllPackaging(page, limit);
-            console.log(res);
-            if (res.code !== 200) {
-                toast.error(res.message, { autoClose: 2000, position: "top-center" });
-                return;
-            } 
-            setData(res.data.results);
-            setTotalPage(res.data.total);
-        } catch (error) {
-            console.error(error);
-        }
-    }
+	const HandleClear = () => {
+		setData([]);
+		setEditInput({});
+		setPage(1);
+		setTotalPage(0);
+		setLimit(10);
+		setInput({ label: "", value: "" });
+		setOpen({
+			create: false,
+			edit: false,
+			delete: false,
+		});
+	}
 
-    const HandleFetchPackagingByLabel = async () => {
-        try {
-            const res = await GetPackagingByLabel(search);
-            console.log(res);
-            if (res.code !== 200) {
-                toast.error(res.message, { autoClose: 2000, position: "top-center" });
-                return;
-            }
-            setData(res?.data.results);
-            setTotalPage(res.total);
-        } catch (error) {
-            console.error(error);
-        }
-    }
+	const HandeFetchPackagingData = async () => {
+		try {
+			const res = await GetAllPackaging(page, limit);
+			if (res.code !== 200) {
+				toast.error(res.message, { autoClose: 2000, position: "top-center" });
+				return;
+			}
+			setData(res.data.results);
+			setTotalPage(res.data.total);
+		} catch (error) {
+			console.error(error);
+		}
+	}
 
-    const HandleCreatePackaging = async () => {
-        try {
-            const validatedData = packagingSchema.parse(input);
-            const res = await CreatePackaging(validatedData);
-            if (res.code !== 200) {
-                toast.error("Failed to create packaging", { autoClose: 2000, position: "top-center" });
-                return;
-            } 
-            toast.success("Successfully created packaging", { autoClose: 2000, position: "top-center" });
-            setOpen({...open, create: false, edit: false, delete: false});
-            HandeFetchPackagingData();
-        } catch (error) {
-            console.error(error);
-        }
-    }
+	const HandleFetchPackagingByLabel = async () => {
+		try {
+			const res = await GetPackagingByLabel(search);
+			if (res.code !== 200) {
+				toast.error(res.message, { autoClose: 2000, position: "top-center" });
+				return;
+			}
+			setData(res?.data.results);
+			setTotalPage(res.total);
+		} catch (error) {
+			console.error(error);
+		}
+	}
 
-    const HandleEditPackaging = async () => {
-        try {
-            const res = await EditPackaging(editInput);
-            if (res.code !== 200) {
-                toast.error("Failed to edit packaging", { autoClose: 2000, position: "top-center" });
-                return;
-            }
-            toast.success(`${action === "delete" ? "Successfully deleted packaging" : "Successfully edited packaging"}`, { autoClose: 2000, position: "top-center" });
-            setOpen({...open, create: false, edit: false, delete: false});
-            HandeFetchPackagingData();
-        } catch (error) {
-            console.error(error);
-        }
-    }
+	const HandleCreatePackaging = async (data) => {
+		try {
+			data = { ...data, value: data.label };
+			const res = await CreatePackaging(data);
+			if (res.code !== 200) {
+				toast.error("Failed to create packaging", { autoClose: 2000, position: "top-center" });
+				return;
+			}
+			toast.success("Successfully created packaging", { autoClose: 2000, position: "top-center" });
+			setOpen({ ...open, create: false, edit: false, delete: false });
+			HandeFetchPackagingData();
+		} catch (error) {
+			console.error(error);
+		}
+	}
 
-    const HandleDeletePackaging = async () => {
-        try {
-            setEditInput({...editInput, isActive: false});
-            const res = await DeletePackaging(editInput);
-            if (res.code !== 200) {
-                toast.error("Failed to delete packaging", { autoClose: 2000, position: "top-center" });
-                return;
-            }
-            toast.success("Successfully deleted packaging", { autoClose: 2000, position: "top-center" });
-            setOpen({...open, create: false, edit: false, delete: false});
-            HandeFetchPackagingData();
-        } catch (error) {
-            console.error(error);
-        }
-    }
+	const HandleEditPackaging = async (data) => {
+		try {
+			data = { ...data, id: editInput.id, value: data.label };
+			const res = await EditPackaging(data);
+			if (res.code !== 200) {
+				toast.error("Failed to edit packaging", { autoClose: 2000, position: "top-center" });
+				return;
+			}
+			toast.success("Successfully edited packaging", { autoClose: 2000, position: "top-center" });
+			setOpen({ ...open, create: false, edit: false, delete: false });
+			HandeFetchPackagingData();
+		} catch (error) {
+			console.error(error);
+		}
+	}
 
-    useEffect(() => {
-        async function fetchData() {
-            if (search === '') {
-                await HandeFetchPackagingData();
-            } else {
-                await HandleFetchPackagingByLabel();
-            }
-        }
-        fetchData();
-    }, [page, limit, search]);
+	const HandleDeletePackaging = async () => {
+		try {
+			const res = await DeletePackaging(editInput);
+			if (res.code !== 200) {
+				toast.error("Failed to delete packaging", { autoClose: 2000, position: "top-center" });
+				return;
+			}
+			toast.success("Successfully deleted packaging", { autoClose: 2000, position: "top-center" });
+			setOpen({ ...open, create: false, edit: false, delete: false });
+			HandeFetchPackagingData();
+		} catch (error) {
+			console.error(error);
+		}
+	}
 
-    return (
-        <Layout active="master-packaging" user={user}>
-            <ContentLayout title="List Kemasan">
-                <div className="w-full h-[500px]">
-                    <div className="flex flex-row justify-between items-center w-full pb-6">
-                        <Button 
-                            prependIcon={<IoMdAdd size={24}/>} 
-                            onClick={() => setOpen({...open, create: true})}>
-                                Tambah
-                        </Button>
+	useEffect(() => {
+		async function fetchData() {
+			if (search === '') {
+				await HandeFetchPackagingData();
+			} else {
+				await HandleFetchPackagingByLabel();
+			}
+		}
+		fetchData();
+	}, [page, limit, search]);
 
-                        <SearchBar 
-                            size="md"
-                            className="w-1/4"
-                            placeholder="Search..."
-                            onChange={(value) => setSearch(value)}
-                        />
-                    </div>
-                    <Table
-                        data={data || []}
-                        bordered
-                        cellBordered
-                        height={400}
-                        shouldUpdateScroll={false}
-                        affixHorizontalScrollbar
-                        loading={isLoading}
-                    >
-                        <Column width={100} fixed="left">
-                            <HeaderCell className="text-center text-dark font-bold">No</HeaderCell>
-                            <Cell className="text-center text-dark">
-                                {(rowData, index) => index + 1}
-                            </Cell>
-                        </Column>
+	const submitcreateform = () => createFormRef.current.requestSubmit();
+	const submitEditForm = () => editFormRef.current.requestSubmit();
 
-                        <Column width={400}>
-                            <HeaderCell className="text-dark font-bold">ID Kemasan</HeaderCell>
-                            <Cell dataKey='label'/>
-                        </Column>
+	return (
+		<Layout active="master-packaging" user={user}>
+			<ContentLayout title="List Kemasan">
+				<div className="w-full h-[500px]">
+					<div className="flex flex-row justify-between items-center w-full pb-6">
+						<Button
+							prependIcon={<IoMdAdd size={24} />}
+							onClick={() => setOpen({ ...open, create: true })}>
+							Tambah
+						</Button>
 
-                        <Column flexGrow={1}>
-                            <HeaderCell className="text-dark font-bold">Nama Kemasan</HeaderCell>
-                            <Cell dataKey='value'/>
-                        </Column>
+						<SearchBar
+							size="md"
+							className="w-1/4"
+							placeholder="Search..."
+							onChange={(value) => setSearch(value)}
+						/>
+					</div>
+					<Table
+						data={data || []}
+						bordered
+						cellBordered
+						height={400}
+						shouldUpdateScroll={false}
+						affixHorizontalScrollbar
+						loading={isLoading}
+					>
+						<Column width={100} fixed="left">
+							<HeaderCell className="text-center text-dark font-bold">No</HeaderCell>
+							<Cell className="text-center text-dark">
+								{(rowData, index) => index + 1}
+							</Cell>
+						</Column>
 
-                        <Column width={150} fixed="right">
-                            <HeaderCell className="text-center text-dark font-bold">Action</HeaderCell>
-                            <Cell className="text-center">
-                                {
-                                    rowData => {
-                                        return (
-                                            <div className="flex justify-center flex-row gap-6">
-                                                <button
-                                                    className="inline-flex items-center justify-center w-8 h-8 text-center bg-transparent border-0 rounded-lg"
-                                                    onClick={() => {
-                                                        console.log(rowData);
-                                                        setEditInput(rowData);
-                                                        setOpen({...open, edit: true});
-                                                    }}
-                                                >
-                                                    <MdOutlineEdit 
-                                                        size="2em" 
-                                                        color="#FFD400" 
-                                                    />
-                                                </button>
+						<Column width={400}>
+							<HeaderCell className="text-dark font-bold">ID Kemasan</HeaderCell>
+							<Cell dataKey='label' />
+						</Column>
 
-                                                <button
-                                                    className="inline-flex items-center justify-center w-8 h-8 text-center bg-transparent border-0 rounded-lg"
-                                                    onClick={() => {
-                                                        console.log(rowData);
-                                                        setEditInput({...rowData, isActive: false});
-                                                        setOpen({...open, delete: true});
-                                                    }}
-                                                >
-                                                    <PiTrash 
-                                                        size="2em" 
-                                                        color="#DC4A43" 
-                                                    />
-                                                </button>
-                                            </div>
-                                        )
-                                    }
-                                }
-                            </Cell>
-                        </Column>
-                    </Table>
-                    <div className="pt-4">
-                        <Pagination
-                            prev
-                            next
-                            first
-                            last
-                            ellipsis
-                            boundaryLinks
-                            maxButtons={5}
-                            size="xs"
-                            layout={["total", "-", "limit", "|", "pager"]}
-                            total={totalPage || 0}
-                            limitOptions={[5, 10, 15]}
-                            limit={limit}
-                            activePage={page}
-                            onChangePage={page => setPage(page)}
-                            onChangeLimit={limit => setLimit(limit)}
-                        />
-                    </div>
-                </div>
-            </ContentLayout>
+						<Column flexGrow={1}>
+							<HeaderCell className="text-dark font-bold">Nama Kemasan</HeaderCell>
+							<Cell dataKey='value' />
+						</Column>
 
-            <Modal 
-                backdrop="static"
-                open={open.create} 
-                onClose={() => setOpen({...open, create: false})}
-                size="lg"
-            >
-                <Header className="text-2xl font-bold">Tambah Kemasan</Header>
-                <Body className="pt-2">
-                    <Input
-                        type="text"
-                        label="Nama Kemasan"
-                        name="name"
-                        placeholder="nama kemasan"
-                        onChange={e => HandleOnChange(e, "create")}
-                    />
-                </Body>
-                <Footer className="pt-4">
-                    <Button
-                        appearance="primary"
-                        isLoading={isLoading}
-                        onClick={() => HandleCreatePackaging()}
-                    >
-                        Simpan
-                    </Button>
-                </Footer>
-            </Modal>
+						<Column width={150} fixed="right">
+							<HeaderCell className="text-center text-dark font-bold">Action</HeaderCell>
+							<Cell className="text-center">
+								{
+									rowData => {
+										return (
+											<div className="flex justify-center flex-row gap-6">
+												<button
+													className="inline-flex items-center justify-center w-8 h-8 text-center bg-transparent border-0 rounded-lg"
+													onClick={() => {
+														setEditInput(rowData);
+														setValue("id", rowData.id);
+														setValue("label", rowData.label);
+														setValue("value", rowData.value);
+														setOpen({ ...open, edit: true });
+													}}
+												>
+													<MdOutlineEdit
+														size="2em"
+														color="#FFD400"
+													/>
+												</button>
 
-            <Modal 
-                backdrop="static"
-                open={open.edit} 
-                onClose={() => {
-                    setOpen({...open, edit: false})
-                }}
-                size="lg"
-            >
-                <Header className="text-2xl font-bold">Edit Kemasan</Header>
-                <Body className="pt-2">
-                    <Input
-                        type="text"
-                        label="Nama Kemasan"
-                        name="name"
-                        placeholder="nama kemasan"
-                        value={editInput.value}
-                        onChange={e => HandleOnChange(e, "edit")}
-                    />
-                </Body>
-                <Footer className="pt-4">
-                    <Button
-                        isLoading={isLoading}
-                        appearance="primary"
-                        onClick={() => HandleEditPackaging()}
-                    >
-                        Simpan
-                    </Button>
-                </Footer>
-            </Modal>
+												<button
+													className="inline-flex items-center justify-center w-8 h-8 text-center bg-transparent border-0 rounded-lg"
+													onClick={() => {
+														setEditInput({ ...rowData, isActive: false, id: parseInt(rowData.id) });
+														setOpen({ ...open, delete: true });
+													}}
+												>
+													<PiTrash
+														size="2em"
+														color="#DC4A43"
+													/>
+												</button>
+											</div>
+										)
+									}
+								}
+							</Cell>
+						</Column>
+					</Table>
+					<div className="pt-4">
+						<Pagination
+							prev
+							next
+							first
+							last
+							ellipsis
+							boundaryLinks
+							maxButtons={5}
+							size="xs"
+							layout={["total", "-", "limit", "|", "pager"]}
+							total={totalPage || 0}
+							limitOptions={[5, 10, 15]}
+							limit={limit}
+							activePage={page}
+							onChangePage={page => setPage(page)}
+							onChangeLimit={limit => setLimit(limit)}
+						/>
+					</div>
+				</div>
+			</ContentLayout>
 
-            {/* TODO: Bold editInput.label */}
-            <Toaster
-                type="warning"
-                open={open.delete} 
-                onClose={() => setOpen({...open, delete: false})}
-                body={<>Apakah anda yakin untuk menghapus data <span className="text-danger">{editInput.label}</span>?</>}
-                btnText="Hapus"
-                onClick={() => HandleDeletePackaging()}
-            />
-        </Layout>
-    )
+			<Modal
+				backdrop="static"
+				open={open.create}
+				onClose={() => {
+					reset();
+					setOpen({ ...open, create: false })
+				}}
+				size="lg"
+			>
+				<Header className="text-2xl font-bold">Tambah Kemasan</Header>
+				<form onSubmit={handleSubmit(HandleCreatePackaging)} ref={createFormRef}>
+					<Body className="pt-2">
+						<Input
+							type="text"
+							label="Nama Kemasan"
+							name="label"
+							placeholder="Nama kemasan"
+							autofocus={true}
+							register={register}
+							error={errors["label"]?.message}
+							onChange={e => HandleOnChange(e, "create")}
+						/>
+					</Body>
+					<Footer className="pt-4">
+						<Button
+							type="button"
+							appearance="primary"
+							isLoading={isLoading}
+							onClick={submitcreateform}
+						>
+							Simpan
+						</Button>
+					</Footer>
+				</form>
+			</Modal>
+
+			<Modal
+				backdrop="static"
+				open={open.edit}
+				onClose={() => {
+					reset();
+					setOpen({ ...open, edit: false })
+				}}
+				size="lg"
+			>
+				<Header className="text-2xl font-bold">Edit Kemasan</Header>
+				<form onSubmit={handleSubmit(HandleEditPackaging)} ref={editFormRef}>
+					<Body className="pt-2">
+						<Input
+							type="text"
+							label="Nama Kemasan"
+							name="label"
+							placeholder="Nama kemasan"
+							autofocus={true}
+							register={register}
+							error={errors["label"]?.message}
+							onChange={e => HandleOnChange(e, "edit")}
+						/>
+					</Body>
+					<Footer className="pt-4">
+						<Button
+							type="button"
+							isLoading={isLoading}
+							appearance="primary"
+							onClick={submitEditForm}
+						>
+							Simpan
+						</Button>
+					</Footer>
+				</form>
+			</Modal>
+
+			<Toaster
+				type="warning"
+				open={open.delete}
+				onClose={() => setOpen({ ...open, delete: false })}
+				body={<>Apakah anda yakin untuk menghapus data <span className="text-danger">{editInput.label}</span>?</>}
+				btnText="Hapus"
+				onClick={HandleDeletePackaging}
+			/>
+		</Layout>
+	)
 }

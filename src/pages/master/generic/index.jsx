@@ -38,7 +38,7 @@ export default function index(props) {
 		delete: false,
 	});
 
-	const { register, handleSubmit, formState: { errors }, setValue, clearErrors } = useForm({
+	const { register, handleSubmit, formState: { errors }, setValue, reset } = useForm({
 		resolver: zodResolver(genericSchema), defaultValues: {
 			id: "",
 			label: "",
@@ -289,7 +289,7 @@ export default function index(props) {
 				backdrop="static"
 				open={open.create}
 				onClose={() => {
-					clearErrors("label");
+					reset();
 					setOpen({ ...open, create: false });
 				}}
 				size="lg"
@@ -325,7 +325,7 @@ export default function index(props) {
 				backdrop="static"
 				open={open.edit}
 				onClose={() => {
-					onclose("label");
+					reset();
 					setOpen({ ...open, edit: false })
 				}}
 				size="lg"
@@ -368,7 +368,7 @@ export default function index(props) {
 					</>
 				}
 				btnText="Hapus"
-				onClick={() => HandleDeleteGeneric()}
+				onClick={HandleDeleteGeneric}
 			/>
 		</Layout>
 	)
