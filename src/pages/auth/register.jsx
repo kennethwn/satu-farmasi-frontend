@@ -60,10 +60,9 @@ export default function Login() {
 
 	const RegisterHandler = async (data) => {
 		try {
-			let response = null;
-			if (data.role === "pharmacist") response = await addPharmacist(data);
-			else response = await addDoctor(data);
-			parseInt(response.code) === 200 && router.push("/auth/login");
+			if (data.role === "pharmacist") await addPharmacist(data);
+			else await addDoctor(data);
+			router.push("/auth/login");
 		} catch (error) {
 			ErrorForm(error, setError);
 			setTriggerErr(!triggerErr);
@@ -89,7 +88,7 @@ export default function Login() {
 		roleRef.current.style.display = "none";
 	}
 
-	const submitForm = () =>  formRef.current.requestSubmit();
+	const submitForm = () => formRef.current.requestSubmit();
 
 	useEffect(() => {
 		if (Object.keys(errors).length > 0) {

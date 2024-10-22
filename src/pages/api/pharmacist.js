@@ -13,6 +13,7 @@ export default function usePharmacist() {
         try {
              return await api.post("/api/v1/pharmacists/", { email, password, nik, firstName, lastName, phoneNum, dob, role })
         } catch (error) {
+			console.log("error di pharmacist.js", error)
             throw error.response.data.errors;
         }
     }
