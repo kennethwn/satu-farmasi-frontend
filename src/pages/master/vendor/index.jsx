@@ -55,7 +55,7 @@ export default function index() {
         return;
       }
       setData(res?.data.results);
-      setTotalPage(res.total);
+      setTotalPage(res.data.total);
     } catch (error) {
       console.error(error);
     }
