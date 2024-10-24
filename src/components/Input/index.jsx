@@ -18,7 +18,8 @@ export default function Input(props) {
         register = () => { },
         value,
         autofocus = false,
-        currency = false
+        currency = false,
+		checked = false,
     } = props;
 
     if (disabled === true) className.push(' cursor-not-allowed');
@@ -27,7 +28,7 @@ export default function Input(props) {
     if (type === "checkbox") {
         return (
             <div className='flex justify-start items-center w-full'>
-                <Checkbox id={id} name={name} {...register(name)} onChange={onChange} value={value} />
+                <Checkbox id={id} name={name} onChange={onChange} value={value} checked={checked} />
                 <Label name={name} label={label} />
             </div>
         )
@@ -109,5 +110,6 @@ Input.propTypes = {
     className: propTypes.string,
     checked: propTypes.bool,
     register: propTypes.func,
-    currency: propTypes.string
+    currency: propTypes.string,
+	checked: propTypes.bool,
 }
