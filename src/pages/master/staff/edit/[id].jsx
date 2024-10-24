@@ -13,6 +13,7 @@ import { z } from "zod";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useUserContext } from "@/pages/api/context/UserContext";
+import { ErrorForm } from "@/helpers/errorForm";
 
 const staffSchema = z.object({
 	firstName: isRequiredString(),
@@ -38,6 +39,7 @@ export default function Index() {
 		handleSubmit,
 		formState: { errors },
 		setValue,
+		setError,
 	} = useForm({
 		resolver: zodResolver(staffSchema), defaultValues: {
 			firstName: "",
@@ -86,15 +88,21 @@ export default function Index() {
 			toast.success(res.message, { autoClose: 2000, position: "top-center" });
 			router.push("/master/staff");
 		} catch (error) {
-			console.error(error);
+			ErrorForm(error, setError);
+			console.log("error found: ", error);
 		}
 	};
 
 	const handleRole = async (data) => {
-		if (data.role.toLowerCase() === "admin") return await EditAdmin(data);
-		else if (data.role.toLowerCase() === "doctor") return await EditDoctor(data);
-		else if (data.role.toLowerCase() === "pharmacist") return await EditPharmacist(data);
-		else throw new Error("Role is not valid");
+		try {
+			if (data.role.toLowerCase() === "admin") return await EditAdmin(data);
+			else if (data.role.toLowerCase() === "doctor") return await EditDoctor(data);
+			else if (data.role.toLowerCase() === "pharmacist") return await EditPharmacist(data);
+			else throw new Error("Role is not valid");
+		} catch (error) {
+			console.log("error here: ", error);
+			throw error;
+		}
 	}
 
 	useEffect(() => {
@@ -111,6 +119,10 @@ export default function Index() {
 		setValue("phoneNum", getValues("phoneNum").toString());
 		formRef.current.requestSubmit();
 	}
+
+	useEffect(() => {
+		console.log(errors);
+	}, [errors])
 
 	{/* TODO: add register, delete values */ }
 	return (
