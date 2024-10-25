@@ -66,7 +66,7 @@ export default function index() {
             setFormData({
                 ...res.data,
                 medicineId: res.data.medicine.id,
-                oldQuantity: parseInt(res.data.quantity),
+                oldQuantity: Number(res.data.quantity),
             })
         } catch (error) {
             console.error(error);
@@ -123,7 +123,7 @@ export default function index() {
 
     const inputOnChangeHandler = (e, name) => {
         if (name === "medicineId" || name === "reasonOfDispose") {
-            setFormData({ ...formData, [name]: name === "medicineId" ? parseInt(e) : e });
+            setFormData({ ...formData, [name]: name === "medicineId" ? Number(e) : e });
             setErrors((prevErrors) => ({ ...prevErrors, [name]: "" }));
         } else {
             setFormData({ ...formData, [e.target.name]: Number(e.target.value) });
