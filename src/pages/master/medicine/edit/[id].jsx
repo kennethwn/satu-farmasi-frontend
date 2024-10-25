@@ -2,7 +2,6 @@ import Button from "@/components/Button";
 import InputField from "@/components/Input";
 import Layout from "@/components/Layouts";
 import ContentLayout from "@/components/Layouts/Content";
-import Select from "@/components/Select";
 import { useUserContext } from "@/pages/api/context/UserContext";
 import useGenericAPI from "@/pages/api/master/generic";
 import useMedicineAPI from "@/pages/api/master/medicine";
@@ -15,6 +14,11 @@ import { SelectPicker } from "rsuite";
 import { z, ZodError } from "zod";
 import { isRequiredNumber, isRequiredString } from "@/helpers/validation";
 import Text from "@/components/Text";
+import useClassificationsAPI from "@/pages/api/master/classification";
+
+const classificationSchema = z.object({
+	classificationId: isRequiredNumber(),
+});
 
 const medicineSchema = z.object({
 	name: isRequiredString(),
@@ -23,9 +27,12 @@ const medicineSchema = z.object({
 	currStock: isRequiredNumber(),
 	minStock: isRequiredNumber(),
 	maxStock: isRequiredNumber(),
-	genericName: isRequiredString(),
-	packaging: isRequiredString(),
-	unitOfMeasure: isRequiredString(),
+	genericNameId: isRequiredNumber(),
+	packagingId: isRequiredNumber(),
+	unitOfMeasure: isRequiredString().nullable().refine(value => value !== null, {
+		message: "This field is required",
+	}),
+	classificationList: z.array(classificationSchema),
 	sideEffect: isRequiredString(),
 }).refine(data => data.minStock < data.maxStock, {
 	message: "Minimum stock must be less than maximum stock",
@@ -43,12 +50,14 @@ export default function Index() {
 	const id = router.query.id;
 	const { user } = useUserContext();
 	const { isLoading, EditMedicine, SearchMedicine } = useMedicineAPI();
+	const { GetAllClassificationsDropdown } = useClassificationsAPI();
 	const { GetPackagingDropdown } = usePackagingAPI();
 	const { GetGenericDropdown } = useGenericAPI();
 
 	const [input, setInput] = useState({});
 	const [errors, setErrors] = useState({});
 	const [packagings, setPackagings] = useState([]);
+	const [classifications, setClassifications] = useState([]);
 	const [generics, setGenerics] = useState([]);
 	const [formFields, setFormFields] = useState([{ id: 0, label: '', value: '' }]);
 	const unitOfMeasure = [
@@ -117,9 +126,33 @@ export default function Index() {
 		}
 	}
 
+	const handleFetchClassifications = async () => {
+		try {
+			const res = await GetAllClassificationsDropdown();
+			if (res.code !== 200) {
+				toast.error(res.message, { autoClose: 2000, position: "top-center" });
+				setGenerics([]);
+				return;
+			}
+			setClassifications(res.data);
+		} catch (error) {
+			console.error(error);
+		}
+	}
+
 	const handleSubmit = async () => {
 		try {
 			let classifications = [];
+			//input.classifications = formFields;
+			// TODO: Make sure this is the coreect logic
+			formFields.forEach((item, index) => {
+				input.classifications[index] = {
+					classification: {
+						id: item.id,
+					}
+				}
+			});
+
 			input?.classifications?.map((item, index) => {
 				let temp = { classificationId: 0, medicineId: 0 };
 				temp['classificationId'] = item.classification.id;
@@ -127,6 +160,9 @@ export default function Index() {
 				classifications.push(temp);
 			})
 
+			console.log("input payload", input);
+			console.log("formfield payload: ", formFields);
+			console.log("classificaiotns payload: ", classifications);
 			const payload = {
 				id: input.id,
 				code: input.code,
@@ -140,7 +176,7 @@ export default function Index() {
 				minStock: Number(input.minStock),
 				maxStock: Number(input.maxStock),
 				genericNameId: Number(input.genericName) || Number(input.genericName.id),
-				packagingId: input.packaging.id,
+				packagingId: Number(input.packaging.id),
 				sideEffect: input.sideEffect,
 				classificationList: classifications,
 				is_active: input.is_active,
@@ -149,7 +185,8 @@ export default function Index() {
 			}
 
 			setErrors({});
-			medicineSchema.parse({ ...payload, genericName: input.genericName.label, packaging: input.packaging.label });
+			console.log("payload", payload);
+			medicineSchema.parse(payload);
 			const res = await EditMedicine(payload);
 			if (res.code !== 200) {
 				toast.error(res.message, { autoClose: 2000, position: "top-center" });
@@ -158,12 +195,19 @@ export default function Index() {
 			toast.success(res.message, { autoClose: 2000, position: "top-center" });
 			router.push("/master/medicine");
 		} catch (error) {
+			console.log("error zod: ", error);
 			if (error instanceof ZodError) {
 				const newErrors = { ...errors };
 				error.issues.forEach((issue) => {
+					console.log("ISSUE: ", issue)
 					if (issue.path.length > 0) {
-						const fieldName = issue.path[0];
-						newErrors[fieldName] = issue.message;
+						if (issue.path[0] === "classificationList") {
+							newErrors[`classificationList[${issue.path[1]}]`] = issue.message;
+						}
+						else {
+							const fieldName = issue.path[0];
+							newErrors[fieldName] = issue.message;
+						}
 					}
 				});
 				setErrors(newErrors);
@@ -176,11 +220,18 @@ export default function Index() {
 			await handleFetchMedicineByCode();
 			await handleFetchPackagingDropdown();
 			await handleFetchGenericDropdown();
+			await handleFetchClassifications();
 		}
 		if (router.isReady) {
 			fetchData();
 		}
 	}, [id, router]);
+
+	useEffect(() => {
+		if (errors) {
+			console.log("errors here: ", errors);
+		}
+	}, [errors]);
 
 	return (
 		<Layout active="master-medicine" user={user}>
@@ -300,7 +351,7 @@ export default function Index() {
 										value={input?.currStock}
 										error={errors['currStock']}
 										onChange={e => {
-											setInput({ ...input, currStock: parseInt(e.target.value) })
+											setInput({ ...input, currStock: Number(e.target.value) })
 											setErrors({ ...errors, "currStock": "" });
 										}}
 									/>
@@ -329,7 +380,7 @@ export default function Index() {
 										error={errors['minStock']}
 										value={input?.minStock}
 										onChange={e => {
-											setInput({ ...input, minStock: parseInt(e.target.value) })
+											setInput({ ...input, minStock: Number(e.target.value) })
 											setErrors({ ...errors, "minStock": "" });
 										}}
 									/>
@@ -358,7 +409,7 @@ export default function Index() {
 										error={errors['maxStock']}
 										value={input?.maxStock}
 										onChange={e => {
-											setInput({ ...input, maxStock: parseInt(e.target.value) })
+											setInput({ ...input, maxStock: Number(e.target.value) })
 											setErrors({ ...errors, "maxStock": "" });
 										}}
 									/>
@@ -374,7 +425,8 @@ export default function Index() {
 									<SelectPicker
 										id="genericName"
 										name="genericName"
-										placeholder="nama generik"
+										className="py-1.5"
+										placeholder="Nama Generik"
 										size='lg'
 										disabled={true}
 										value={input?.genericName?.id}
@@ -388,22 +440,25 @@ export default function Index() {
 										<SelectPicker
 											id="genericName"
 											name="genericName"
-											placeholder="nama generik"
+											placeholder="Nama Generik"
 											size='lg'
 											value={input?.genericName?.id}
 											valueKey="id"
+											className="py-1.5"
 											labelKey="label"
 											onChange={value => {
-												setInput({ ...input, genericName: value })
-												setErrors({ ...errors, "genericName": "" });
+												console.log("value", value);
+												console.log("input", input);
+												setInput({ ...input, genericName: { id: value } })
+												setErrors({ ...errors, "genericNameId": "" });
 											}}
 											data={generics}
 											block
 										/>
 										<div style={{ minHeight: '22px' }}>
 											{
-												errors['genericName'] &&
-												<Text type="danger">{errors['genericName']}</Text>
+												errors['genericNameId'] &&
+												<Text type="danger">{errors['genericNameId']}</Text>
 											}
 										</div>
 									</>
@@ -421,6 +476,7 @@ export default function Index() {
 										name="packaging"
 										placeholder="kemasan"
 										disabled={true}
+										className="py-1.5"
 										size='lg'
 										value={input?.packaging?.id}
 										labelKey="label"
@@ -433,31 +489,35 @@ export default function Index() {
 										<SelectPicker
 											id="packaging"
 											name="packaging"
-											placeholder="kemasan"
+											placeholder="Kemasan"
 											value={input?.packaging?.id}
 											labelKey="label"
 											size='lg'
+											className="py-1.5"
 											valueKey="id"
 											onChange={value => {
-												setInput({ ...input, packaging: value })
-												setErrors({ ...errors, "packaging": "" });
+												console.log("value", value);
+												console.log("input", input);
+												setInput({ ...input, packaging: { id: value } })
+												setErrors({ ...errors, "packagingId": "" });
 											}}
 											data={packagings}
 											block
 										/>
 										<div style={{ minHeight: '22px' }}>
 											{
-												errors['packaging'] &&
-												<Text type="danger">{errors['packaging']}</Text>
+												errors['packagingId'] &&
+												<Text type="danger">{errors['packagingId']}</Text>
 											}
 										</div>
 									</>
 								}
 							</div>
 						</div>
+						{/* TODO: add validation for classification */}
 						<div className="sm:col-span-6 my-6">
 							{/* <MedicineClassificationForm isLoading={isLoading} formFields={formFields} setFormFields={HandleFormFields} /> */}
-							<MedicineClassificationForm isLoading={isLoading} formFields={formFields} setFormFields={handleFormFields} />
+							<MedicineClassificationForm errors={errors} setErrors={setErrors} classifications={classifications} isLoading={isLoading} formFields={formFields} setFormFields={handleFormFields} />
 						</div>
 						<div className="sm:col-span-6">
 							<label htmlFor="unitOfMeasure" className="block text-sm font-medium leading-6 text-dark">
@@ -468,10 +528,11 @@ export default function Index() {
 									<SelectPicker
 										id="unitOfMeasure"
 										name="unitOfMeasure"
-										placeholder="satuan"
+										placeholder="Satuan"
 										disabled={true}
 										size='lg'
 										block
+										className="py-1.5"
 										data={unitOfMeasure}
 										value={input?.unitOfMeasure}
 										valueKey="value"
@@ -482,8 +543,9 @@ export default function Index() {
 										<SelectPicker
 											id="unitOfMeasure"
 											name="unitOfMeasure"
-											placeholder="satuan"
+											placeholder="Satuan"
 											size='lg'
+											className="py-1.5"
 											data={unitOfMeasure}
 											block
 											onChange={value => {

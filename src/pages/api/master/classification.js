@@ -15,6 +15,17 @@ export default function useClassificationsAPI() {
         }
     }
 
+    const GetAllClassificationsDropdown = async () => {
+        setIsLoading(true)
+        try {
+            return await axios.get(`/api/v1/classifications/dropdown`)
+        } catch (error) {
+            console.error(error);
+        } finally {
+          setIsLoading(false);
+        }
+    }
+
     const GetClassificationByLabel = async (label) => {
         setIsLoading(true)
         try {
@@ -63,6 +74,7 @@ export default function useClassificationsAPI() {
     return {
         isLoading,
         GetAllClassification,
+		GetAllClassificationsDropdown,
         GetClassificationByLabel,
         CreateClassification,
         EditClassification,
