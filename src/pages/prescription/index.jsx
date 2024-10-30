@@ -186,7 +186,7 @@ export default function index() {
                             <Cell dataKey='patientName'/>
                         </Column>
 
-                        <Column flexGrow={1} resizable sortable>
+                        <Column width={200} resizable sortable>
                             <HeaderCell className="text-dark">Status</HeaderCell>
                             <Cell dataKey='status'/>
                         </Column>

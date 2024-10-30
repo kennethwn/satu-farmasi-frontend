@@ -1,17 +1,17 @@
 import React, { useEffect, useState } from "react";
 import InputField from "../Input";
 import Button from "../Button";
-import { SelectPicker } from "rsuite";
 import { IoIosAdd } from "react-icons/io";
 import { MdDeleteOutline } from "react-icons/md";
 import useMedicineDropdownOption from "@/pages/api/medicineDropdownOption";
 import { formatRupiah } from "@/helpers/currency";
+import Dropdown from "../SelectPicker/Dropdown";
 
 function PrescriptionForm(props) {
   const { formFields, setFormFields } = props;
 
   const { getMedicineDropdownOptions } = useMedicineDropdownOption();
-  const [medicineDropdownOptions, setMedicineDropdownOptions] = useState([])
+  const [medicineDropdownOptions, setMedicineDropdownOptions] = useState([]);
 
   const data = Object.entries(medicineDropdownOptions).map(([key, item]) => ({
     label: item.name,
@@ -116,11 +116,12 @@ function PrescriptionForm(props) {
         item.instruction = instruction;
       }
     });
+    setFormFields(temp);
   };
 
   return (
-    <div className="flex flex-col gap-4">
-      <div className="grid grid-cols-10 gap-4 text-center font-bold">
+    <div className="flex flex-col gap-y-4">
+      <div className="grid grid-cols-10 gap-4 text-center font-bold max-lg:invisible">
         <div> </div>
         <div className="col-span-2">Nama Obat</div>
         <div className="col-span-2">Jumlah</div>
@@ -132,7 +133,7 @@ function PrescriptionForm(props) {
         formFields.map((formField, index) => (
           <div className="flex flex-col gap-2">
             <div key={index} className="grid grid-cols-1 w-full lg:grid-cols-10 gap-4 mb-2">
-              <div className="flex max-lg:w-full justify-center">
+              <div className="flex lg:flex-col w-3/4">
                 {index == formFields.length - 1 && (
                   <Button size="small" onClick={(e) => handleAddFormFieldRow()}>
                     <IoIosAdd size={"1.6rem"} />
@@ -140,7 +141,8 @@ function PrescriptionForm(props) {
                 )}
               </div>
               <div className="col-span-2">
-                <SelectPicker
+                <label className="lg:hidden">Nama Obat</label>
+                <Dropdown
                   id="name"
                   // appearance="subtle"
                   size="lg"
@@ -151,10 +153,12 @@ function PrescriptionForm(props) {
                   renderValue={formField.medicineId != -1 ? (value) => <div className="text-sm">{medicineDropdownOptions[value].name}</div> : null}
                   block
                   style={{ }}
+                  placement="bottomStart"
                   // cleanable={false}
                 />
               </div>
               <div className="col-span-2">
+                <label className="lg:hidden">Jumlah</label>
                 <InputField
                   type="number"
                   id="quantity"
@@ -167,6 +171,7 @@ function PrescriptionForm(props) {
                 />
               </div>
               <div className="col-span-2">
+                <label className="lg:hidden">Harga per Obat</label>
                 <InputField
                   type="text"
                   id="price"
@@ -178,6 +183,7 @@ function PrescriptionForm(props) {
                 />
               </div>
               <div className="col-span-2">
+                <label className="lg:hidden">Total Sub Harga</label>
                 <InputField
                   type="text"
                   id="subtotal"
@@ -188,19 +194,20 @@ function PrescriptionForm(props) {
                   currency="true"
                 />
               </div>
-              <div className="flex justify-center">
-                {/* <Button
-                  type="button"
-                  id="action"
-                  name="action"
-                  placeholder="action"
-                  size="medium"
-                  onClick={(e) => handleRemoveFormFieldRow(index)}
-                >
-                  <MdDeleteOutline size={"1.6rem"} color="maroon" />
-                </Button> */}
+              <div className="col-span-2 lg:hidden">
+                <label className="lg:hidden">Instruction</label> 
+                  <InputField
+                    type="text"
+                    id="instruction"
+                    name="instruction"
+                    value={formField?.instruction} // TODO: fix handle change
+                    placeholder="Instruction"
+                    onChange={(e) => handleInstructionField(index, e.target.value)}
+                  />
+              </div>
+              <div className="max-lg:col-span-2 justify-center lg:flex lg:flex-col lg:justify-end">
                 <button
-                    className={`flex justify-center w-full rounded-md py-1.5 stroke-2 shadow-sm ${formFields.length > 1 ? 'stroke-white' : 'lg:stroke-gray-300 stroke-white'} lg:shadow-none lg:border-0 border-2 border-gray-300 placeholder:text-gray-400 sm:text-sm sm:leading-6`}
+                    className={`flex justify-center w-full rounded-md py-2 stroke-2 shadow-sm ${formFields.length > 1 ? 'stroke-white bg-button-danger lg:bg-white' : 'lg:stroke-gray-300 bg-border-box stroke-white'} lg:shadow-none lg:border-0 border-2 border-gray-300 placeholder:text-gray-400 sm:text-sm sm:leading-6`}
                     disabled={formFields?.length > 1 ? false : true}
                     onClick={(e) => handleRemoveFormFieldRow(index)}
                 >
@@ -208,9 +215,9 @@ function PrescriptionForm(props) {
                 </button>
               </div>
             </div>
-            <div className="grid grid-cols-10 gap-4 mb-6">
+            <div className="grid grid-cols-10 max-lg:hidden max-lg:grid-cols-1 w-full gap-4 mb-6">
               <div className="col-span-1 max-lg:hidden"></div> 
-              <div className="lg:col-span-8">
+              <div className="lg:col-span-8 col-span-1 w-full">
                 <InputField
                   type="text"
                   id="instruction"

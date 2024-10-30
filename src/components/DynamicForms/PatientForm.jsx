@@ -1,7 +1,8 @@
 import React, { useEffect, useState } from 'react'
-import { SelectPicker } from 'rsuite'
 import InputField from '../Input';
-import usePatientDropdownOption from '@/pages/api/patientDropdownOption';
+import usPatientAPI from '@/pages/api/patient';
+import Dropdown from '../SelectPicker/Dropdown';
+import usePatientAPI from '@/pages/api/patient';
 
 function PatientForm(props) {
     const {
@@ -10,7 +11,7 @@ function PatientForm(props) {
         existingPatient
     } = props
 
-    const { getPatientDropdownOptions } = usePatientDropdownOption();
+    const { getPatientDropdownOptions } = usePatientAPI();
     const [patientDropdownOptions, setPatientDropdownOptions] = useState([])
 
     const data = Object.entries(patientDropdownOptions).map(([key, patient]) => ({
@@ -81,7 +82,7 @@ function PatientForm(props) {
                 <p> Nama Pasien </p>
                 <div className='col-span-2'>
                     {existingPatient ? 
-                    <SelectPicker
+                    <Dropdown
                         id='name'
                         size='lg'
                         name='name'
