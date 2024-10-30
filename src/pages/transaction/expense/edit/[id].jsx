@@ -12,6 +12,7 @@ import Dropdown from "@/components/SelectPicker/Dropdown";
 import { isRequiredNumber, isRequiredString } from "@/helpers/validation";
 import useMedicineDropdownOption from "@/pages/api/medicineDropdownOption";
 import { useUserContext } from "@/pages/api/context/UserContext";
+import { ErrorForm } from "@/helpers/errorForm";
 
 const medicineSchema = z.object({
     medicineId: isRequiredNumber(),
@@ -87,6 +88,7 @@ export default function index() {
             toast.success(res.message, { autoClose: 2000, position: "top-center" });
             router.push("/transaction/expense");
         } catch (error) {
+			console.log("error: ", error)
             if (error instanceof ZodError) {
                 const newErrors = { ...errors };
                 error.issues.forEach((issue) => {
@@ -96,7 +98,9 @@ export default function index() {
                     }
                 });
                 setErrors(newErrors);
-            }
+            } else {
+				ErrorForm(error, setErrors);
+			}
         }
     };
 

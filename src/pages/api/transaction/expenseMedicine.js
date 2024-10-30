@@ -57,7 +57,7 @@ export default function useExpenseMedicineAPI() {
         try {
             return await axios.put(`/api/v1/outputMedicines/`, data);
         } catch (error) {
-            console.error(error);
+			throw error.response.data.errors;
         } finally {
             setIsLoading(false);
         }
