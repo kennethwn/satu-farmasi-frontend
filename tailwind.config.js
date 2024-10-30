@@ -28,6 +28,7 @@ module.exports = {
         selected: '#659BB0',
         danger: '#DC4A43',
         warning: '#FFD400',
+        purple:'#5065f6',
         hover: {
           light: '#EDF8FC',
           dark: '#3D5D6A',

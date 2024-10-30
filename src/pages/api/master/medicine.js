@@ -22,6 +22,24 @@ export default function useMedicineAPI() {
         }
     }
 
+    const GetTotalMedicine = async () => {
+        setIsLoading(true);
+        try {
+            const response = await axios.get('/api/v1/medicines/total')
+            .then(response => {
+                setIsLoading(false);
+                return response;
+            })
+            .catch(error => {
+                setIsLoading(false);
+                return error;
+            })
+            return response;
+        } catch (error) {
+            console.error(error);
+        }
+    }
+
     const SearchMedicine = async (page, limit, parameter) => {
         setIsLoading(true)
         try {
@@ -149,6 +167,7 @@ export default function useMedicineAPI() {
     return {
         isLoading,
         GetAllMedicines,
+        GetTotalMedicine,
         SearchMedicine,
         CreateMedicine,
         AddCurrentStock,

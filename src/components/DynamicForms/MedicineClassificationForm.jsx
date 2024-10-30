@@ -5,6 +5,7 @@ import Button from '../Button';
 import { IoIosAdd } from 'react-icons/io';
 import { MdDeleteOutline } from 'react-icons/md';
 import { SelectPicker } from 'rsuite';
+import Dropdown from '../SelectPicker/Dropdown';
 
 export default function MedicineClassificationForm(props) {
     const {
@@ -50,11 +51,10 @@ export default function MedicineClassificationForm(props) {
 
     return (
         <div id="form-2">
-            <div className="grid grid-cols-1 w-full gap-x-6 gap-y-2">
+            <div className="grid grid-cols-1 w-full gap-x-6 gap-y-2 lg:grid-cols-10">
                 {formFields?.map((form, index) => (
-                    <div key={index} className='col-span-12 w-full grid lg:grid-cols-12 gap-x-6'>
-                        <div className='max-lg:w-full'>
-                            {/* TODO: cari cara biar bisa ga usah print object/element  */}
+                    <div key={index} className='col-span-12 w-full grid lg:grid-cols-12 grid-cols-1 lg:gap-x-6 gap-y-2'>
+                        <div className='w-full'>
                             {index === 0 && (
                                 <div className="flex text-sm invisible font-medium leading-6 text-gray-900 lg:justify-center">
                                     .
@@ -68,19 +68,17 @@ export default function MedicineClassificationForm(props) {
                                     :
                                     <div className='lg:px-6 lg:py-2'></div>
                                 }
-                                {/* <p className={`${index < formFields.length - 1 ? 'lg:mx-auto' : 'lg:ml-[1px]'}`}>{index + 1}</p> */}
                             </div>
                         </div>
                         <div className="col-span-10">
                             {(index === 0) && (
-                                <label className="block text-sm font-medium leading-6 text-gray-900">
+                                <label className="block text-sm leading-6 font-medium text-gray-900">
                                     Klasifikasi obat
                                 </label>
-                            )
-                            }
+                            )}
                             <div className="mt-2">
                                 {isLoading ?
-                                    <SelectPicker
+                                    <Dropdown
                                         id='classification'
                                         name='classification'
                                         placeholder='klasifikasi'
@@ -93,7 +91,7 @@ export default function MedicineClassificationForm(props) {
                                         block
                                     />
                                     :
-                                    <SelectPicker 
+                                    <Dropdown 
                                         id='classification'
                                         name='classification'
                                         placeholder='klasifikasi'
@@ -111,13 +109,14 @@ export default function MedicineClassificationForm(props) {
                         {(disabled === undefined || disabled === null || disabled === false) && (
                             <div className="">
                                 {(index === 0) && (
-                                    <label className="flex text-sm font-medium leading-6 text-gray-900 lg:justify-center">
+                                    <label className="flex text-sm leading-6 font-medium text-gray-900 lg:justify-center">
                                         Action
                                     </label>
                                 )
                                 }
                                 <button
-                                    className={`flex justify-center w-full rounded-md py-2 mt-2 stroke-2 shadow-sm ${formFields.length > 1 ? ' stroke-white' : 'lg:stroke-gray-300 stroke-white'} lg:shadow-none lg:border-0 border-2 border-gray-300 placeholder:text-gray-400 sm:text-sm sm:leading-6`}
+                                    // className={`flex justify-center w-full rounded-md py-1.5 stroke-2 shadow-sm ${formFields.length > 1 ? 'lg:stroke-red-500 lg:bg-stone-50 stroke-white bg-red-500' : 'lg:stroke-gray-300 lg:bg-stone-50 stroke-white bg-gray-500'} lg:shadow-none lg:border-0 border-2 border-gray-300 placeholder:text-gray-400 sm:text-sm sm:leading-6`}
+                                    className={`flex justify-center w-full rounded-md py-2 mt-2 stroke-2 shadow-sm ${formFields.length > 1 ? ' lg:stroke-red-500 lg:bg-white stroke-white bg-background-danger' : 'lg:stroke-gray-300 bg-border-box stroke-white'} lg:shadow-none lg:border-0 border-2 border-gray-300 placeholder:text-gray-400 sm:text-sm sm:leading-6`}
                                     disabled={formFields?.length > 1 ? false : true}
                                     onClick={(e) => {
                                         e.preventDefault();
