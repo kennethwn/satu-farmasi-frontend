@@ -1,6 +1,4 @@
 import propTypes from 'prop-types';
-import Select from '../Select';
-import { useEffect } from 'react';
 import Button from '../Button';
 import { IoIosAdd } from 'react-icons/io';
 import { MdDeleteOutline } from 'react-icons/md';
@@ -20,17 +18,12 @@ export default function MedicineClassificationForm(props) {
 		classifications,
 	} = props;
 
-	console.log("formFields", formFields);
-
 	const handleChangeFormFields = (value, index) => {
 		try {
-			console.log("HANDLE CHANGE FORM FIELDS");
-			console.log(value);
 			let data = [...formFields];
 			data[index]['id'] = Number(value);
 			data[index]['label'] = classifications.find((item) => item.id === Number(value))?.label;
 			data[index]['value'] = classifications.find((item) => item.id === Number(value))?.value;
-			console.log("data yang akan di push", data);
 			setFormFields(data);
 		} catch (error) {
 			console.error(error);
@@ -137,7 +130,6 @@ export default function MedicineClassificationForm(props) {
 									disabled={formFields?.length > 1 ? false : true}
 									onClick={(e) => {
 										e.preventDefault();
-										console.log(index);
 										removeFormField(index);
 									}}
 								>

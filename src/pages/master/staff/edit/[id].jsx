@@ -49,6 +49,7 @@ export default function Index() {
             nik: "",
             role: "",
             oldEmail: "",
+            oldNik: "",
             phoneNum: 0,
             is_active: true,
         }
@@ -66,6 +67,7 @@ export default function Index() {
                 else if (key === "dob") res.data[key] = res.data[key].substring(0, 10);
                 else if (key === "is_active") setIsChecked(res.data[key]);
                 else if (key === "email") setValue("oldEmail", res.data[key]);
+                else if (key === "nik") setValue("oldNik", res.data[key]);
                 setValue(key, res.data[key]);
             });
         } catch (error) {
@@ -82,18 +84,15 @@ export default function Index() {
                 dob: convertToTimestampString(data.dob),
                 is_active: isChecked,
                 oldEmail: getValues("oldEmail"),
+                oldNik: getValues("oldNik"),
             }
-            console.log("sent data: ", data)
             res = await handleRole(data);
-            if (res.code !== 200) {
-                toast.error(res.message, { autoClose: 2000, position: "top-center" });
-                return;
-            }
-            toast.success(res.message, { autoClose: 2000, position: "top-center" });
-            router.push("/master/staff");
+            toast.success(res.message, { autoClose: 2000, position: "top-right" });
+            setTimeout(() => {
+                router.push("/master/staff");
+            }, 2000);
         } catch (error) {
             ErrorForm(error, setError);
-            console.log("error found: ", error);
         }
     };
 

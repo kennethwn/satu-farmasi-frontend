@@ -21,7 +21,7 @@ export default function useUser() {
             setUser({ name: fullName, role: response.data.role });
             return response;
         } catch (error) {
-            return error.response.data;
+            throw error.response.data;
         }
     };
 

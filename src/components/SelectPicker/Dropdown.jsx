@@ -2,6 +2,7 @@ import { SelectPicker } from "rsuite";
 import propTypes from 'prop-types';
 import Label from "../Input/Label";
 import Text from "../Text";
+import { useEffect, useRef } from "react";
 
 export default function Dropdown({
     name,
@@ -20,31 +21,49 @@ export default function Dropdown({
     const styles = {
         display: 'flex',
         width: '100%',
-        borderRadius: '1rem', // 6px
-        borderWidth: '1px',
         color: '#111827', // Tailwind's gray-900
         boxShadow: '0 1px 2px 0 rgba(0, 0, 0, 0.05)', // Small shadow
-        borderColor: '#333333', // Tailwind's gray-300
         fontSize: '0.875rem', // 14px
         lineHeight: '1.5rem', // 24px
     };
 
-    if (label) className.push('my-2');
-    console.log("eror: ", error)
+    const containerSelect = useRef();
+
+    const addNewClass = (newClass) => {
+        const selectPicker = containerSelect.current?.querySelectorAll('.rs-picker-toggle');
+        console.log('selectPicker', selectPicker);
+        selectPicker.forEach((element) => {
+            element.classList.add(newClass);
+        });
+    }
+
+    const removeClass = (className) => {
+        const selectPicker = containerSelect.current?.querySelectorAll('.rs-picker-toggle');
+        selectPicker.forEach((element) => {
+            element.classList.remove(className);
+        });
+    }
+
+    useEffect(() => {
+        if (error) addNewClass('error-field');
+        else removeClass('error-field');
+    }, [error])
+
+    if (label) className.push('my-2 container-select');
 
     return (
         <>
             {label && <Label id={id} label={label} />}
-            <SelectPicker
-                style={styles}
-                placeholder={placeholder}
-                onChange={onChange}
-                className={className}
-                defaultValue={defaultValue}
-                value={value}
-                {...props}
-            />
-            <div style={{ minHeight: '22px' }}>
+            <div ref={containerSelect}>
+                <SelectPicker
+                    style={styles}
+                    placeholder={placeholder}
+                    onChange={onChange}
+                    className={className}
+                    defaultValue={defaultValue}
+                    value={value}
+                    {...props}
+                />
                 {
                     error &&
                     <Text type="danger">{error}</Text>

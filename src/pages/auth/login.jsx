@@ -55,17 +55,13 @@ export default function Login() {
         try {
             setIsLoading(true);
             const response = await getUser(data);
-            if (response.code !== 200) {
-                toast.error(response.message, { autoClose: 2000, position: 'top-right' });
-                return;
-            }
             toast.success("Login successful!", { autoClose: 2000, position: 'top-right' });
             setTimeout(() => {
                 router.push("/");
             }, 2000)
         } catch (error) {
             // TODO: Handle if the user is not active anymore
-            console.log("error: ", error.message);
+            toast.error(error.message, { autoClose: 2000, position: 'top-right' });
         } finally {
             setIsLoading(false);
 

@@ -4,7 +4,7 @@ import { useEffect, useState } from "react";
 import SearchBar from "@/components/SearchBar";
 import { Checkbox, Pagination, SelectPicker, Table } from "rsuite";
 import useStaffAPI from "@/pages/api/master/staff";
-import { toast } from "react-toastify";
+import { toast} from "react-toastify";
 import formatDate from "@/helpers/dayHelper";
 import { MdOutlineEdit } from "react-icons/md";
 import { useRouter } from "next/router";
@@ -37,19 +37,12 @@ export default function Index() {
         try {
             let selectedData = data.find((item) => item.nik === rowData.nik);
             selectedData.is_active = !selectedData.is_active;
-            console.log("selectedData", selectedData);
 
             let res = null;
             if (selectedData.role.toLowerCase() === "admin") res = await EditAdmin(selectedData);
             else if (selectedData.role.toLowerCase() === "doctor") res = await EditDoctor(selectedData);
             else if (selectedData.role.toLowerCase() === "pharmacist") res = await EditPharmacist(selectedData);
-
-            if (res.code !== 200) {
-                toast.error(res.message, { autoClose: 2000, position: "top-center" });
-                return;
-            }
-
-            toast.success(res.message, { autoClose: 2000, position: "top-center" });
+            toast.success(res.message, { autoClose: 2000, position: "top-right" });
             handleFetchStaffData();
         } catch (error) {
             console.error(error);
@@ -59,13 +52,10 @@ export default function Index() {
     const handleFetchStaffData = async () => {
         try {
             const res = await GetAllStaff(page, limit, search, filter);
-            if (res.code !== 200) {
-                toast.error(res.message, { autoClose: 2000, position: "top-center" });
-                return;
-            }
             const dataArr = res.data.results.map(item => ({
                 ...item,
                 oldEmail: item.email,
+                oldNik: item.nik,
             }))
             setData(dataArr);
             setTotalPage(res.data.total);
@@ -225,6 +215,7 @@ export default function Index() {
                     </div>
                 </div>
             </ContentLayout>
+
         </Layout>
     )
 }

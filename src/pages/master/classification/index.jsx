@@ -21,7 +21,7 @@ const classificationSchema = z.object({
 	label: isRequiredString(),
 })
 
-export default function index(props) {
+export default function index() {
 	const { user } = useUserContext();
 	const { Header, Body, Footer } = Modal;
 	const { HeaderCell, Cell, Column } = Table;
@@ -77,26 +77,11 @@ export default function index(props) {
 		}
 	};
 
-	const HandleClear = () => {
-		setData([]);
-		setEditInput({});
-		setPage(1);
-		setTotalPage(0);
-		setLimit(10);
-		setInput({ label: "", value: "" });
-		setOpen({
-			create: false,
-			edit: false,
-			delete: false,
-		});
-	};
-
-
 	const HandleFetchClassificationData = async () => {
 		try {
 			const res = await GetAllClassification(page, limit);
 			if (res.code !== 200) {
-				toast.error(res.message, { autoClose: 2000, position: "top-center" });
+				toast.error(res.message, { autoClose: 2000, position: "top-right" });
 				return;
 			}
 			setData(res.data.results);
@@ -110,7 +95,7 @@ export default function index(props) {
 		try {
 			const res = await GetClassificationByLabel(search);
 			if (res.code !== 200) {
-				toast.error(res.message, { autoClose: 2000, position: "top-center" });
+				toast.error(res.message, { autoClose: 2000, position: "top-right" });
 				return;
 			}
 			setData(res?.data.results);
@@ -125,15 +110,15 @@ export default function index(props) {
 			data = { ...data, value: data.label };
 			const res = await CreateClassification(data);
 			if (res.code !== 200) {
-				toast.error("Failed to create classification", {
+				toast.error(res.message, {
 					autoClose: 2000,
-					position: "top-center",
+					position: "top-right",
 				});
 				return;
 			}
-			toast.success("Successfully created classification", {
+			toast.success(res.message, {
 				autoClose: 2000,
-				position: "top-center",
+				position: "top-right",
 			});
 			setOpen({ ...open, create: false, edit: false, delete: false });
 			HandleFetchClassificationData();
@@ -147,15 +132,15 @@ export default function index(props) {
 			data = { ...data, id: editInput.id, value: data.label };
 			const res = await EditClassification(data);
 			if (res.code !== 200) {
-				toast.error("Failed to edit Classification", {
+				toast.error(res.message, {
 					autoClose: 2000,
-					position: "top-center",
+					position: "top-right",
 				});
 				return;
 			}
-			toast.success("Successfully edited classification", {
+			toast.success(res.message, {
 				autoClose: 2000,
-				position: "top-center",
+				position: "top-right",
 			});
 			setOpen({ ...open, create: false, edit: false, delete: false });
 			HandleFetchClassificationData();
@@ -168,15 +153,15 @@ export default function index(props) {
 		try {
 			const res = await DeleteClassification(editInput);
 			if (res.code !== 200) {
-				toast.error("Failed to delete Classification", {
+				toast.error(res.message, {
 					autoClose: 2000,
-					position: "top-center",
+					position: "top-right",
 				});
 				return;
 			}
-			toast.success("Successfully deleted Classification", {
+			toast.success(res.message, {
 				autoClose: 2000,
-				position: "top-center",
+				position: "top-right",
 			});
 			setOpen({ ...open, create: false, edit: false, delete: false });
 			HandleFetchClassificationData();

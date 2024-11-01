@@ -17,610 +17,603 @@ import Text from "@/components/Text";
 import useClassificationsAPI from "@/pages/api/master/classification";
 
 const classificationSchema = z.object({
-	classificationId: isRequiredNumber(),
+    classificationId: isRequiredNumber(),
 });
 
 const medicineSchema = z.object({
-	name: isRequiredString(),
-	merk: isRequiredString(),
-	price: isRequiredNumber(),
-	currStock: isRequiredNumber(),
-	minStock: isRequiredNumber(),
-	maxStock: isRequiredNumber(),
-	genericNameId: isRequiredNumber(),
-	packagingId: isRequiredNumber(),
-	unitOfMeasure: isRequiredString().nullable().refine(value => value !== null, {
-		message: "This field is required",
-	}),
-	classificationList: z.array(classificationSchema),
-	sideEffect: isRequiredString(),
+    name: isRequiredString(),
+    merk: isRequiredString(),
+    price: isRequiredNumber(),
+    currStock: isRequiredNumber(),
+    minStock: isRequiredNumber(),
+    maxStock: isRequiredNumber(),
+    genericNameId: isRequiredNumber(),
+    packagingId: isRequiredNumber(),
+    unitOfMeasure: isRequiredString().nullable().refine(value => value !== null, {
+        message: "This field is required",
+    }),
+    classificationList: z.array(classificationSchema),
+    sideEffect: isRequiredString(),
 }).refine(data => data.minStock < data.maxStock, {
-	message: "Minimum stock must be less than maximum stock",
-	path: ["minStock"],
+    message: "Minimum stock must be less than maximum stock",
+    path: ["minStock"],
 }).refine(data => data.maxStock > data.minStock, {
-	message: "Maximum stock must be greater than minimum stock",
-	path: ["maxStock"],
-}).refine(data => data.currStock >= data.minStock && data.currStock <= data.maxStock, {
-	message: "Current stock must be between minimum stock and maximum stock",
-	path: ["currStock"],
+    message: "Maximum stock must be greater than minimum stock",
+    path: ["maxStock"],
+}).refine(data => data.currStock <= data.maxStock, {
+    message: "Current stock cannot be greater than maximum stock",
+    path: ["currStock"],
 })
 
+
+// TODO:
+// 1. Price validation is still not validating float number
+// 2. Random number appears after inputting number in price field 
+
 export default function Index() {
-	const router = useRouter();
-	const id = router.query.id;
-	const { user } = useUserContext();
-	const { isLoading, EditMedicine, SearchMedicine } = useMedicineAPI();
-	const { GetAllClassificationsDropdown } = useClassificationsAPI();
-	const { GetPackagingDropdown } = usePackagingAPI();
-	const { GetGenericDropdown } = useGenericAPI();
+    const router = useRouter();
+    const id = router.query.id;
+    const { user } = useUserContext();
+    const { isLoading, EditMedicine, SearchMedicine } = useMedicineAPI();
+    const { GetAllClassificationsDropdown } = useClassificationsAPI();
+    const { GetPackagingDropdown } = usePackagingAPI();
+    const { GetGenericDropdown } = useGenericAPI();
 
-	const [input, setInput] = useState({});
-	const [errors, setErrors] = useState({});
-	const [packagings, setPackagings] = useState([]);
-	const [classifications, setClassifications] = useState([]);
-	const [generics, setGenerics] = useState([]);
-	const [formFields, setFormFields] = useState([{ id: 0, label: '', value: '' }]);
-	const unitOfMeasure = [
-		{ id: 1, label: 'MILILITER', value: 'MILILITER' },
-		{ id: 2, label: 'MILIGRAM', value: 'MILIGRAM' },
-		{ id: 3, label: 'GRAM', value: 'GRAM' },
-		{ id: 4, label: 'LITER', value: 'LITER' },
-		{ id: 5, label: 'GROS', value: 'GROS' },
-		{ id: 6, label: 'KODI', value: 'KODI' },
-		{ id: 7, label: 'RIM', value: 'RIM' },
-		{ id: 8, label: 'PCS', value: 'PCS' },
-	];
+    const [input, setInput] = useState({});
+    const [errors, setErrors] = useState({});
+    const [packagings, setPackagings] = useState([]);
+    const [classifications, setClassifications] = useState([]);
+    const [generics, setGenerics] = useState([]);
+    const [formFields, setFormFields] = useState([{ id: 0, label: '', value: '' }]);
+    const unitOfMeasure = [
+        { id: 1, label: 'MILILITER', value: 'MILILITER' },
+        { id: 2, label: 'MILIGRAM', value: 'MILIGRAM' },
+        { id: 3, label: 'GRAM', value: 'GRAM' },
+        { id: 4, label: 'LITER', value: 'LITER' },
+        { id: 5, label: 'GROS', value: 'GROS' },
+        { id: 6, label: 'KODI', value: 'KODI' },
+        { id: 7, label: 'RIM', value: 'RIM' },
+        { id: 8, label: 'PCS', value: 'PCS' },
+    ];
 
-	const handleFormFields = (value) => {
-		setFormFields(value);
-	}
+    const handleFormFields = (value) => {
+        setFormFields(value);
+    }
 
-	const handleFetchMedicineByCode = async () => {
-		try {
-			const res = await SearchMedicine(1, 1, id);
-			if (res.code !== 200) {
-				toast.error(res.message, { autoClose: 2000, position: "top-center" });
-				return;
-			}
-			setInput(res?.data?.results[0]);
+    const handleFetchMedicineByCode = async () => {
+        try {
+            const res = await SearchMedicine(1, 1, id);
+            if (res.code !== 200) {
+                toast.error(res.message, { autoClose: 2000, position: "top-right" });
+                return;
+            }
+            setInput(res?.data?.results[0]);
 
-			let classificationForm = [];
-			res.data.results[0].classifications.forEach((item, index) => {
-				let data = { id: 0, label: '', value: '' };
-				data['id'] = item.classification.id;
-				data['label'] = item.classification.label;
-				data['value'] = item.classification.value;
-				classificationForm.push(data);
-			})
-			setFormFields(classificationForm);
-		} catch (error) {
-			console.error(error);
-		}
-	}
+            let classificationForm = [];
+            res.data.results[0].classifications.forEach((item, index) => {
+                let data = { id: 0, label: '', value: '' };
+                data['id'] = item.classification.id;
+                data['label'] = item.classification.label;
+                data['value'] = item.classification.value;
+                classificationForm.push(data);
+            })
+            setFormFields(classificationForm);
+        } catch (error) {
+            console.error(error);
+        }
+    }
 
-	const handleFetchPackagingDropdown = async () => {
-		try {
-			const res = await GetPackagingDropdown();
-			if (res.code !== 200) {
-				toast.error(res.message, { autoClose: 2000, position: "top-center" });
-				setPackagings([]);
-				return;
-			}
-			setPackagings(res.data);
-		} catch (error) {
-			console.error(error);
-		}
-	}
+    const handleFetchPackagingDropdown = async () => {
+        try {
+            const res = await GetPackagingDropdown();
+            if (res.code !== 200) {
+                toast.error(res.message, { autoClose: 2000, position: "top-right" });
+                setPackagings([]);
+                return;
+            }
+            setPackagings(res.data);
+        } catch (error) {
+            console.error(error);
+        }
+    }
 
-	const handleFetchGenericDropdown = async () => {
-		try {
-			const res = await GetGenericDropdown();
-			if (res.code !== 200) {
-				toast.error(res.message, { autoClose: 2000, position: "top-center" });
-				setGenerics([]);
-				return;
-			}
-			setGenerics(res.data);
-		} catch (error) {
-			console.error(error);
-		}
-	}
+    const handleFetchGenericDropdown = async () => {
+        try {
+            const res = await GetGenericDropdown();
+            if (res.code !== 200) {
+                toast.error(res.message, { autoClose: 2000, position: "top-right" });
+                setGenerics([]);
+                return;
+            }
+            setGenerics(res.data);
+        } catch (error) {
+            console.error(error);
+        }
+    }
 
-	const handleFetchClassifications = async () => {
-		try {
-			const res = await GetAllClassificationsDropdown();
-			if (res.code !== 200) {
-				toast.error(res.message, { autoClose: 2000, position: "top-center" });
-				setGenerics([]);
-				return;
-			}
-			setClassifications(res.data);
-		} catch (error) {
-			console.error(error);
-		}
-	}
+    const handleFetchClassifications = async () => {
+        try {
+            const res = await GetAllClassificationsDropdown();
+            if (res.code !== 200) {
+                toast.error(res.message, { autoClose: 2000, position: "top-right" });
+                setGenerics([]);
+                return;
+            }
+            setClassifications(res.data);
+        } catch (error) {
+            console.error(error);
+        }
+    }
 
-	const handleSubmit = async () => {
-		try {
-			let classifications = [];
-			//input.classifications = formFields;
-			// TODO: Make sure this is the coreect logic
-			formFields.forEach((item, index) => {
-				input.classifications[index] = {
-					classification: {
-						id: item.id,
-					}
-				}
-			});
+    const handleSubmit = async () => {
+        try {
+            let classifications = [];
+            //input.classifications = formFields;
+            // TODO: Make sure this is the coreect logic
+           
+            input.classifications = [];
+            formFields.forEach((item, index) => {
+                input.classifications[index] = {
+                    classification: {
+                        id: item.id,
+                    }
+                }
+            });
 
-			input?.classifications?.map((item, index) => {
-				let temp = { classificationId: 0, medicineId: 0 };
-				temp['classificationId'] = item.classification.id;
-				temp['medicineId'] = input.id;
-				classifications.push(temp);
-			})
+            input?.classifications?.map((item, index) => {
+                let temp = { classificationId: 0, medicineId: 0 };
+                temp['classificationId'] = item.classification.id;
+                temp['medicineId'] = input.id;
+                classifications.push(temp);
+            })
 
-			console.log("input payload", input);
-			console.log("formfield payload: ", formFields);
-			console.log("classificaiotns payload: ", classifications);
-			const payload = {
-				id: input.id,
-				code: input.code,
-				name: input.name,
-				merk: input.merk,
-				description: input.description,
-				unitOfMeasure: input.unitOfMeasure,
-				price: Number(input.price),
-				expiredDate: input.expiredDate,
-				currStock: Number(input.currStock),
-				minStock: Number(input.minStock),
-				maxStock: Number(input.maxStock),
-				genericNameId: Number(input.genericName) || Number(input.genericName.id),
-				packagingId: Number(input.packaging.id),
-				sideEffect: input.sideEffect,
-				classificationList: classifications,
-				is_active: input.is_active,
-				created_at: input.created_at,
-				updated_at: input.updated_at
-			}
+            const payload = {
+                id: input.id,
+                code: input.code,
+                name: input.name,
+                merk: input.merk,
+                description: input.description,
+                unitOfMeasure: input.unitOfMeasure,
+                price: parseInt(input.price),
+                expiredDate: input.expiredDate,
+                currStock: parseInt(input.currStock),
+                minStock: parseInt(input.minStock),
+                maxStock: parseInt(input.maxStock),
+                genericNameId: parseInt(input.genericName) || parseInt(input.genericName.id),
+                packagingId: parseInt(input.packaging.id),
+                sideEffect: input.sideEffect,
+                classificationList: classifications,
+                is_active: input.is_active,
+                created_at: input.created_at,
+                updated_at: input.updated_at
+            }
 
-			setErrors({});
-			console.log("payload", payload);
-			medicineSchema.parse(payload);
-			const res = await EditMedicine(payload);
-			if (res.code !== 200) {
-				toast.error(res.message, { autoClose: 2000, position: "top-center" });
-				return;
-			}
-			toast.success(res.message, { autoClose: 2000, position: "top-center" });
-			router.push("/master/medicine");
-		} catch (error) {
-			console.log("error zod: ", error);
-			if (error instanceof ZodError) {
-				const newErrors = { ...errors };
-				error.issues.forEach((issue) => {
-					console.log("ISSUE: ", issue)
-					if (issue.path.length > 0) {
-						if (issue.path[0] === "classificationList") {
-							newErrors[`classificationList[${issue.path[1]}]`] = issue.message;
-						}
-						else {
-							const fieldName = issue.path[0];
-							newErrors[fieldName] = issue.message;
-						}
-					}
-				});
-				setErrors(newErrors);
-			}
-		}
-	}
+            setErrors({});
+            medicineSchema.parse(payload);
+            const res = await EditMedicine(payload);
+            if (res.code !== 200) {
+                toast.error(res.message, { autoClose: 2000, position: "top-right" });
+                return;
+            }
+            toast.success(res.message, { autoClose: 2000, position: "top-right" });
+            setTimeout(() => {
+                router.push("/master/medicine");
+            }, 2000)
+        } catch (error) {
+            if (error instanceof ZodError) {
+                const newErrors = { ...errors };
+                error.issues.forEach((issue) => {
+                    if (issue.path.length > 0) {
+                        if (issue.path[0] === "classificationList") {
+                            newErrors[`classificationList[${issue.path[1]}]`] = issue.message;
+                        }
+                        else {
+                            const fieldName = issue.path[0];
+                            newErrors[fieldName] = issue.message;
+                        }
+                    }
+                });
+                setErrors(newErrors);
+            }
+        }
+    }
 
-	useEffect(() => {
-		async function fetchData() {
-			await handleFetchMedicineByCode();
-			await handleFetchPackagingDropdown();
-			await handleFetchGenericDropdown();
-			await handleFetchClassifications();
-		}
-		if (router.isReady) {
-			fetchData();
-		}
-	}, [id, router]);
+    useEffect(() => {
+        async function fetchData() {
+            await handleFetchMedicineByCode();
+            await handleFetchPackagingDropdown();
+            await handleFetchGenericDropdown();
+            await handleFetchClassifications();
+        }
+        if (router.isReady) {
+            fetchData();
+        }
+    }, [id, router]);
 
-	useEffect(() => {
-		if (errors) {
-			console.log("errors here: ", errors);
-		}
-	}, [errors]);
+    return (
+        <Layout active="master-medicine" user={user}>
+            <ContentLayout title="Edit Obat" type="child" backpageUrl="/master/medicine">
+                <form id="form">
+                    <div className="grid grid-cols-1 gap-x-6 gap-y-2 sm:grid-cols-6">
+                        <div className="sm:col-span-6">
+                            <div className="mt-2">
+                                {isLoading ?
+                                    <InputField
+                                        type="text"
+                                        id="medicine_name"
+                                        name="medicine_name"
+                                        disabled={true}
+                                        label="Nama Obat"
+                                        placeholder="nama obat"
+                                        value={input?.name}
+                                    />
+                                    :
+                                    <InputField
+                                        type="text"
+                                        id="medicine_name"
+                                        name="medicine_name"
+                                        onChange={e => {
+                                            setInput({ ...input, name: e.target.value });
+                                            setErrors({ ...errors, "name": "" });
+                                        }}
+                                        label="Nama Obat"
+                                        placeholder="nama obat"
+                                        error={errors['name']}
+                                        value={input?.name}
+                                    />
+                                }
+                            </div>
+                        </div>
+                        <div className="sm:col-span-6">
+                            <div className="mt-2">
+                                {isLoading ?
+                                    <InputField
+                                        type="text"
+                                        id="merk"
+                                        name="merk"
+                                        label="Merek"
+                                        disabled={true}
+                                        placeholder="merek"
+                                        value={input?.merk}
+                                    />
+                                    :
+                                    <InputField
+                                        type="text"
+                                        id="merk"
+                                        name="merk"
+                                        label="Merek"
+                                        onChange={e => {
+                                            setInput({ ...input, merk: e.target.value });
+                                            setErrors({ ...errors, "merk": "" });
+                                        }}
+                                        placeholder="merek"
+                                        error={errors['merk']}
+                                        value={input?.merk}
+                                    />
+                                }
+                            </div>
+                        </div>
+                        <div className="sm:col-span-6">
+                            <div className="mt-2">
+                                {isLoading ?
+                                    <InputField
+                                        className="sm:leading-6 px-16"
+                                        type="number"
+                                        id="price"
+                                        name="price"
+                                        disabled={true}
+                                        placeholder="0"
+                                        label="Harga Jual Obat"
+                                        value={input?.price}
+                                        currency={true}
+                                    />
+                                    :
+                                    <InputField
+                                        className="sm:leading-6 px-16"
+                                        type="number"
+                                        id="price"
+                                        name="price"
+                                        onChange={e => {
+                                            setInput({ ...input, price: parseInt(e.target.value) })
+                                            setErrors({ ...errors, "price": "" });
+                                        }}
+                                        placeholder="0"
+                                        label="Harga Jual Obat"
+                                        value={input?.price}
+                                        error={errors['price']}
+                                        currency={true}
+                                    />
+                                }
+                            </div>
+                        </div>
+                        <div className="sm:col-span-2">
+                            <div className="mt-2">
+                                {isLoading ?
+                                    <InputField
+                                        type="number"
+                                        id="currStock"
+                                        name="currStock"
+                                        placeholder="0"
+                                        label="Stok Sekarang"
+                                        value={input?.currStock}
+                                        disabled={true}
+                                    />
+                                    :
+                                    <InputField
+                                        type="number"
+                                        id="currStock"
+                                        name="currStock"
+                                        placeholder="0"
+                                        label="Stok Sekarang"
+                                        value={input?.currStock}
+                                        error={errors['currStock']}
+                                        onChange={e => {
+                                            setInput({ ...input, currStock: parseInt(e.target.value) })
+                                            setErrors({ ...errors, "currStock": "" });
+                                        }}
+                                    />
+                                }
+                            </div>
+                        </div>
+                        <div className="sm:col-span-2">
+                            <div className="mt-2">
+                                {isLoading ?
+                                    <InputField
+                                        type="number"
+                                        id="minStock"
+                                        name="minStock"
+                                        placeholder="0"
+                                        label="Stok Minimum"
+                                        value={input?.minStock}
+                                        disabled={true}
+                                    />
+                                    :
+                                    <InputField
+                                        type="number"
+                                        id="minStock"
+                                        name="minStock"
+                                        placeholder="0"
+                                        label="Stok Minimum"
+                                        error={errors['minStock']}
+                                        value={input?.minStock}
+                                        onChange={e => {
+                                            setInput({ ...input, minStock: parseInt(e.target.value) })
+                                            setErrors({ ...errors, "minStock": "" });
+                                        }}
+                                    />
+                                }
+                            </div>
+                        </div>
+                        <div className="sm:col-span-2">
+                            <div className="mt-2">
+                                {isLoading ?
+                                    <InputField
+                                        type="number"
+                                        id="maxStock"
+                                        name="maxStock"
+                                        placeholder="0"
+                                        label="Stok Maksimum"
+                                        value={input?.maxStock}
+                                        disabled={true}
+                                    />
+                                    :
+                                    <InputField
+                                        type="number"
+                                        id="maxStock"
+                                        name="maxStock"
+                                        placeholder="0"
+                                        label="Stok Maksimum"
+                                        error={errors['maxStock']}
+                                        value={input?.maxStock}
+                                        onChange={e => {
+                                            setInput({ ...input, maxStock: parseInt(e.target.value) })
+                                            setErrors({ ...errors, "maxStock": "" });
+                                        }}
+                                    />
+                                }
+                            </div>
+                        </div>
+                        <div className="sm:col-span-3">
+                            <label htmlFor="genericName" className="block text-sm font-medium leading-6 pt-2 text-dark">
+                                Nama Generik
+                            </label>
+                            <div className="mt-2">
+                                {isLoading ?
+                                    <SelectPicker
+                                        id="genericName"
+                                        name="genericName"
+                                        className="py-1.5"
+                                        placeholder="Nama Generik"
+                                        size='lg'
+                                        disabled={true}
+                                        value={input?.genericName?.id}
+                                        valueKey="id"
+                                        labelKey="label"
+                                        data={generics}
+                                        block
+                                    />
+                                    :
+                                    <>
+                                        <SelectPicker
+                                            id="genericName"
+                                            name="genericName"
+                                            placeholder="Nama Generik"
+                                            size='lg'
+                                            value={input?.genericName?.id}
+                                            valueKey="id"
+                                            className="py-1.5"
+                                            labelKey="label"
+                                            onChange={value => {
+                                                setInput({ ...input, genericName: { id: value } })
+                                                setErrors({ ...errors, "genericNameId": "" });
+                                            }}
+                                            data={generics}
+                                            block
+                                        />
+                                        <div style={{ minHeight: '22px' }}>
+                                            {
+                                                errors['genericNameId'] &&
+                                                <Text type="danger">{errors['genericNameId']}</Text>
+                                            }
+                                        </div>
+                                    </>
+                                }
+                            </div>
+                        </div>
+                        <div className="sm:col-span-3">
+                            <label htmlFor="packaging" className="block text-sm font-medium leading-6 pt-2 text-dark">
+                                Kemasan
+                            </label>
+                            <div className="mt-2">
+                                {isLoading ?
+                                    <SelectPicker
+                                        id="packaging"
+                                        name="packaging"
+                                        placeholder="kemasan"
+                                        disabled={true}
+                                        className="py-1.5"
+                                        size='lg'
+                                        value={input?.packaging?.id}
+                                        labelKey="label"
+                                        valueKey="id"
+                                        data={packagings}
+                                        block
+                                    />
+                                    :
+                                    <>
+                                        <SelectPicker
+                                            id="packaging"
+                                            name="packaging"
+                                            placeholder="Kemasan"
+                                            value={input?.packaging?.id}
+                                            labelKey="label"
+                                            size='lg'
+                                            className="py-1.5"
+                                            valueKey="id"
+                                            onChange={value => {
+                                                setInput({ ...input, packaging: { id: value } })
+                                                setErrors({ ...errors, "packagingId": "" });
+                                            }}
+                                            data={packagings}
+                                            block
+                                        />
+                                        <div style={{ minHeight: '22px' }}>
+                                            {
+                                                errors['packagingId'] &&
+                                                <Text type="danger">{errors['packagingId']}</Text>
+                                            }
+                                        </div>
+                                    </>
+                                }
+                            </div>
+                        </div>
+                        {/* TODO: add validation for classification */}
+                        <div className="sm:col-span-6 my-6">
+                            {/* <MedicineClassificationForm isLoading={isLoading} formFields={formFields} setFormFields={HandleFormFields} /> */}
+                            <MedicineClassificationForm errors={errors} setErrors={setErrors} classifications={classifications} isLoading={isLoading} formFields={formFields} setFormFields={handleFormFields} />
+                        </div>
+                        <div className="sm:col-span-6">
+                            <label htmlFor="unitOfMeasure" className="block text-sm font-medium leading-6 text-dark">
+                                Satuan Ukuran
+                            </label>
+                            <div className="mt-2">
+                                {isLoading ?
+                                    <SelectPicker
+                                        id="unitOfMeasure"
+                                        name="unitOfMeasure"
+                                        placeholder="Satuan"
+                                        disabled={true}
+                                        size='lg'
+                                        block
+                                        className="py-1.5"
+                                        data={unitOfMeasure}
+                                        value={input?.unitOfMeasure}
+                                        valueKey="value"
+                                        labelKey="label"
+                                    />
+                                    :
+                                    <>
+                                        <SelectPicker
+                                            id="unitOfMeasure"
+                                            name="unitOfMeasure"
+                                            placeholder="Satuan"
+                                            size='lg'
+                                            className="py-1.5"
+                                            data={unitOfMeasure}
+                                            block
+                                            onChange={value => {
+                                                setInput({ ...input, unitOfMeasure: value })
+                                                setErrors({ ...errors, "unitOfMeasure": "" });
+                                            }}
+                                            value={input?.unitOfMeasure}
+                                            valueKey="value"
+                                            labelKey="label"
+                                        />
+                                        <div style={{ minHeight: '22px' }}>
+                                            {
+                                                errors['unitOfMeasure'] &&
+                                                <Text type="danger">{errors['unitOfMeasure']}</Text>
+                                            }
+                                        </div>
+                                    </>
+                                }
+                            </div>
+                        </div>
+                        <div className="sm:col-span-6">
+                            <div className="mt-2">
+                                {isLoading ?
+                                    <InputField
+                                        type="text"
+                                        label="Efek Samping"
+                                        id="sideEffect"
+                                        name="sideEffect"
+                                        placeholder="efek samping"
+                                        value={input?.sideEffect}
+                                        disabled={true}
+                                    />
+                                    :
+                                    <InputField
+                                        type="text"
+                                        id="sideEffect"
+                                        label="Efek Samping"
+                                        name="sideEffect"
+                                        placeholder="efek samping"
+                                        value={input?.sideEffect}
+                                        error={errors['sideEffect']}
+                                        onChange={e => {
+                                            setInput({ ...input, sideEffect: e.target.value })
+                                            setErrors({ ...errors, "sideEffect": "" });
+                                        }}
+                                    />
+                                }
+                            </div>
+                        </div>
+                    </div>
 
-	return (
-		<Layout active="master-medicine" user={user}>
-			<ContentLayout title="Edit Obat" type="child" backpageUrl="/master/medicine">
-				<form id="form">
-					<div className="grid grid-cols-1 gap-x-6 gap-y-2 sm:grid-cols-6">
-						<div className="sm:col-span-6">
-							<div className="mt-2">
-								{isLoading ?
-									<InputField
-										type="text"
-										id="medicine_name"
-										name="medicine_name"
-										disabled={true}
-										label="Nama Obat"
-										placeholder="nama obat"
-										value={input?.name}
-									/>
-									:
-									<InputField
-										type="text"
-										id="medicine_name"
-										name="medicine_name"
-										onChange={e => {
-											setInput({ ...input, name: e.target.value });
-											setErrors({ ...errors, "name": "" });
-										}}
-										label="Nama Obat"
-										placeholder="nama obat"
-										error={errors['name']}
-										value={input?.name}
-									/>
-								}
-							</div>
-						</div>
-						<div className="sm:col-span-6">
-							<div className="mt-2">
-								{isLoading ?
-									<InputField
-										type="text"
-										id="merk"
-										name="merk"
-										label="Merek"
-										disabled={true}
-										placeholder="merek"
-										value={input?.merk}
-									/>
-									:
-									<InputField
-										type="text"
-										id="merk"
-										name="merk"
-										label="Merek"
-										onChange={e => {
-											setInput({ ...input, merk: e.target.value });
-											setErrors({ ...errors, "merk": "" });
-										}}
-										placeholder="merek"
-										error={errors['merk']}
-										value={input?.merk}
-									/>
-								}
-							</div>
-						</div>
-						<div className="sm:col-span-6">
-							<div className="mt-2">
-								{isLoading ?
-									<InputField
-										className="sm:leading-6 px-16"
-										type="number"
-										id="price"
-										name="price"
-										disabled={true}
-										placeholder="0"
-										label="Harga Jual Obat"
-										value={input?.price}
-										currency={true}
-									/>
-									:
-									<InputField
-										className="sm:leading-6 px-16"
-										type="number"
-										id="price"
-										name="price"
-										onChange={e => {
-											setInput({ ...input, price: e.target.value })
-											setErrors({ ...errors, "price": "" });
-										}}
-										placeholder="0"
-										label="Harga Jual Obat"
-										value={input?.price}
-										error={errors['price']}
-										currency={true}
-									/>
-								}
-							</div>
-						</div>
-						<div className="sm:col-span-2">
-							<div className="mt-2">
-								{isLoading ?
-									<InputField
-										type="number"
-										id="currStock"
-										name="currStock"
-										placeholder="0"
-										label="Stok Sekarang"
-										value={input?.currStock}
-										disabled={true}
-									/>
-									:
-									<InputField
-										type="number"
-										id="currStock"
-										name="currStock"
-										placeholder="0"
-										label="Stok Sekarang"
-										value={input?.currStock}
-										error={errors['currStock']}
-										onChange={e => {
-											setInput({ ...input, currStock: Number(e.target.value) })
-											setErrors({ ...errors, "currStock": "" });
-										}}
-									/>
-								}
-							</div>
-						</div>
-						<div className="sm:col-span-2">
-							<div className="mt-2">
-								{isLoading ?
-									<InputField
-										type="number"
-										id="minStock"
-										name="minStock"
-										placeholder="0"
-										label="Stok Minimum"
-										value={input?.minStock}
-										disabled={true}
-									/>
-									:
-									<InputField
-										type="number"
-										id="minStock"
-										name="minStock"
-										placeholder="0"
-										label="Stok Minimum"
-										error={errors['minStock']}
-										value={input?.minStock}
-										onChange={e => {
-											setInput({ ...input, minStock: Number(e.target.value) })
-											setErrors({ ...errors, "minStock": "" });
-										}}
-									/>
-								}
-							</div>
-						</div>
-						<div className="sm:col-span-2">
-							<div className="mt-2">
-								{isLoading ?
-									<InputField
-										type="number"
-										id="maxStock"
-										name="maxStock"
-										placeholder="0"
-										label="Stok Maksimum"
-										value={input?.maxStock}
-										disabled={true}
-									/>
-									:
-									<InputField
-										type="number"
-										id="maxStock"
-										name="maxStock"
-										placeholder="0"
-										label="Stok Maksimum"
-										error={errors['maxStock']}
-										value={input?.maxStock}
-										onChange={e => {
-											setInput({ ...input, maxStock: Number(e.target.value) })
-											setErrors({ ...errors, "maxStock": "" });
-										}}
-									/>
-								}
-							</div>
-						</div>
-						<div className="sm:col-span-3">
-							<label htmlFor="genericName" className="block text-sm font-medium leading-6 pt-2 text-dark">
-								Nama Generik
-							</label>
-							<div className="mt-2">
-								{isLoading ?
-									<SelectPicker
-										id="genericName"
-										name="genericName"
-										className="py-1.5"
-										placeholder="Nama Generik"
-										size='lg'
-										disabled={true}
-										value={input?.genericName?.id}
-										valueKey="id"
-										labelKey="label"
-										data={generics}
-										block
-									/>
-									:
-									<>
-										<SelectPicker
-											id="genericName"
-											name="genericName"
-											placeholder="Nama Generik"
-											size='lg'
-											value={input?.genericName?.id}
-											valueKey="id"
-											className="py-1.5"
-											labelKey="label"
-											onChange={value => {
-												console.log("value", value);
-												console.log("input", input);
-												setInput({ ...input, genericName: { id: value } })
-												setErrors({ ...errors, "genericNameId": "" });
-											}}
-											data={generics}
-											block
-										/>
-										<div style={{ minHeight: '22px' }}>
-											{
-												errors['genericNameId'] &&
-												<Text type="danger">{errors['genericNameId']}</Text>
-											}
-										</div>
-									</>
-								}
-							</div>
-						</div>
-						<div className="sm:col-span-3">
-							<label htmlFor="packaging" className="block text-sm font-medium leading-6 pt-2 text-dark">
-								Kemasan
-							</label>
-							<div className="mt-2">
-								{isLoading ?
-									<SelectPicker
-										id="packaging"
-										name="packaging"
-										placeholder="kemasan"
-										disabled={true}
-										className="py-1.5"
-										size='lg'
-										value={input?.packaging?.id}
-										labelKey="label"
-										valueKey="id"
-										data={packagings}
-										block
-									/>
-									:
-									<>
-										<SelectPicker
-											id="packaging"
-											name="packaging"
-											placeholder="Kemasan"
-											value={input?.packaging?.id}
-											labelKey="label"
-											size='lg'
-											className="py-1.5"
-											valueKey="id"
-											onChange={value => {
-												console.log("value", value);
-												console.log("input", input);
-												setInput({ ...input, packaging: { id: value } })
-												setErrors({ ...errors, "packagingId": "" });
-											}}
-											data={packagings}
-											block
-										/>
-										<div style={{ minHeight: '22px' }}>
-											{
-												errors['packagingId'] &&
-												<Text type="danger">{errors['packagingId']}</Text>
-											}
-										</div>
-									</>
-								}
-							</div>
-						</div>
-						{/* TODO: add validation for classification */}
-						<div className="sm:col-span-6 my-6">
-							{/* <MedicineClassificationForm isLoading={isLoading} formFields={formFields} setFormFields={HandleFormFields} /> */}
-							<MedicineClassificationForm errors={errors} setErrors={setErrors} classifications={classifications} isLoading={isLoading} formFields={formFields} setFormFields={handleFormFields} />
-						</div>
-						<div className="sm:col-span-6">
-							<label htmlFor="unitOfMeasure" className="block text-sm font-medium leading-6 text-dark">
-								Satuan Ukuran
-							</label>
-							<div className="mt-2">
-								{isLoading ?
-									<SelectPicker
-										id="unitOfMeasure"
-										name="unitOfMeasure"
-										placeholder="Satuan"
-										disabled={true}
-										size='lg'
-										block
-										className="py-1.5"
-										data={unitOfMeasure}
-										value={input?.unitOfMeasure}
-										valueKey="value"
-										labelKey="label"
-									/>
-									:
-									<>
-										<SelectPicker
-											id="unitOfMeasure"
-											name="unitOfMeasure"
-											placeholder="Satuan"
-											size='lg'
-											className="py-1.5"
-											data={unitOfMeasure}
-											block
-											onChange={value => {
-												setInput({ ...input, unitOfMeasure: value })
-												setErrors({ ...errors, "unitOfMeasure": "" });
-											}}
-											value={input?.unitOfMeasure}
-											valueKey="value"
-											labelKey="label"
-										/>
-										<div style={{ minHeight: '22px' }}>
-											{
-												errors['unitOfMeasure'] &&
-												<Text type="danger">{errors['unitOfMeasure']}</Text>
-											}
-										</div>
-									</>
-								}
-							</div>
-						</div>
-						<div className="sm:col-span-6">
-							<div className="mt-2">
-								{isLoading ?
-									<InputField
-										type="text"
-										label="Efek Samping"
-										id="sideEffect"
-										name="sideEffect"
-										placeholder="efek samping"
-										value={input?.sideEffect}
-										disabled={true}
-									/>
-									:
-									<InputField
-										type="text"
-										id="sideEffect"
-										label="Efek Samping"
-										name="sideEffect"
-										placeholder="efek samping"
-										value={input?.sideEffect}
-										error={errors['sideEffect']}
-										onChange={e => {
-											setInput({ ...input, sideEffect: e.target.value })
-											setErrors({ ...errors, "sideEffect": "" });
-										}}
-									/>
-								}
-							</div>
-						</div>
-					</div>
-
-					<div className="flex justify-center gap-2 my-6 lg:justify-end">
-						{isLoading ?
-							<Button
-								appearance="primary"
-								isDisabled={true}
-								isLoading={isLoading}
-							>
-								Simpan
-							</Button>
-							:
-							<Button
-								isLoading={isLoading}
-								type="button"
-								appearance="primary"
-								onClick={() => {
-									handleSubmit();
-								}}
-							>
-								Simpan
-							</Button>
-						}
-					</div>
-				</form>
-			</ContentLayout>
-		</Layout>
-	)
+                    <div className="flex justify-center gap-2 my-6 lg:justify-end">
+                        {isLoading ?
+                            <Button
+                                appearance="primary"
+                                isDisabled={true}
+                                isLoading={isLoading}
+                            >
+                                Simpan
+                            </Button>
+                            :
+                            <Button
+                                isLoading={isLoading}
+                                type="button"
+                                appearance="primary"
+                                onClick={() => {
+                                    handleSubmit();
+                                }}
+                            >
+                                Simpan
+                            </Button>
+                        }
+                    </div>
+                </form>
+            </ContentLayout>
+        </Layout>
+    )
 }

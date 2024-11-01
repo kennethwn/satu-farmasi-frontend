@@ -79,7 +79,7 @@ export default function index() {
 			if (res.code !== 200)
 				return toast.error(res.message, {
 					autoClose: 2000,
-					position: "top-center",
+					position: "top-right",
 				});
 			Object.keys(res.data).forEach((key) => {
 				if (key === "phoneNum") res.data[key] = parseInt(res.data[key]);
@@ -97,9 +97,9 @@ export default function index() {
 			if (res.code !== 200)
 				return toast.error(res.message, {
 					autoClose: 2000,
-					position: "top-center",
+					position: "top-right",
 				});
-			toast.success(res.message, { autoClose: 2000, position: "top-center" });
+			toast.success(res.message, { autoClose: 2000, position: "top-right" });
 			router.push("/master/vendor");
 		} catch (error) {
 			console.error(error);

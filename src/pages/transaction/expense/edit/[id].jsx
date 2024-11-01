@@ -3,9 +3,8 @@ import Input from "@/components/Input";
 import Layout from "@/components/Layouts";
 import ContentLayout from "@/components/Layouts/Content";
 import { useRouter } from "next/router";
-import { useEffect, useRef, useState } from "react";
-import { toast, ToastContainer } from "react-toastify";
-import { Loader } from "rsuite";
+import { useEffect, useState } from "react";
+import { toast } from "react-toastify";
 import { z, ZodError } from "zod";
 import useExpenseMedicineAPI from "@/pages/api/transaction/expenseMedicine";
 import Dropdown from "@/components/SelectPicker/Dropdown";
@@ -53,6 +52,7 @@ export default function index() {
         quantity: 0,
         reasonOfDispose: "",
         oldQuantity: 0,
+        medicine: {}
     });
     const [errors, setErrors] = useState({});
 
@@ -62,12 +62,12 @@ export default function index() {
             if (res.code !== 200)
                 return toast.error(res.message, {
                     autoClose: 2000,
-                    position: "top-center",
+                    position: "top-right",
                 });
             setFormData({
                 ...res.data,
                 medicineId: res.data.medicine.id,
-                oldQuantity: Number(res.data.quantity),
+                oldQuantity: parseInt(res.data.quantity),
             })
         } catch (error) {
             console.error(error);
@@ -83,12 +83,13 @@ export default function index() {
             if (res.code !== 200)
                 return toast.error(res.message, {
                     autoClose: 2000,
-                    position: "top-center",
+                    position: "top-right",
                 });
-            toast.success(res.message, { autoClose: 2000, position: "top-center" });
-            router.push("/transaction/expense");
+            toast.success(res.message, { autoClose: 2000, position: "top-right" });
+            setTimeout(() => {
+                router.push("/transaction/expense");
+            }, 2000)
         } catch (error) {
-			console.log("error: ", error)
             if (error instanceof ZodError) {
                 const newErrors = { ...errors };
                 error.issues.forEach((issue) => {
@@ -99,13 +100,16 @@ export default function index() {
                 });
                 setErrors(newErrors);
             } else {
-				ErrorForm(error, setErrors);
-			}
+                ErrorForm(error, setErrors, false);
+            }
         }
     };
 
-    const reasonOfDisposeListData = ["Broken", "Lost", "Expired"].map(item => ({ label: item, value: item.toUpperCase() }));
-    const data = Object.entries(medicineDropdownOptions).map(([key, item]) => ({ label: item.name, value: key, }));
+    const reasonOfDisposeListData = ["Broken", "Lost", "Expired"]
+        .map(item => ({ label: item, value: item.toUpperCase() }));
+
+    const data = Object.entries(medicineDropdownOptions)
+        .map(([key, item]) => ({ label: item.name, value: key, }));
 
     useEffect(() => {
         const fetchData = async () => await handleFetchMedicineById();
@@ -116,10 +120,9 @@ export default function index() {
         async function fetchMedicineDropdownOptionsData() {
             try {
                 const response = await getMedicineDropdownOptions()
-				console.log("response: ", response)
                 setMedicineDropdownOptions(response)
             } catch (error) {
-				console.error(error);
+                console.error(error);
             }
         }
         fetchMedicineDropdownOptionsData()
@@ -127,10 +130,10 @@ export default function index() {
 
     const inputOnChangeHandler = (e, name) => {
         if (name === "medicineId" || name === "reasonOfDispose") {
-            setFormData({ ...formData, [name]: name === "medicineId" ? Number(e) : e });
+            setFormData({ ...formData, [name]: name === "medicineId" ? parseInt(e) : e });
             setErrors((prevErrors) => ({ ...prevErrors, [name]: "" }));
         } else {
-            setFormData({ ...formData, [e.target.name]: Number(e.target.value) });
+            setFormData({ ...formData, [e.target.name]: parseInt(e.target.value) });
             setErrors((prevErrors) => ({ ...prevErrors, [e.target.name]: "" }));
         }
     };
@@ -176,15 +179,27 @@ export default function index() {
                                     }
                                     {
                                         input.name == "quantity" &&
-                                        <Input
-                                            label={input.label}
-                                            type={input.type}
-                                            name={input.name}
-                                            value={formData.quantity}
-                                            onChange={e => inputOnChangeHandler(e, input.name)}
-                                            placeholder={input.placeholder}
-                                            error={errors[input.name]}
-                                        />
+                                        (
+                                            <div class="flex ">
+                                                <Input
+                                                    label={"Jumlah Keluar"}
+                                                    type={"number"}
+                                                    name={"quantity"}
+                                                    value={formData.quantity}
+                                                    onChange={e => inputOnChangeHandler(e, input.name)}
+                                                    placeholder={0}
+                                                    error={errors["quantity"]}
+                                                />
+                                                <Input
+                                                    label={"Stock Obat Sekarang"}
+                                                    type={"number"}
+                                                    name={"currStock"}
+                                                    value={formData.medicine.currStock}
+                                                    disabled={true}
+                                                    placeholder={0}
+                                                />
+                                            </div>
+                                        )
                                     }
                                 </div>
                             );
@@ -208,9 +223,6 @@ export default function index() {
                     </div>
                 </form>
             </ContentLayout>
-
-            <ToastContainer />
-            {isLoading && <Loader />}
         </Layout>
     );
 }

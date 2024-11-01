@@ -69,25 +69,11 @@ export default function index(props) {
 		}
 	}
 
-	const HandleClear = () => {
-		setData([]);
-		setEditInput({});
-		setPage(1);
-		setTotalPage(0);
-		setLimit(10);
-		setInput({ label: "", value: "" });
-		setOpen({
-			create: false,
-			edit: false,
-			delete: false,
-		});
-	}
-
 	const HandeFetchGenericData = async () => {
 		try {
 			const res = await GetAllGeneric(page, limit);
 			if (res.code !== 200) {
-				toast.error("Failed to fetch generic data", { autoClose: 2000, position: "top-center" });
+				toast.error("Failed to fetch generic data", { autoClose: 2000, position: "top-right" });
 				return;
 			}
 			setData(res.data.results);
@@ -101,7 +87,7 @@ export default function index(props) {
 		try {
 			const res = await GetGenericByLabel(search);
 			if (res.code !== 200) {
-				toast.error("Failed to fetch generic data", { autoClose: 2000, position: "top-center" });
+				toast.error("Failed to fetch generic data", { autoClose: 2000, position: "top-right" });
 				return;
 			}
 			setData(res.data.results);
@@ -116,11 +102,12 @@ export default function index(props) {
 			data = { ...data, value: data.label };
 			const res = await CreateGeneric(data);
 			if (res.code !== 200) {
-				toast.error("Failed to create generic name", { autoClose: 2000, position: "top-center" });
+				toast.error(res.message, { autoClose: 2000, position: "top-right" });
 				return;
 			}
-			toast.success("Successfully created generic name", { autoClose: 2000, position: "top-center" });
+			toast.success(res.message, { autoClose: 2000, position: "top-right" });
 			setOpen({ ...open, create: false });
+            reset();
 			HandeFetchGenericData();
 		} catch (error) {
 			console.error(error);
@@ -132,11 +119,12 @@ export default function index(props) {
 			data = { ...data, id: editInput.id, value: data.label };
 			const res = await EditGeneric(data);
 			if (res.code !== 200) {
-				toast.error("Failed to edit generic", { autoClose: 2000, position: "top-center" });
+				toast.error(res.message, { autoClose: 2000, position: "top-right" });
 				return;
 			}
-			toast.success("Successfully edited generic name", { autoClose: 2000, position: "top-center" });
+			toast.success(res.message, { autoClose: 2000, position: "top-right" });
 			setOpen({ ...open, edit: false, delete: false });
+            reset();
 			HandeFetchGenericData();
 		} catch (error) {
 			console.error(error);
@@ -145,13 +133,14 @@ export default function index(props) {
 
 	const HandleDeleteGeneric = async () => {
 		try {
-			const response = await DeleteGeneric(editInput);
-			if (response.code !== 200) {
-				toast.error("Failed to delete generic", { autoClose: 2000, position: "top-center" });
+			const res = await DeleteGeneric(editInput);
+			if (res.code !== 200) {
+				toast.error(res.message, { autoClose: 2000, position: "top-right" });
 				return;
 			}
-			toast.success("Successfully deleted generic", { autoClose: 2000, position: "top-center" });
+			toast.success(res.message, { autoClose: 2000, position: "top-right" });
 			setOpen({ ...open, delete: false });
+            reset();
 			HandeFetchGenericData();
 		} catch (error) {
 			console.error(error);
