@@ -3,17 +3,17 @@
 @tailwind utilities;
 
 :root {
-  --foreground-rgb: 0, 0, 0;
-  --background-start-rgb: 214, 219, 220;
-  --background-end-rgb: 255, 255, 255;
+    --foreground-rgb: 0, 0, 0;
+    --background-start-rgb: 214, 219, 220;
+    --background-end-rgb: 255, 255, 255;
 }
 
 @media (prefers-color-scheme: dark) {
-  :root {
-    --foreground-rgb: 255, 255, 255;
-    --background-start-rgb: 0, 0, 0;
-    --background-end-rgb: 0, 0, 0;
-  }
+    :root {
+        --foreground-rgb: 255, 255, 255;
+        --background-start-rgb: 0, 0, 0;
+        --background-end-rgb: 0, 0, 0;
+    }
 }
 
 /* body {
@@ -27,26 +27,85 @@
 } */
 
 @layer utilities {
-  .text-balance {
-    text-wrap: balance;
-  }
+    .text-balance {
+        text-wrap: balance;
+    }
 }
+
 input::-webkit-outer-spin-button,
 input::-webkit-inner-spin-button {
     -webkit-appearance: none;
-    margin: 0; 
+    margin: 0;
 }
 
-input[type=number] {
-    -moz-appearance:textfield;
+input[type="number"] {
+    -moz-appearance: textfield;
     appearance: textfield;
 }
 
-/*
-  NOTE: Modal styles for rsuite
-*/
-.rs-modal-wrapper{
-  display: flex;
-  align-items: center;
-  background-color: rgba(0, 0, 0, 0.5);
+.error-field {
+    border-color: #ef4444 !important;
+}
+
+/* NOTE: Modal styles for rsuite */
+.rs-modal-wrapper {
+    display: flex;
+    align-items: center;
+    background-color: rgba(0, 0, 0, 0.5);
+}
+
+input:hover,
+input:focus,
+input:active,
+input:focus-visible,
+input:focus-within,
+input:active {
+    border-color: rgb(107 114 128);
+}
+
+/* NOTE: Select Picker styles for rsuite */
+.rs-picker-toggle {
+    border-color: rgb(107 114 128);
+    transition: none !important;
+    /*border-color: #EF4444 !important;*/
+}
+
+/* Disable default hover state */
+.rs-picker-toggle:hover,
+.rs-picker-toggle:not(.rs-picker-toggle-active):hover {
+    border-color: rgb(107 114 128);
+}
+
+.rs-picker-toggle-value,
+.rs-picker-select-menu-item {
+    color: #333333 !important;
+}
+
+/* Disable default focus state */
+.rs-picker-toggle:focus,
+.rs-picker-toggle-active,
+.rs-picker:not(.rs-picker-disabled) .rs-picker-toggle:focus,
+.rs-picker:not(.rs-picker-disabled) .rs-picker-toggle-active {
+    border-color: rgb(107 114 128);
+    box-shadow: none !important;
+}
+
+/* Remove blue outline on focus */
+.rs-picker-toggle:focus-within {
+    border-color: rgb(107 114 128);
+    outline: none !important;
+}
+
+/* Override any remaining blue states */
+.rs-picker-default:not(.rs-picker-disabled) .rs-picker-toggle:hover,
+.rs-picker-default:not(.rs-picker-disabled) .rs-picker-toggle.rs-picker-toggle-active {
+    border-color: rgb(107 114 128);
+}
+
+/* Remove transition effects */
+.rs-picker-toggle,
+.rs-picker-toggle:hover,
+.rs-picker-toggle:focus,
+.rs-picker-toggle-active {
+    transition: none !important;
 }

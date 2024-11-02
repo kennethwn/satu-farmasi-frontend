@@ -62,10 +62,13 @@ export default function create() {
             if (res.code !== 200)
                 return toast.error(res.message, {
                     autoClose: 2000,
-                    position: "top-center",
+                    position: "top-right",
                 });
-            toast.success(res.message, { autoClose: 2000, position: "top-center" });
-            router.push("/transaction/expense");
+            toast.success(res.message, { autoClose: 2000, position: "top-right" });
+            console.log("res", res.message)
+            setTimeout(() => {
+                router.push("/transaction/expense");
+            }, 2000)
         } catch (error) {
             if (error instanceof ZodError) {
                 const newErrors = { ...errors };

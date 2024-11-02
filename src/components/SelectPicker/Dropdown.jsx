@@ -2,7 +2,7 @@ import { SelectPicker } from "rsuite";
 import propTypes from 'prop-types';
 import Label from "../Input/Label";
 import Text from "../Text";
-import { useRef } from "react";
+import { useEffect, useRef } from "react";
 
 export default function Dropdown({
     name,
@@ -20,7 +20,36 @@ export default function Dropdown({
     const classNames = [className];
     const containerRef = useRef(null);
 
-    if (label) classNames.push('my-2');
+    const styles = {
+        display: 'flex',
+        width: '100%',
+        color: '#111827', // Tailwind's gray-900
+        boxShadow: '0 1px 2px 0 rgba(0, 0, 0, 0.05)', // Small shadow
+        fontSize: '0.875rem', // 14px
+        lineHeight: '1.5rem', // 24px
+    };
+
+    const addNewClass = (newClass) => {
+        const selectPicker = containerRef.current?.querySelectorAll('.rs-picker-toggle');
+        console.log('selectPicker', selectPicker);
+        selectPicker.forEach((element) => {
+            element.classList.add(newClass);
+        });
+    }
+
+    const removeClass = (className) => {
+        const selectPicker = containerRef.current?.querySelectorAll('.rs-picker-toggle');
+        selectPicker.forEach((element) => {
+            element.classList.remove(className);
+        });
+    }
+
+    useEffect(() => {
+        if (error) addNewClass('error-field');
+        else removeClass('error-field');
+    }, [error])
+
+    if (label) className.push('my-2 container-select');
 
     return (
         <>
@@ -37,6 +66,10 @@ export default function Dropdown({
                     placement={placement}
                     {...props}
                 />
+                {
+                    error &&
+                    <Text type="danger">{error}</Text>
+                }
             </div>
             {
                 error &&

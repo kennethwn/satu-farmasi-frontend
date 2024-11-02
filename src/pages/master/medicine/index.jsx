@@ -35,7 +35,7 @@ export default function index() {
             const res = await GetAllMedicines(page, limit);
             console.log(res);
             if (res.code !== 200) {
-                toast.error(res.message, { autoClose: 2000, position: "top-center" });
+                toast.error(res.message, { autoClose: 2000, position: "top-right" });
                 return;
             }
             setData(res.data.results);
@@ -50,7 +50,7 @@ export default function index() {
             // TODO: By Name atau By Code
             const res = await SearchMedicine(page, limit, search);
             if (res.code != 200) {
-                toast.error(res.message, { autoClose: 2000, position: "top-center" });
+                toast.error(res.message, { autoClose: 2000, position: "top-right" });
                 return;
             }
             setData(res.data.results);
@@ -66,10 +66,10 @@ export default function index() {
             const res = await DeleteMedicine(payload);
             console.log(res);
             if (res.code !== 200) {
-                toast.error(res.message, { autoClose: 2000, position: "top-center" });
+                toast.error(res.message, { autoClose: 2000, position: "top-right" });
                 return;
             }
-            toast.success(res.message, { autoClose: 2000, position: "top-center" });
+            toast.success(res.message, { autoClose: 2000, position: "top-right" });
             setSelectedMedicine({});
             handleFetchMedicines();
             setModalDelete(false);
