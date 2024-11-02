@@ -82,7 +82,7 @@ export default function create() {
     return (
         <Layout active="prescription" user={user}>
             <ContentLayout title="Create Prescription" type="child" backpageUrl="/prescription">
-                <form onSubmit={handleSubmitPrescription} className="flex flex-col gap-6">
+                <form onSubmit={handleSubmitPrescription} className="flex flex-col gap-4">
                     <div className="flex flex-col gap-2">
                         <Toggle size="lg" checkedChildren="Existing Patient" unCheckedChildren="New Patient" defaultChecked onChange={(e) => setExistingPatient(e)}/>
                         <PatientForm

@@ -12,6 +12,7 @@ import { useEffect, useState } from "react";
 import { toast } from "react-toastify";
 import MedicineClassificationForm from "@/components/DynamicForms/MedicineClassificationForm";
 import { SelectPicker } from "rsuite";
+import Dropdown from "@/components/SelectPicker/Dropdown";
 
 export default function Index() {
     const router = useRouter();
@@ -27,8 +28,8 @@ export default function Index() {
     const [generics, setGenerics] = useState([]);
     const [formFields, setFormFields] = useState([{id: 0, label: '', value: ''}]);
     const unitOfMeasure = [
-        {id: 1, label: 'MILILITER', value: 'MILILITER'},
-        {id: 2, label: 'MILIGRAM', value: 'MILIGRAM'},
+        {id: 1, label: 'MILLILITER', value: 'MILLILITER'},
+        {id: 2, label: 'MILLIGRAM', value: 'MILLIGRAM'},
         {id: 3, label: 'GRAM', value: 'GRAM'},
         {id: 4, label: 'LITER', value: 'LITER'},
         {id: 5, label: 'GROS', value: 'GROS'},
@@ -153,7 +154,7 @@ export default function Index() {
     return (
         <Layout active="master-medicine" user={user}>
             <ContentLayout title="Edit Obat" type="child" backpageUrl="/master/medicine">
-            <form id="form">
+                <form id="form">
                     <div className="grid grid-cols-1 gap-x-6 gap-y-2 sm:grid-cols-6">
                         <div className="sm:col-span-6">
                             <div className="mt-2">
@@ -321,7 +322,7 @@ export default function Index() {
                             </label>
                             <div className="mt-2">
                                 {isLoading ?
-                                    <SelectPicker 
+                                    <Dropdown 
                                         id="genericName"
                                         name="genericName"
                                         placeholder="nama generik"
@@ -334,7 +335,7 @@ export default function Index() {
                                         block
                                     />
                                     :
-                                    <SelectPicker 
+                                    <Dropdown 
                                         id="genericName"
                                         name="genericName"
                                         placeholder="nama generik"
@@ -355,7 +356,7 @@ export default function Index() {
                             </label>
                             <div className="mt-2">
                                 {isLoading ?
-                                    <SelectPicker
+                                    <Dropdown
                                         id="packaging"
                                         name="packaging"
                                         placeholder="kemasan"
@@ -368,7 +369,7 @@ export default function Index() {
                                         block
                                     />
                                     :
-                                    <SelectPicker 
+                                    <Dropdown 
                                         id="packaging"
                                         name="packaging"
                                         placeholder="kemasan"
@@ -393,7 +394,7 @@ export default function Index() {
                             </label>
                             <div className="mt-2">
                                 {isLoading ?
-                                    <SelectPicker 
+                                    <Dropdown 
                                     id="unitOfMeasure"
                                     name="unitOfMeasure"
                                     placeholder="satuan"
@@ -406,7 +407,7 @@ export default function Index() {
                                     labelKey="label"
                                     />
                                     :
-                                    <SelectPicker 
+                                    <Dropdown 
                                     id="unitOfMeasure"
                                     name="unitOfMeasure"
                                     placeholder="satuan"
