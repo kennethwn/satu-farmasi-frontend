@@ -60,7 +60,7 @@ export default function Toaster({
 
 Toaster.propTypes = {
     title: propTypes.string,
-    body: propTypes.string,
+    body: propTypes.object,
     type: propTypes.string,
     btnText: propTypes.string,
     isLoading: propTypes.bool,

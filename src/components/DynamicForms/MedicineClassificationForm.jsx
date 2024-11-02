@@ -4,6 +4,7 @@ import { IoIosAdd } from 'react-icons/io';
 import { MdDeleteOutline } from 'react-icons/md';
 import { SelectPicker } from 'rsuite';
 import Text from "@/components/Text";
+import Dropdown from '../SelectPicker/Dropdown';
 
 export default function MedicineClassificationForm(props) {
 	const {

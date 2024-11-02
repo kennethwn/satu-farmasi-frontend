@@ -14,9 +14,11 @@ export default function Dropdown({
     onChange,
     label,
     id,
+    placement = "auto",
     ...props
 }) {
-    className = [className];
+    const classNames = [className];
+    const containerRef = useRef(null);
 
     const styles = {
         display: 'flex',
@@ -27,10 +29,8 @@ export default function Dropdown({
         lineHeight: '1.5rem', // 24px
     };
 
-    const containerSelect = useRef();
-
     const addNewClass = (newClass) => {
-        const selectPicker = containerSelect.current?.querySelectorAll('.rs-picker-toggle');
+        const selectPicker = containerRef.current?.querySelectorAll('.rs-picker-toggle');
         console.log('selectPicker', selectPicker);
         selectPicker.forEach((element) => {
             element.classList.add(newClass);
@@ -38,7 +38,7 @@ export default function Dropdown({
     }
 
     const removeClass = (className) => {
-        const selectPicker = containerSelect.current?.querySelectorAll('.rs-picker-toggle');
+        const selectPicker = containerRef.current?.querySelectorAll('.rs-picker-toggle');
         selectPicker.forEach((element) => {
             element.classList.remove(className);
         });
@@ -54,14 +54,16 @@ export default function Dropdown({
     return (
         <>
             {label && <Label id={id} label={label} />}
-            <div ref={containerSelect}>
+            <div ref={containerRef} style={{ position: 'relative' }}>
                 <SelectPicker
-                    style={styles}
+                    container={() => containerRef.current}
+                    preventOverflow={false}
                     placeholder={placeholder}
                     onChange={onChange}
                     className={className}
                     defaultValue={defaultValue}
                     value={value}
+                    placement={placement}
                     {...props}
                 />
                 {
@@ -69,6 +71,12 @@ export default function Dropdown({
                     <Text type="danger">{error}</Text>
                 }
             </div>
+            {
+                error &&
+                    <div style={{ minHeight: '22px' }}>
+                            <Text type="danger">{error}</Text>
+                    </div>
+            }
         </>
         // <div className="block w-full rounded-full px-4 border py-1.5 text-dark border-dark placeholder:text-gray-400 sm:text-base sm:leading-6 ">
         // </div>
@@ -76,7 +84,14 @@ export default function Dropdown({
 }
 
 Dropdown.propTypes = {
+    name: propTypes.string,
+    label: propTypes.string,
+    id: propTypes.string,
+    placement: propTypes.string,
+    error: propTypes.string,
     className: propTypes.string,
     placeholder: propTypes.string,
     onChange: propTypes.func,
+    value: propTypes.any,
+    defaultValue: propTypes.any,
 }

@@ -15,6 +15,7 @@ import { z, ZodError } from "zod";
 import { isRequiredNumber, isRequiredString } from "@/helpers/validation";
 import Text from "@/components/Text";
 import useClassificationsAPI from "@/pages/api/master/classification";
+import Dropdown from "@/components/SelectPicker/Dropdown";
 
 const classificationSchema = z.object({
     classificationId: isRequiredNumber(),
@@ -45,11 +46,6 @@ const medicineSchema = z.object({
     path: ["currStock"],
 })
 
-
-// TODO:
-// 1. Price validation is still not validating float number
-// 2. Random number appears after inputting number in price field 
-
 export default function Index() {
     const router = useRouter();
     const id = router.query.id;
@@ -66,8 +62,8 @@ export default function Index() {
     const [generics, setGenerics] = useState([]);
     const [formFields, setFormFields] = useState([{ id: 0, label: '', value: '' }]);
     const unitOfMeasure = [
-        { id: 1, label: 'MILILITER', value: 'MILILITER' },
-        { id: 2, label: 'MILIGRAM', value: 'MILIGRAM' },
+        { id: 1, label: 'MILLILITER', value: 'MILLILITER' },
+        { id: 2, label: 'MILLIGRAM', value: 'MILLIGRAM' },
         { id: 3, label: 'GRAM', value: 'GRAM' },
         { id: 4, label: 'LITER', value: 'LITER' },
         { id: 5, label: 'GROS', value: 'GROS' },
@@ -148,9 +144,6 @@ export default function Index() {
     const handleSubmit = async () => {
         try {
             let classifications = [];
-            //input.classifications = formFields;
-            // TODO: Make sure this is the coreect logic
-           
             input.classifications = [];
             formFields.forEach((item, index) => {
                 input.classifications[index] = {
@@ -160,7 +153,7 @@ export default function Index() {
                 }
             });
 
-            input?.classifications?.map((item, index) => {
+            input?.classifications?.map((item) => {
                 let temp = { classificationId: 0, medicineId: 0 };
                 temp['classificationId'] = item.classification.id;
                 temp['medicineId'] = input.id;
@@ -419,7 +412,7 @@ export default function Index() {
                             </label>
                             <div className="mt-2">
                                 {isLoading ?
-                                    <SelectPicker
+                                    <Dropdown
                                         id="genericName"
                                         name="genericName"
                                         className="py-1.5"
@@ -434,7 +427,7 @@ export default function Index() {
                                     />
                                     :
                                     <>
-                                        <SelectPicker
+                                        <Dropdown
                                             id="genericName"
                                             name="genericName"
                                             placeholder="Nama Generik"
@@ -466,7 +459,7 @@ export default function Index() {
                             </label>
                             <div className="mt-2">
                                 {isLoading ?
-                                    <SelectPicker
+                                    <Dropdown
                                         id="packaging"
                                         name="packaging"
                                         placeholder="kemasan"
@@ -481,7 +474,7 @@ export default function Index() {
                                     />
                                     :
                                     <>
-                                        <SelectPicker
+                                        <Dropdown
                                             id="packaging"
                                             name="packaging"
                                             placeholder="Kemasan"
@@ -518,7 +511,7 @@ export default function Index() {
                             </label>
                             <div className="mt-2">
                                 {isLoading ?
-                                    <SelectPicker
+                                    <Dropdown
                                         id="unitOfMeasure"
                                         name="unitOfMeasure"
                                         placeholder="Satuan"
