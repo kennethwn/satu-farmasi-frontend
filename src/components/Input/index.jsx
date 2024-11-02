@@ -85,7 +85,7 @@ export default function Input(props) {
                         {...register(name)}
                     />
             }
-            <div>
+            <div className='px-4'>
                 {
                     error &&
                     <Text type="danger">{error}</Text>

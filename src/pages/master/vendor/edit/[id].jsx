@@ -49,6 +49,7 @@ const createVendorField = [
 export default function index() {
   const router = useRouter();
   const id = router.query.id;
+	console.log("id: ", id);
   const { isLoading, GetVendorById, EditVendor } = useVendorAPI();
   const formRef = useRef(null);
   const {
@@ -92,6 +93,10 @@ export default function index() {
     const fetchData = async () => await handleFetchVendorById();
     if (router.isReady) fetchData();
   }, [id]);
+
+  useEffect(() => {
+	  console.log("input: ", input);
+  }, [input]);
 
   return (
     <Layout active="master-vendor">
