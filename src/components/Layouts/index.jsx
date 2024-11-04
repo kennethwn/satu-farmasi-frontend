@@ -126,6 +126,25 @@ export default function Layout(props) {
                             }
                             {userRole === 'pharmacist' &&
                                 <Nav.Menu
+                                    eventKey="report"
+                                    trigger="hover"
+                                    title="Laporan"
+                                    icon={renderIcon("report", activeKey === "report-dashboard"
+                                        || activeKey === "report-receive" 
+                                        || activeKey === "report-expense")}
+                                    placement="rightStart"
+                                >
+                                    <Nav.Item
+                                        onClick={() => {
+                                            router.push("/report/medicine", undefined, { shallow: true });
+                                            setActiveKey("report-dashboard");
+                                        }}
+                                        eventKey="report-dashboard"
+                                    >{renderTitle("Laporan Obat", activeKey === "report-dashboard")}</Nav.Item>
+                                </Nav.Menu>
+                            }
+                            {userRole === 'pharmacist' &&
+                                <Nav.Menu
                                     eventKey="transaction"
                                     trigger="hover"
                                     title="Transaksi"
