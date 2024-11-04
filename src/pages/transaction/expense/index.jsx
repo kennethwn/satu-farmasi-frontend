@@ -10,7 +10,7 @@ import { useEffect, useState } from "react";
 import { IoMdAdd } from "react-icons/io";
 import { MdOutlineEdit } from "react-icons/md";
 import { PiTrash } from "react-icons/pi";
-import { Pagination, Table } from "rsuite";
+import { Pagination, SelectPicker, Table } from "rsuite";
 import { toast } from "react-toastify";
 import formatCalendar from "@/helpers/dayHelper";
 
@@ -18,6 +18,8 @@ export default function index() {
     const { user } = useUserContext();
     const { HeaderCell, Cell, Column } = Table;
     const { isLoading, GetAllMedicine, GetMedicineByParams, DeleteMedicine } = useExpenseMedicineAPI();
+    const status = ["LOST", "EXPIRED", "BROKEN"];
+    const [filter, setFilter] = useState('');
 
     const [data, setData] = useState([]);
     const [editInput, setEditInput] = useState({});
@@ -26,24 +28,25 @@ export default function index() {
         edit: false,
         delete: false,
     });
-    const router = useRouter();
+    const [search, setSearch] = useState({
+        q: "",
+        filter: "",
+    });
 
-    const [search, setSearch] = useState("");
+    const router = useRouter();
     const [page, setPage] = useState(1);
     const [totalPage, setTotalPage] = useState(0);
     const [limit, setLimit] = useState(10);
-    const [sortColumn, setSortColumn] = useState();
-    const [sortType, setSortType] = useState();
 
     const HandleFetchMedicineData = async () => {
         try {
             const res = await GetAllMedicine(page, limit);
-            console.log(res.data);
             if (res.code !== 200) {
-                toast.error(res.message, { autoClose: 2000, position: "top-center" });
+                toast.error(res.message, { autoClose: 2000, position: "top-right" });
                 return;
             }
             res.data.results.map(item => { item.created_at = formatCalendar(item.created_at); })
+            console.log(res.data.results);
             setData(res.data.results);
             setTotalPage(res.data.total);
         } catch (error) {
@@ -51,36 +54,35 @@ export default function index() {
         }
     };
 
-  const HandleFetchMedicineByParams = async () => {
-    try {
-      const res = await GetMedicineByParams(search);
-      if (res.code !== 200) {
-        toast.error(res.message, { autoClose: 2000, position: "top-center" });
-        return;
-      }
-        res?.data.results.map(item => { item.created_at = formatCalendar(item.created_at); })
-      setData(res?.data.results);
-      setTotalPage(res.total);
-    } catch (error) {
-      console.error(error);
-    }
-  };
+    const HandleFetchMedicineByParams = async () => {
+        try {
+            const res = await GetMedicineByParams(search);
+            if (res.code !== 200) {
+                toast.error(res.message, { autoClose: 2000, position: "top-right" });
+                return;
+            }
+            res?.data.results.map(item => { item.created_at = formatCalendar(item.created_at); })
+            setData(res?.data.results);
+            setTotalPage(res.data.total);
+        } catch (error) {
+            console.error(error);
+        }
+    };
 
     const HandleDeleteMedicine = async () => {
         try {
             setEditInput({ ...editInput, is_active: false });
             const res = await DeleteMedicine(editInput);
-            console.log("res: ", res)
             if (res.code !== 200) {
-                toast.error("Failed to delete Vendor", {
+                toast.error(res.message, {
                     autoClose: 2000,
-                    position: "top-center",
+                    position: "top-right",
                 });
                 return;
             }
-            toast.success("Successfully deleted Vendor", {
+            toast.success(res.message, {
                 autoClose: 2000,
-                position: "top-center",
+                position: "top-right",
             });
             setOpen({ ...open, create: false, edit: false, delete: false });
             HandleFetchMedicineData();
@@ -91,7 +93,7 @@ export default function index() {
 
     useEffect(() => {
         async function fetchData() {
-            if (search === "") {
+            if (search.q === "" && search.filter === "") {
                 await HandleFetchMedicineData();
             } else {
                 await HandleFetchMedicineByParams();
@@ -100,42 +102,49 @@ export default function index() {
         fetchData();
     }, [page, limit, search]);
 
-    const handleSortColumn = (sortColumn, sortType) => {
-        setTimeout(() => {
-            setSortColumn(sortColumn);
-            setSortType(sortType);
-        }, 500);
-    };
-
     return (
         <Layout active="master-expense" user={user}>
             <ContentLayout title="List Pengeluaran Obat">
-                <div className="flex flex-row justify-between items-center w-full pb-6">
-                    <Button
-                        prependIcon={<IoMdAdd size={24} />}
-                        onClick={() => router.push(`/transaction/expense/create`)}
-                    >
-                        Tambah
-                    </Button>
-
-                    <SearchBar
-                        size="md"
-                        className="w-1/4"
-                        placeholder="Search..."
-                        onChange={(value) => setSearch(value)}
-                    />
+                <div className="flex flex-col gap-2 md:flex-row justify-between w-full">
+                    <div>
+                        <Button
+                            prependIcon={<IoMdAdd size={24} />}
+                            onClick={() => router.push(`/transaction/expense/create`)}
+                        >
+                            Tambah
+                        </Button>
+                    </div>
+                    <div className="flex md:flex-row flex-col gap-4">
+                        <SelectPicker
+                            style={{
+                                // borderWidth: '0.5px',     
+                                color: '#DDDDDD',
+                                borderColor: '#DDDDDD',
+                                // borderRadius: '0.4rem',
+                            }}
+                            label="Status"
+                            data={status.map((status) => ({ label: status, value: status }))}
+                            value={filter}
+                            onChange={value => {
+                                setSearch({ ...search, filter: value }),
+                                    setFilter(value)
+                            }}
+                        />
+                        <SearchBar
+                            size="md"
+                            placeholder="Search..."
+                            onChange={value => setSearch({ ...search, q: value })}
+                        />
+                    </div>
                 </div>
-                <div className="w-full h-[500px]">
+                <div className="w-full pt-6">
                     <Table
                         data={data || []}
                         bordered
                         cellBordered
                         shouldUpdateScroll={false}
+                        height={400}
                         affixHorizontalScrollbar
-                        fillHeight={true}
-                        sortColumn={sortColumn}
-                        sortType={sortType}
-                        onSortColumn={handleSortColumn}
                         loading={isLoading}
                     >
                         <Column width={100} fixed="left">
@@ -147,7 +156,7 @@ export default function index() {
                             </Cell>
                         </Column>
 
-                        <Column flexGrow={1} sortable>
+                        <Column flexGrow={1}>
                             <HeaderCell className="text-dark font-bold">
                                 Nama Obat
                             </HeaderCell>
@@ -159,6 +168,13 @@ export default function index() {
                                 Jumlah Keluar
                             </HeaderCell>
                             <Cell dataKey="quantity" />
+                        </Column>
+
+                        <Column flexGrow={1}>
+                            <HeaderCell className="text-dark font-bold">
+                                Stock Obat Sekarang
+                            </HeaderCell>
+                            <Cell dataKey="medicine.currStock" />
                         </Column>
 
                         <Column flexGrow={1}>
@@ -184,7 +200,7 @@ export default function index() {
                                     return (
                                         <div className="flex justify-center flex-row gap-6">
                                             <button
-                                                className="inline-flex items-center justify-center w-8 h-8 text-center bg-transparent border-0 rounded-lg"
+                                                disabled={rowData?.report?.id} className={`${rowData?.report?.id ? 'hidden' : ''} inline-flex items-center justify-center w-8 h-8 text-center bg-transparent border-0 rounded-lg`}
                                                 onClick={() =>
                                                     router.push(`/transaction/expense/edit/${rowData?.id}`)
                                                 }
@@ -193,7 +209,8 @@ export default function index() {
                                             </button>
 
                                             <button
-                                                className="inline-flex items-center justify-center w-8 h-8 text-center bg-transparent border-0 rounded-lg"
+                                                disabled={rowData?.report?.id}
+                                                className={`${rowData?.report?.id ? 'hidden' : ''} inline-flex items-center justify-center w-8 h-8 text-center bg-transparent border-0 rounded-lg`}
                                                 onClick={() => {
                                                     setEditInput({ ...rowData, is_active: false });
                                                     setOpen({ ...open, delete: true });
@@ -229,19 +246,19 @@ export default function index() {
                 </div>
             </ContentLayout>
 
-      <Toaster
-        type="warning"
-        open={open.delete}
-        onClose={() => setOpen({ ...open, delete: false })}
-        body={
-          <>
-            Apakah anda yakin untuk menghapus data{" "}
-            <span className="text-danger">{editInput.name}</span>?
-          </>
-        }
-        btnText="Hapus"
-        onClick={() => HandleDeleteMedicine("delete")}
-      />
+            <Toaster
+                type="warning"
+                open={open.delete}
+                onClose={() => setOpen({ ...open, delete: false })}
+                body={
+                    <>
+                        Apakah anda yakin untuk menghapus data{" "}
+                        <span className="text-danger">{editInput.name}</span>?
+                    </>
+                }
+                btnText="Hapus"
+                onClick={() => HandleDeleteMedicine("delete")}
+            />
         </Layout>
     );
 }

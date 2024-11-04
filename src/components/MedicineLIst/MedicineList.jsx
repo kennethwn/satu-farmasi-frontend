@@ -1,6 +1,7 @@
 import { Grid, Row, Table } from "rsuite";
 import { Cell, Column, HeaderCell } from "rsuite-table";
 import { useState } from "react";
+import { formatRupiah } from "@/helpers/currency";
 
 export default function MedicineList(props) {
     const {medicineList} = props;
@@ -54,7 +55,7 @@ export default function MedicineList(props) {
                 </Cell>
             </Column>
 
-            <Column width={200} resizable sortable>
+            <Column width={250} fullText resizable sortable>
                 <HeaderCell className="text-dark">Nama Obat</HeaderCell>
                 <Cell>
                     {(rowData) => 
@@ -75,14 +76,18 @@ export default function MedicineList(props) {
                 <Cell dataKey='quantity'/>
             </Column>
 
-            <Column width={175} resizable sortable>
+            <Column flexGrow={1} resizable sortable>
                 <HeaderCell className="text-dark">Harga Per Obat (Rp.)</HeaderCell>
-                <Cell dataKey='medicine.price'/>
+                <Cell dataKey='medicine.price'>
+                    {rowData => formatRupiah(rowData?.medicine?.price)}
+                </Cell>
             </Column>
 
-            <Column width={175} resizable sortable>
+            <Column flexGrow={1} resizable sortable>
                 <HeaderCell className="text-dark">Total Sub Harga (Rp.)</HeaderCell>
-                <Cell dataKey='totalPrice'/>
+                <Cell dataKey='totalPrice'>
+                    {rowData => formatRupiah(rowData?.totalPrice)}
+                </Cell>
             </Column>
 
             {/* <Column width={225} fixed="right">

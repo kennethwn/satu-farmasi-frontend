@@ -1,22 +1,33 @@
 import { Inter } from "next/font/google";
 import Layouts from "@/components/Layouts";
-import Input from "@/components/Input";
-import { useEffect, useState } from "react";
-import PrescribeIcon from "@/components/Icons/PrescribeIcon";
 import ContentLayout from "@/components/Layouts/Content";
-import { IoMdArrowDropleft as ArrowLeftIcon } from "react-icons/io";
 import { useUserContext } from "./api/context/UserContext";
-import Button from "@/components/Button";
-import { toast } from "react-toastify";
-import Toaster from "@/components/Modal/Toaster";
 import pdfMake from "pdfmake/build/pdfmake"
 import pdfFonts from "pdfmake/build/vfs_fonts";
+import DashboardView from "@/components/Dashboard/DashboardView";
+import formatDate from "@/helpers/dayHelper";
+import { useEffect, useState } from "react";
+import usePatientAPI from "./api/patient";
+import getDataCard from "@/data/dashboard";
+import useMedicineAPI from "./api/master/medicine";
+import { useRouter } from "next/router";
 
 const inter = Inter({ subsets: ["latin"] });
 pdfMake.vfs = pdfFonts.pdfMake.vfs;
 
 export default function Home() {
+  const { getTotalPatient } = usePatientAPI();
+  const { GetTotalMedicine, CheckExpirationByDate } = useMedicineAPI();
   const { user } = useUserContext();
+
+  const [dataExp, setDataExp] = useState([]);
+
+  const [totalPatient, setTotalPatient] = useState(0);
+  const [totalMedicine, setTotalMedicine] = useState(0);
+  const [totalProfit, setTotalProfit] = useState(0);
+  const [totalOutOfStock, setTotalOfStock] = useState(0);
+
+  const router = useRouter();
 
   function printPDF() {
     var docDefinition = {
@@ -48,11 +59,52 @@ export default function Home() {
     pdfMake.createPdf(docDefinition).open();
   }
 
+  const handleFetchTotalPatient = async () => {
+    try {
+      const response = await getTotalPatient();
+      if (response.code != 200) return;
+      setTotalPatient(response.data);
+    } catch (error) {
+      console.error(error);
+    }
+  }
+  
+  const handleFetchTotalMedicine = async () => {
+    try {
+      const response = await GetTotalMedicine();
+      if (response.code != 200) return;
+      setTotalMedicine(response.data)
+    } catch (error) {
+      console.error(error);
+    }
+  }
+
+  const handleFetchExpiredMedicines = async () => {
+    try {
+      const date = new Date;
+      const response = await CheckExpirationByDate({expiredDate: date.toISOString()});
+      if (response.code != 200) return;
+      setDataExp(response.data);
+    } catch (error) {
+      console.error(error);
+    }
+  }
+
+  useEffect(() => {
+    async function fetchData() {
+      if (router.isReady) {
+        await handleFetchTotalPatient();
+        await handleFetchTotalMedicine();
+        await handleFetchExpiredMedicines();
+      }
+    }
+    fetchData();
+  }, [router]);
+
   return (
     <Layouts user={user}>
-      <ContentLayout type="child" title="Home">
-        <p>hello world</p>
-        <Button onClick={printPDF}>PDF</Button>
+      <ContentLayout title={`Welcome, ${user?.name}`}>
+        <DashboardView dataCard={getDataCard(totalPatient, totalMedicine, 52, 93)} dataExpired={dataExp} />
       </ContentLayout>
     </Layouts>
   );

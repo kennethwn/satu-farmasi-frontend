@@ -11,15 +11,10 @@ export default function usePharmacist() {
         let { email, password, nik, firstName, lastName, phoneNum, dob, role } = data;
         dob = convertToTimestampString(dob);
         try {
-            return await api.post("/api/v1/pharmacists/", { email, password, nik, firstName, lastName, phoneNum, dob, role })
-                .then((response) => {
-                    return response;
-                })
-                .catch((error) => {
-                    return error;
-                })
+             return await api.post("/api/v1/pharmacists/", { email, password, nik, firstName, lastName, phoneNum, dob, role })
         } catch (error) {
-            return error;
+			console.log("error di pharmacist.js", error)
+            throw error.response.data.errors;
         }
     }
 

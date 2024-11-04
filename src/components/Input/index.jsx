@@ -1,4 +1,4 @@
-import React  from 'react'
+import React from 'react'
 import propTypes from 'prop-types'
 import Text from '../Text';
 import { Radio, Checkbox } from 'rsuite';
@@ -18,16 +18,19 @@ export default function Input(props) {
         register = () => { },
         value,
         autofocus = false,
-        currency = false
+        currency = false,
+        checked = false,
     } = props;
 
     if (disabled === true) className.push(' cursor-not-allowed');
+    if (error) className.push('border-red-500');
+    else className.push('border-gray-300');
     if (label) className.push('my-2');
 
     if (type === "checkbox") {
         return (
             <div className='flex justify-start items-center w-full'>
-                <Checkbox id={id} name={name} {...register(name)} onChange={onChange} value={value} />
+                <Checkbox id={id} name={name} onChange={onChange} value={value} checked={checked} />
                 <Label name={name} label={label} />
             </div>
         )
@@ -64,7 +67,7 @@ export default function Input(props) {
                             disabled={disabled}
                             placeholder={placeholder}
                             value={value}
-                            className={`block w-full rounded-md px-14 border py-2 text-dark border-gray-300 shadow-sm placeholder:text-gray-400 sm:text-md sm:leading-6 ${className.join(" ")}`}
+                            className={`block w-full rounded-md px-14 border py-2 text-dark hadow-sm placeholder:text-gray-400 sm:text-md sm:leading-6 ${className.join(" ")}`}
                             // className={`block w-full rounded-full px-4 border py-1.5 text-dark border-dark placeholder:text-gray-400 sm:text-base sm:leading-6 ${className.join(" ")}`}
                             autoFocus={autofocus}
                             {...register(name)}
@@ -79,18 +82,16 @@ export default function Input(props) {
                         disabled={disabled}
                         placeholder={placeholder}
                         value={value}
-                        className={`block w-full rounded-md px-4 border py-2 text-dark border-gray-300 shadow-sm placeholder:text-gray-400 sm:text-md sm:leading-6 ${className.join(" ")}`}
+                        className={`block w-full rounded-md px-4 border py-2 text-dark shadow-sm placeholder:text-gray-400 sm:text-md sm:leading-6 ${className.join(" ")}`}
                         // className={`block w-full rounded-full px-4 border py-1.5 text-dark border-dark placeholder:text-gray-400 sm:text-base sm:leading-6 ${className.join(" ")}`}
                         autoFocus={autofocus}
                         {...register(name)}
                     />
             }
-            <div>
-                {
-                    error &&
-                    <Text type="danger">{error}</Text>
-                }
-            </div>
+            {
+                error &&
+                <Text type="danger">{error}</Text>
+            }
         </div>
     )
 }
@@ -109,5 +110,6 @@ Input.propTypes = {
     className: propTypes.string,
     checked: propTypes.bool,
     register: propTypes.func,
-    currency: propTypes.string
+    currency: propTypes.string,
+    checked: propTypes.bool,
 }

@@ -6,10 +6,11 @@ import ContentLayout from "@/components/Layouts/Content";
 import PrescriptionForm from "@/components/DynamicForms/PrescriptionForm";
 import { useRouter } from "next/router";
 import Input from "@/components/Input";
+import Button from "@/components/Button";
 
 export default function Page() {
     const { user } = useUserContext();
-    const { getPrescriptionDetail, updatePrescription } = usePrescription();
+    const { isLoading, getPrescriptionDetail, updatePrescription } = usePrescription();
     const router = useRouter();
     const id = router.query.idx;
 
@@ -137,7 +138,7 @@ export default function Page() {
             console.log(data)
 
             await updatePrescription(data)
-                .then(router.push(`/prescribe`))
+                .then(router.push(`/prescription`))
         } catch (error) {
             console.log("error when #submitPrescription")
         }
@@ -161,10 +162,12 @@ export default function Page() {
                         formFields={formFields} 
                         setFormFields={setFormFields}
                     />
-                    <input
-                        type="submit"
-                        value="Update Prescription"
-                    />
+                    <div className="flex justify-center gap-2 mt-6 lg:justify-end">
+                        {isLoading
+                            ? <Button appearance="primary" isDisabled={true} isLoading={isLoading}>Simpan</Button>
+                            : <Button isLoading={isLoading} appearance="primary" type="submit">Simpan</Button>
+                        }
+                    </div>
                 </form>
             </ContentLayout>
         </Layout>
