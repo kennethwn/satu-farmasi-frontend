@@ -63,7 +63,7 @@ export default function MedicineList(props) {
                             <Row>
                                 {rowData.medicine.name}
                             </Row>
-                            <Row>
+                            <Row className="text-gray-500">
                                 {rowData.instruction}
                             </Row>
                         </Grid>

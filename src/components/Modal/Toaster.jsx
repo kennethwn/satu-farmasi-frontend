@@ -36,7 +36,7 @@ export default function Toaster({
                     </div>
                 )
             default:
-                return <Button className="w-full">Lanjutkan</Button>
+                return <Button className="w-full" onClick={() => onClick()}>Lanjutkan</Button>
         }
     }
 

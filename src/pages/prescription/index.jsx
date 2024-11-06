@@ -11,6 +11,7 @@ import Button from "@/components/Button";
 import { IoMdAdd } from "react-icons/io";
 import { useRouter } from "next/router";
 import PrescriptionDetail from "@/components/Modal/PrescriptionDetail";
+import prescriptionStatusMapped from "@/helpers/prescriptionStatusMap";
 
 export default function index() {
     const { user } = useUserContext();
@@ -19,6 +20,7 @@ export default function index() {
     const [filter, setFilter] = useState('');
     const [search, setSearch] = useState('');
     const [searchResult, setSearchResult] = useState([])
+    const prescriptionStatusMap = prescriptionStatusMapped
     const [limit, setLimit] = useState(10);
     const [page, setPage] = useState(1);
     const [sortColumn, setSortColumn] = useState();
@@ -186,9 +188,21 @@ export default function index() {
                             <Cell dataKey='patientName'/>
                         </Column>
 
-                        <Column width={200} resizable sortable>
-                            <HeaderCell className="text-dark">Status</HeaderCell>
-                            <Cell dataKey='status'/>
+                        <Column flexGrow={1} resizable sortable>
+                            <HeaderCell className="text-center text-dark">Status</HeaderCell>
+                            <Cell className="text-center">
+                                {(rowData) => {
+                                    return (
+                                        <div className="flex justify-center flex-row gap-6">
+                                            <p 
+                                                style={{ backgroundColor: prescriptionStatusMap.get(rowData.status)?.color }}
+                                                className="text-white rounded-lg w-3/4">
+                                                {prescriptionStatusMap.get(rowData.status)?.label}
+                                            </p>
+                                        </div>
+                                    );
+                                }}
+                            </Cell>
                         </Column>
 
                         <Column width={100} fixed="right">
