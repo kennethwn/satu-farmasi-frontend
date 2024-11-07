@@ -12,6 +12,7 @@ export default function useReportAPI() {
             );
         } catch (error) {
             console.error(error);
+            throw error.response.data;
         } finally {
             setIsLoading(false);
         }
@@ -23,15 +24,29 @@ export default function useReportAPI() {
             return await axios.get(`/api/v1/reports/${id}`);
         } catch (error) {
             console.error(error);
+            throw error.response.data;
         } finally {
             setIsLoading(false);
         }
     };
+
+    const finalizeReport = async (id) => {
+        setIsLoading(true);
+        try {
+            return await axios.post(`/api/v1/reports/${id}`);
+        } catch (error) {
+            console.error(error.response.data);
+            throw error.response.data;
+        } finally {
+            setIsLoading(false);
+        }
+    }
 
 
     return {
         isLoading,
         GetAllReports,
         GetReportById,
+        finalizeReport,
     };
 }

@@ -4,6 +4,7 @@ import SearchBar from "@/components/SearchBar";
 import formatDate from "@/helpers/dayHelper";
 import { useUserContext } from "@/pages/api/context/UserContext";
 import useReportAPI from "@/pages/api/master/report";
+import { Router, useRouter } from "next/router";
 import { useEffect, useState } from "react";
 import { PiListMagnifyingGlass } from "react-icons/pi";
 import { toast } from "react-toastify";
@@ -12,6 +13,7 @@ import { Checkbox, Pagination, Table } from "rsuite";
 export default function index() {
     const { user } = useUserContext();
     const { isLoading, GetAllReports, GetReportById } = useReportAPI();
+    const router = useRouter();
 
     const { HeaderCell, Cell, Column } = Table;
     const [data, setData] = useState([]);
@@ -85,11 +87,6 @@ export default function index() {
                         </Column>
 
                         <Column flexGrow={1}>
-                            <HeaderCell className="text-dark font-bold"> ID Transaksi </HeaderCell>
-                            <Cell dataKey="id" />
-                        </Column>
-
-                        <Column flexGrow={1}>
                             <HeaderCell className="text-dark font-bold"> Total Obat Masuk </HeaderCell>
                             <Cell dataKey="_count.receiveMedicines" />
                         </Column>
@@ -129,7 +126,8 @@ export default function index() {
                                         <div className="flex justify-center flex-row gap-6">
                                             <button className="inline-flex items-center justify-center w-8 h-8 text-center bg-transparent border-0 rounded-lg"
                                                 onClick={() => {
-                                                    console.log(rowData.id);
+                                                    router.push(`/report/medicine/${rowData.id}`);
+
                                                 }}>
                                                 <PiListMagnifyingGlass />
                                             </button>
