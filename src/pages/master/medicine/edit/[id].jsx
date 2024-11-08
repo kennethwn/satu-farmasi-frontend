@@ -54,6 +54,7 @@ export default function Index() {
     const { GetAllClassificationsDropdown } = useClassificationsAPI();
     const { GetPackagingDropdown } = usePackagingAPI();
     const { GetGenericDropdown } = useGenericAPI();
+    const [isSubmitted, setIsSubmitted] = useState(false);
 
     const [input, setInput] = useState({});
     const [errors, setErrors] = useState({});
@@ -189,6 +190,7 @@ export default function Index() {
                 return;
             }
             toast.success(res.message, { autoClose: 2000, position: "top-right" });
+            setIsSubmitted(true);
             setTimeout(() => {
                 router.push("/master/medicine");
             }, 2000)
@@ -584,7 +586,7 @@ export default function Index() {
                     </div>
 
                     <div className="flex justify-center gap-2 my-6 lg:justify-end">
-                        {isLoading ?
+                        {isSubmitted ?
                             <Button
                                 appearance="primary"
                                 isDisabled={true}

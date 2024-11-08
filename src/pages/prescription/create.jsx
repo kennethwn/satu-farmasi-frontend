@@ -68,7 +68,7 @@ export default function create() {
 
             const res = await addNewPrescription(data);
             console.log(res)
-            if (res == undefined || res == null || res.status != 200 || res.code != 200) {
+            if (res == undefined || res == null || res.code != 200) {
                 toast.error(res.message, { autoClose: 2000, position: "top-center" });
                 return
             }

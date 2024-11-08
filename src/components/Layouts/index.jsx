@@ -114,7 +114,7 @@ export default function Layout(props) {
                                     }}
                                 >{renderTitle("Diagnosis", activeKey === "diagnose")}</Nav.Item>
                             }
-                            {(userRole === 'pharmacist' || userRole === 'doctor') &&
+                            {(userRole === 'pharmacist' ) &&
                                 <Nav.Item
                                     eventKey="prescription"
                                     icon={renderIcon("prescription", activeKey === "prescription")}

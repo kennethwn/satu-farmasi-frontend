@@ -49,7 +49,7 @@ export default function Dropdown({
         else removeClass('error-field');
     }, [error])
 
-    if (label) className.push('my-2 container-select');
+    if (label) classNames.push('my-2 container-select');
 
     return (
         <>
@@ -57,13 +57,14 @@ export default function Dropdown({
             <div ref={containerRef} style={{ position: 'relative' }}>
                 <SelectPicker
                     container={() => containerRef.current}
-                    preventOverflow={false}
+                    preventOverflow={true}
                     placeholder={placeholder}
                     onChange={onChange}
                     className={className}
                     defaultValue={defaultValue}
                     value={value}
                     placement={placement}
+                    block
                     {...props}
                 />
                 {

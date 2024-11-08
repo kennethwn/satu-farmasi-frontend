@@ -133,7 +133,9 @@ export default function index() {
         if (router.isReady) fetchData();
     }, [id, router.isReady]);
 
-    const handleDetailPrescription = (index) => {
+    const handleDetailPrescriptionFromTransaction = (index) => {
+        setCurrState(currState + 1)
+        setOpen(true)
         const updatedModalState = [...modalState];
         updatedModalState.push({
             data: value.transactions[index].prescription.medicineList,
@@ -149,6 +151,46 @@ export default function index() {
                 {
                     column: "Harga Per Obat",
                     key: "medicine.price",
+                },
+                {
+                    column: "Total Harga Obat",
+                    key: "totalPrice",
+                },
+            ]
+        });
+        setModalState(updatedModalState);
+    }
+
+    const HandleMedicineFromReceiveMedicine = (index) => {
+        setCurrState(currState + 1)
+        setOpen(true)
+        const updatedModalState = [...modalState];
+        updatedModalState.push({
+            data: value.receiveMedicines[index].medicine,
+            table: [
+                {
+                    column: "Kode Obat",
+                    key: "code",
+                },
+                {
+                    column: "Nama Obat",
+                    key: "name",
+                },
+                {
+                    column: "Merk",
+                    key: "name",
+                },
+                {
+                    column: "Deskripsi Obat",
+                    key: "description",
+                },
+                {
+                    column: "Satuan Kemasan",
+                    key: "unitOfMeasure",
+                },
+                {
+                    column: "Harga Obat",
+                    key: "price",
                 },
                 {
                     column: "Total Harga Obat",
@@ -199,22 +241,22 @@ export default function index() {
                                     </Cell>
                                 </Column>
 
-                                <Column flexGrow={1}>
+                                <Column width={200} resizable>
                                     <HeaderCell className="text-dark font-bold"> Nama Pasien </HeaderCell>
                                     <Cell dataKey="patient.name" />
                                 </Column>
 
-                                <Column flexGrow={1}>
+                                <Column width={200} resizable>
                                     <HeaderCell className="text-dark font-bold"> Nama Dokter </HeaderCell>
                                     <Cell dataKey="prescription.diagnose.doctor.fullName" />
                                 </Column>
 
-                                <Column flexGrow={1}>
+                                <Column width={200} resizable>
                                     <HeaderCell className="text-dark font-bold"> Nama Farmasi </HeaderCell>
                                     <Cell dataKey="pharmacist.fullName" />
                                 </Column>
 
-                                <Column flexGrow={1}>
+                                <Column width={200} resizable>
                                     <HeaderCell className="text-dark font-bold"> Total Harga </HeaderCell>
                                     <Cell dataKey="totalPrice" />
                                 </Column>
@@ -229,9 +271,7 @@ export default function index() {
                                                 <div className="flex justify-center flex-row gap-6">
                                                     <button className="inline-flex items-center justify-center w-8 h-8 text-center bg-transparent border-0 rounded-lg"
                                                         onClick={() => {
-                                                            setCurrState(currState + 1)
-                                                            setOpen(true)
-                                                            handleDetailPrescription(index)
+                                                            handleDetailPrescriptionFromTransaction(index)
                                                         }}>
                                                         <PiListMagnifyingGlass />
                                                     </button>
@@ -262,45 +302,69 @@ export default function index() {
                                     </Cell>
                                 </Column>
 
-                                <Column flexGrow={1}>
+                                <Column width={200} resizable>
+                                    <HeaderCell className="text-dark font-bold"> Document Number </HeaderCell>
+                                    <Cell dataKey="documentNumber" />
+                                </Column>
+
+                                <Column width={200} resizable>
                                     <HeaderCell className="text-dark font-bold"> Nama Obat </HeaderCell>
                                     <Cell dataKey="medicine.name" />
                                 </Column>
 
-                                <Column flexGrow={1}>
+                                <Column width={200} resizable>
+                                    <HeaderCell className="text-dark font-bold"> Kode Batch </HeaderCell>
+                                    <Cell dataKey="batchCode" />
+                                </Column>
+
+                                <Column width={200} resizable>
                                     <HeaderCell className="text-dark font-bold"> Jumlah Obat Masuk </HeaderCell>
                                     <Cell dataKey="quantity" />
                                 </Column>
 
-                                <Column flexGrow={1}>
+                                <Column width={200} resizable>
                                     <HeaderCell className="text-dark font-bold"> Harga Beli </HeaderCell>
                                     <Cell dataKey="buyingPrice" />
                                 </Column>
 
-                                <Column flexGrow={1}>
+                                <Column width={200} resizable>
                                     <HeaderCell className="text-dark font-bold"> Metode Pembayaran </HeaderCell>
                                     <Cell dataKey="paymentMethod" />
                                 </Column>
 
-                                <Column flexGrow={1}>
+                                <Column width={200} resizable>
                                     <HeaderCell className="text-dark font-bold"> Nama Vendor </HeaderCell>
                                     <Cell dataKey="vendor.name" />
                                 </Column>
 
                                 <Column width={150} fixed="right">
                                     <HeaderCell className="text-center text-dark font-bold">
-                                        Detail Resep
+                                        Detail Vendor
                                     </HeaderCell>
                                     <Cell className="text-center">
                                         {(rowData, index) => {
                                             return (
                                                 <div className="flex justify-center flex-row gap-6">
                                                     <button className="inline-flex items-center justify-center w-8 h-8 text-center bg-transparent border-0 rounded-lg"
-                                                        onClick={() => {
-                                                            setCurrState(index)
-                                                            setOpen(true)
+                                                        onClick={() => router.push(`/master/vendor/edit/${rowData.vendor.id}`)}>
+                                                        <PiListMagnifyingGlass />
+                                                    </button>
+                                                </div>
+                                            );
+                                        }}
+                                    </Cell>
+                                </Column>
 
-                                                        }}>
+                                <Column width={150} fixed="right">
+                                    <HeaderCell className="text-center text-dark font-bold">
+                                        Detail Obat
+                                    </HeaderCell>
+                                    <Cell className="text-center">
+                                        {(rowData, index) => {
+                                            return (
+                                                <div className="flex justify-center flex-row gap-6">
+                                                    <button className="inline-flex items-center justify-center w-8 h-8 text-center bg-transparent border-0 rounded-lg"
+                                                        onClick={() => router.push(`/master/medicine/edit/${rowData.medicine.id}`)}>
                                                         <PiListMagnifyingGlass />
                                                     </button>
                                                 </div>
@@ -330,35 +394,31 @@ export default function index() {
                                     </Cell>
                                 </Column>
 
-                                <Column flexGrow={1}>
+                                <Column width={200} flexGrow={1}>
                                     <HeaderCell className="text-dark font-bold"> Nama Obat </HeaderCell>
                                     <Cell dataKey="medicine.name" />
                                 </Column>
 
-                                <Column flexGrow={1}>
+                                <Column width={200} rflexGrow={1}>
                                     <HeaderCell className="text-dark font-bold"> Jumlah Obat Keluar </HeaderCell>
                                     <Cell dataKey="quantity" />
                                 </Column>
 
-                                <Column flexGrow={1}>
+                                <Column width={200} flexGrow={1}>
                                     <HeaderCell className="text-dark font-bold"> Penyebab Keluar </HeaderCell>
                                     <Cell dataKey="reasonOfDispose" />
                                 </Column>
 
-                                <Column width={150} fixed="right">
+                                <Column width={150} flexGrow={1}>
                                     <HeaderCell className="text-center text-dark font-bold">
-                                        Detail Resep
+                                        Detail Obat
                                     </HeaderCell>
                                     <Cell className="text-center">
                                         {(rowData, index) => {
                                             return (
                                                 <div className="flex justify-center flex-row gap-6">
                                                     <button className="inline-flex items-center justify-center w-8 h-8 text-center bg-transparent border-0 rounded-lg"
-                                                        onClick={() => {
-                                                            setCurrState(index)
-                                                            setOpen(true)
-
-                                                        }}>
+                                                        onClick={() => router.push(`/master/medicine/edit/${rowData.medicine.id}`)}>
                                                         <PiListMagnifyingGlass />
                                                     </button>
                                                 </div>
@@ -427,7 +487,7 @@ export default function index() {
                                 </Column>
 
                                 {modalState[currState].table.map(item =>
-                                    <Column flexGrow={1}>
+                                    <Column width={200} resizable>
                                         <HeaderCell className="text-dark font-bold"> {item.column} </HeaderCell>
                                         <Cell dataKey={item.key} />
                                     </Column>

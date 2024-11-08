@@ -25,7 +25,7 @@ export default function index() {
     const [page, setPage] = useState(1);
     const [sortColumn, setSortColumn] = useState();
     const [sortType, setSortType] = useState();
-    const status = ["UNPROCESSED", "ON PROGRESS", "WAITING FOR PAYMENT", "DONE"];
+    const status = ["UNPROCESSED", "ON_PROGRESS", "WAITING_FOR_PAYMENT", "DONE"];
     const { HeaderCell, Cell, Column } = Table;
     const router = useRouter()
     const [selectedPrescriptionId, setSelectedPrescriptionId] = useState(-1)
@@ -132,7 +132,7 @@ export default function index() {
                             // borderRadius: '0.4rem',
                         }}
                         label="Status"
-                        data={status.map((status) => ({ label: status, value: status }))}
+                        data={Array.from(prescriptionStatusMap.values()).map((status) => ({ label: status.label, value: status.value }))}
                         value={filter}
                         onChange={(value) => {
                             setFilter(value);
