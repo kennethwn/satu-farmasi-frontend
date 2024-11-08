@@ -73,7 +73,7 @@ function PrescriptionForm(props) {
   const handleMedicineQuantity = (formFieldId, quantity) => {
     const medicineId = formFields[formFieldId].medicineId;
     const checkIfStockIsInsufficient = (medicineDropdownOption, quantity) => {
-      return medicineDropdownOption.currStock - quantity < medicineDropdownOption.minStock
+      return medicineDropdownOption.currStock - quantity < 0
     }
 
     let updatedData = {

@@ -76,10 +76,10 @@ export default function index() {
     };
   }, []);
 
-    useEffect(() => {
-        console.log(openModal)
-        console.log("selectedID:", selectedTransactionId)
-    }, [openModal])
+  useEffect(() => {
+      console.log(openModal)
+      console.log("selectedID:", selectedTransactionId)
+  }, [openModal])
 
 
   useEffect(() => {
@@ -91,7 +91,7 @@ export default function index() {
 
   useEffect(() => {
     setPage(1)
-  }, [search])
+  }, [search, limit])
 
   return (
     <Layout active="transaction-dashboard" user={user}>
@@ -100,7 +100,7 @@ export default function index() {
           <SearchBar
             size="md"
             className="w-1/4"
-            placeholder="Search..."
+            placeholder="Search by patient name..."
             onChange={(value) => setSearch(value)}
           />
         </div>
