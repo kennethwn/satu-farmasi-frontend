@@ -55,6 +55,24 @@ export default function useTransaction() {
         }
     }
 
+    const getOnProgressAndWaitingPaymentTransaction = async () => {
+        setIsLoading(true);
+        try {
+            const response = await axios.get(`/api/v1/transactions/_status/on-progress-waiting-payment`)
+            .then(response => {
+                setIsLoading(false);
+                return response;
+            })
+            .catch(error => {
+                setIsLoading(false);
+                return error;
+            })
+            return response;
+        } catch (error) {
+            console.error(error);
+        }
+    }
+
     const createTransaction = async (data) => {
         setIsLoading(true);
         try {
@@ -94,6 +112,7 @@ export default function useTransaction() {
     return {
         isLoading,
         getAllTransaction,
+        getOnProgressAndWaitingPaymentTransaction,
         createTransaction,
         getTransactionDetail,
         publishNotification

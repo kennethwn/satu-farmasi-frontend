@@ -80,6 +80,24 @@ export default function usePrescription() {
         }
     }
 
+    const getMostSalesMedicineByPrescription = async (data) => {
+        setIsLoading(true)
+        try {
+            const response = await api.post('/api/v1/prescriptions/most-sales-medicines', data)
+            .then((response) => {
+                setIsLoading(false);
+                return response;
+            })
+            .catch((error) => {
+                setIsLoading(false);
+                return error;
+            })
+            return response;
+        } catch (error) {
+            console.error(error);
+        }
+    }
+
     const updatePrescription = async (data) => {
         setIsLoading(true)
         try {
@@ -104,6 +122,7 @@ export default function usePrescription() {
         getSearchedPrescription,
         addNewPrescription,
         getPrescriptionDetail,
+        getMostSalesMedicineByPrescription,
         updatePrescription
     }
 }

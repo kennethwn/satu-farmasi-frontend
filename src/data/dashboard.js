@@ -1,4 +1,4 @@
-export default function getDataCard(totalPatient, totalMedicine, totalProfit, totalOutOfStock) {
+export default function getDataCard(totalPatient, totalMedicine, totalProfit, totalRestock) {
     const data = [
         {
             colorBackground: "purple",
@@ -25,8 +25,8 @@ export default function getDataCard(totalPatient, totalMedicine, totalProfit, to
             colorBackground: "red",
             icon: "stock",
             link: "/",
-            label: "Out of Stock",
-            value: totalOutOfStock
+            label: "Need to Retock",
+            value: totalRestock
         },
     ]
 

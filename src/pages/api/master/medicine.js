@@ -40,6 +40,24 @@ export default function useMedicineAPI() {
         }
     }
 
+    const GetTotalNeedToRestockMedicine = async () => {
+        setIsLoading(true);
+        try {
+            const response = await axios.get('/api/v1/medicines/total/need-to-restock')
+            .then(response => {
+                setIsLoading(false);
+                return response;
+            })
+            .catch(error => {
+                setIsLoading(false);
+                return error;
+            })
+            return response;
+        } catch (error) {
+            console.error(error);
+        }
+    }
+
     const SearchMedicine = async (page, limit, parameter) => {
         setIsLoading(true)
         try {
@@ -168,6 +186,7 @@ export default function useMedicineAPI() {
         isLoading,
         GetAllMedicines,
         GetTotalMedicine,
+        GetTotalNeedToRestockMedicine,
         SearchMedicine,
         CreateMedicine,
         AddCurrentStock,

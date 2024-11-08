@@ -12,20 +12,18 @@ export default function useUser() {
         const { email, password } = data;
 
         try {
-            return await api.post("/api/v1/users/", { email, password })
-                .then((response) => {
-                    setUser(response)
-                    const fullName = response.firstName + " " + response.lastName;
-                    setUser({ name: fullName, role: response.role });
-                    return response.token;
-                })
-                .catch((error) => {
-                    return { status: error.response.status, message: error.response.data.message };
-                })
+            const response = await api.post("/api/v1/users/", {
+                email,
+                password,
+            });
+            setUser(response);
+            const fullName = response.firstName + " " + response.lastName;
+            setUser({ name: fullName, role: response.role });
+            return response;
         } catch (error) {
-            throw new Error(error);
+            throw error.response.data;
         }
-    }
+    };
 
     const deleteUser = async () => {
         try {

@@ -51,17 +51,18 @@ export default function Login() {
 
   const LoginHandler = async (data) => {
     try {
-      setIsLoading(true);
-      const response = await getUser(data);
-      setIsLoading(false);
-      if (typeof response !== "string") {
-        toast.error(response.message, { autoClose: 2000, position: 'top-center' });
-        return;
-      }
-      toast.success("Login successful!", { autoClose: 2000, position: 'top-center' });
-      router.push("/");
+        setIsLoading(true);
+        const response = await getUser(data);
+        toast.success("Login successful!", { autoClose: 2000, position: 'top-right' });
+        setTimeout(() => {
+            router.push("/");
+        }, 2000)
     } catch (error) {
-      console.log("error: ", error);
+        // TODO: Handle if the user is not active anymore
+        toast.error(error.message, { autoClose: 2000, position: 'top-right' });
+    } finally {
+        setIsLoading(false);
+
     }
   };
 

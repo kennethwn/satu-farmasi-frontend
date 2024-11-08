@@ -11,6 +11,7 @@ import propTypes from 'prop-types';
 import { useRouter } from 'next/router';
 import useUser from '@/pages/api/user';
 import Toaster from "@/components/Modal/Toaster";
+import Image from 'next/image';
 
 export default function Layout(props) {
     const {
@@ -202,7 +203,7 @@ export default function Layout(props) {
                             </div>
                         </React.Fragment>
                         :
-                        <img src="https://i.pravatar.cc/300" alt="Profile" className='rounded-full w-7 h-7' />
+                        <Image src="https://i.pravatar.cc/300" alt="Profile" className='rounded-full w-7 h-7' />
                     }
                 </div>
                 <div className='bg-background-sidebar'>

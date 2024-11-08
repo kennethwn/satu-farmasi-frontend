@@ -8,7 +8,7 @@ import { month } from "@/data/date";
 
 export default function DashboardView(props) {
     const {Column, Cell, HeaderCell} = Table;
-    const { dataCard, dataExpired } = props;
+    const { dataCard, dataExpired, dataTransaction, dataMonthlyReport, setCurrentMonth, onChangeMonthlyReport } = props;
 
     const TableExpired = (props) => (
         <Table {...props}>
@@ -35,9 +35,23 @@ export default function DashboardView(props) {
 
     const TableMedicineOrder = (props) => (
         <Table {...props}>
-            <Column>
-                <HeaderCell>Header</HeaderCell>
-                <Cell/>
+            <Column width={75}>
+                <HeaderCell>Id</HeaderCell>
+                <Cell dataKey="id"/>
+            </Column>
+            <Column flexGrow={1}>
+                <HeaderCell>Patient</HeaderCell>
+                <Cell dataKey="patient.name"/>
+            </Column>
+            <Column flexGrow={1}>
+                <HeaderCell>Pharmacist</HeaderCell>
+                <Cell dataKey="pharmacist.firstName"/>
+            </Column>
+            <Column flexGrow={1} resizable>
+                <HeaderCell>Status</HeaderCell>
+                <Cell dataKey="prescription.status">
+                    {rowData => rowData?.prescription.status.replace(/_/g, " ")}
+                </Cell>
             </Column>
         </Table>
     )
@@ -68,8 +82,8 @@ export default function DashboardView(props) {
         chart: {
             type: "donut"
         },
-        series: [44, 55, 13, 33],
-        labels: ['Sales', 'Revenue', 'Profit', 'Watermelon']
+        series: dataMonthlyReport?.map(item => item?.quantity),
+        labels: dataMonthlyReport?.map(item => item?.medicineName)
     }
 
     return (
@@ -93,13 +107,13 @@ export default function DashboardView(props) {
                 <TableLayout title="Expiring List">
                     <TableExpired data={dataExpired} />
                 </TableLayout>
-                <TableLayout title="Medicine Order">
-                    <TableMedicineOrder/>
+                <TableLayout title="Remaining Transaction">
+                    <TableMedicineOrder data={dataTransaction}/>
                 </TableLayout>
             </div>
             <div className="flex flex-col max-lg:gap-y-4 lg:flex-row gap-x-4 w-full">
                 <Chart title="Annual Report" className="w-full lg:w-3/5" options={options} series={series} />
-                <Chart title="Monthly Report" className="w-full lg:w-2/5" options={pieOptions} series={pieOptions.series} monthPicker />
+                <Chart title="Monthly Report" className="w-full lg:w-2/5" options={pieOptions} series={pieOptions.series} monthPicker setCurrentMonth={setCurrentMonth} />
             </div>
         </div>
     )
@@ -108,4 +122,8 @@ export default function DashboardView(props) {
 DashboardView.propTypes = {
     dataCard: propTypes.array,
     dataExpired: propTypes.array,
+    setCurrentMonth: propTypes.func,
+    dataTransaction: propTypes.array,
+    dataMonthlyReport: propTypes.array,
+    onChangeMonthlyReport: propTypes.func,
 }
