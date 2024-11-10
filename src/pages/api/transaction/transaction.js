@@ -76,6 +76,7 @@ export default function useTransaction() {
     const createTransaction = async (data) => {
         setIsLoading(true);
         try {
+            console.log('#createTransaction: ', {data})
             const response = await axios.post(`/api/v1/transactions`, {data})
             .then((response) => {
                 setIsLoading(false);
@@ -91,10 +92,47 @@ export default function useTransaction() {
         }
     }
 
-    const publishNotification = async () => {
+    const confirmPayment = async (data) => {
+        try {
+            const response = await axios.post(`/api/v1/transactions/_pay`, {data})
+            .then((response) => {
+                setIsLoading(false);
+                return response;
+            })
+            .catch((error) => {
+                setIsLoading(false);
+                return error;
+            })
+            return response
+        } catch (error) {
+            console.error(error)
+        }
+    }
+
+    const finishTransaction = async (data) => {
         setIsLoading(true)
         try {
-            const response = await axios.post('/api/v1/transactions/_publish', {data: true})
+            const response = await axios.post('/api/v1/transactions/_finish', {data})
+            .then((response) => {
+                setIsLoading(false);
+                return response;
+            })
+            .catch((error) => {
+                setIsLoading(false);
+                return error;
+            })
+            return response
+        } catch (error) {
+            console.error(error);
+        }
+    }
+
+
+    const publishNotification = async (data) => {
+        setIsLoading(true)
+        try {
+            console.log("publish data: ", data)
+            const response = await axios.post('/api/v1/transactions/_publish', data)
             .then((response) => {
                 setIsLoading(false);
                 return response;
@@ -115,6 +153,8 @@ export default function useTransaction() {
         getOnProgressAndWaitingPaymentTransaction,
         createTransaction,
         getTransactionDetail,
+        confirmPayment,
+        finishTransaction,
         publishNotification
     };
 }

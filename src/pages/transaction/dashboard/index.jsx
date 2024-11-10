@@ -1,14 +1,11 @@
-import Button from "@/components/Button";
 import Layout from "@/components/Layouts";
 import ContentLayout from "@/components/Layouts/Content";
 import TransactionDetail from "@/components/Modal/TransactionDetail";
 import SearchBar from "@/components/SearchBar";
+import prescriptionStatusMapped from "@/helpers/prescriptionStatusMap";
 import { useUserContext } from "@/pages/api/context/UserContext";
-import useClassifiVendorAPI from "@/pages/api/master/vendor";
 import useTransaction from "@/pages/api/transaction/transaction";
-import { useRouter } from "next/router";
 import { useEffect, useState } from "react";
-import { IoMdAdd } from "react-icons/io";
 import { PiListMagnifyingGlass } from "react-icons/pi";
 import { toast } from "react-toastify";
 import { Pagination, Table } from "rsuite";
@@ -17,6 +14,7 @@ export default function index() {
   const { user } = useUserContext();
   const { HeaderCell, Cell, Column } = Table;
   const { isLoading, getAllTransaction } = useTransaction();
+  const prescriptionStatusMap = prescriptionStatusMapped;
   const [data, setData] = useState([]);
   const [search, setSearch] = useState("");
   const [page, setPage] = useState(1);
@@ -51,7 +49,11 @@ export default function index() {
             try {
                 const parsedData = JSON.parse(event?.data);
                 console.log(parsedData)// Append new data to the state
-                toast.info(`New Transaction Created, Refresh to See New Transaction`, { autoClose: 2000, position: "top-right" });
+                if (parsedData.status === "WAITING_FOR_PAYMENT") {
+                  toast.info(`New Transaction Created, Refresh to See New Transaction`, { autoClose: 2000, position: "top-right" });
+                } else if (parsedData.status === "DONE") {
+                  toast.info(`A Transaction Has Been Mark as Done, Refresh to See the Update`, { autoClose: 2000, position: "top-right" });
+                }
             } catch (err) {
                 console.error("Failed to parse data from SSE:", err);
             }
@@ -74,10 +76,10 @@ export default function index() {
     };
   }, []);
 
-    useEffect(() => {
-        console.log(openModal)
-        console.log("selectedID:", selectedTransactionId)
-    }, [openModal])
+  useEffect(() => {
+      console.log(openModal)
+      console.log("selectedID:", selectedTransactionId)
+  }, [openModal])
 
 
   useEffect(() => {
@@ -89,7 +91,7 @@ export default function index() {
 
   useEffect(() => {
     setPage(1)
-  }, [search])
+  }, [search, limit])
 
   return (
     <Layout active="transaction-dashboard" user={user}>
@@ -98,7 +100,7 @@ export default function index() {
           <SearchBar
             size="md"
             className="w-1/4"
-            placeholder="Search..."
+            placeholder="Search by patient name..."
             onChange={(value) => setSearch(value)}
           />
         </div>
@@ -143,10 +145,22 @@ export default function index() {
             </Column>
 
             <Column flexGrow={1}>
-              <HeaderCell className="text-dark font-bold">
+              <HeaderCell className="text-center text-dark font-bold">
                 Status
               </HeaderCell>
-              <Cell dataKey="prescription.status" />
+              <Cell className="text-center">
+                {(rowData) => {
+                  return (
+                    <div className="flex justify-center flex-row gap-6">
+                      <p 
+                        style={{ backgroundColor: prescriptionStatusMap.get(rowData.prescription.status)?.color }}
+                        className="text-white rounded-lg w-3/4">
+                          {prescriptionStatusMap.get(rowData.prescription.status)?.label}
+                      </p>
+                    </div>
+                  );
+                }}
+              </Cell>
             </Column>
 
             <Column width={150} fixed="right">
