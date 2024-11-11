@@ -199,7 +199,7 @@ export default function index() {
 
                         <Column width={150} fixed="right">
                             <HeaderCell className="text-center text-dark ">Action</HeaderCell>
-                            <Cell className="text-center">
+                            <Cell className="text-center" style={{ padding: '6px' }}>
                                 {
                                     rowData => {
                                         return (

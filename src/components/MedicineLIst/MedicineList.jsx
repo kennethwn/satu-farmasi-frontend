@@ -55,19 +55,26 @@ export default function MedicineList(props) {
                 </Cell>
             </Column>
 
-            <Column width={250} fullText resizable sortable>
+            <Column flexGrow={2} fullText resizable>
                 <HeaderCell className="text-dark">Nama Obat</HeaderCell>
                 <Cell>
-                    {(rowData) => 
-                        <Grid>
-                            <Row>
-                                {rowData.medicine.name}
-                            </Row>
-                            <Row className="text-gray-500">
-                                {rowData.instruction}
-                            </Row>
-                        </Grid>
-                    }
+                    {(rowData) => {
+                        return (
+                            <div className="flex flex-col">
+                                <p>{rowData.medicine.name}</p>
+                                <p>{rowData.instruction}</p>
+                            </div>
+                        )
+                    }}
+                        {/* // <Grid>
+                        //     <Row>
+                        //         {rowData.medicine.name}
+                        //     </Row>
+                        //     <Row className="text-gray-500">
+                        //         {rowData.instruction}
+                        //     </Row>
+                        // </Grid>
+                    // } */}
                 </Cell>
             </Column>
 
