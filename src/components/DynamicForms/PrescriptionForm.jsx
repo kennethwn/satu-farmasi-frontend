@@ -37,7 +37,8 @@ function PrescriptionForm(props) {
   const handleMedicineChange = (formFieldId, medicineId) => {
     let updatedData = {
       medicineId: medicineId,
-      medicineName: medicineDropdownOptions[medicineId].name,
+        // TODO: Handle if the user is not selecting the medicine yet (Diabled it (?))
+      medicineName: medicineDropdownOptions[medicineId]?.name,
       quantity: 0,
       price: medicineDropdownOptions[medicineId].price,
       totalPrice: 0,

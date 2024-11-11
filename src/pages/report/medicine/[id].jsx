@@ -241,22 +241,22 @@ export default function index() {
                                     </Cell>
                                 </Column>
 
-                                <Column width={200} resizable>
+                                <Column width={200} flexGrow={1}>
                                     <HeaderCell className="text-dark font-bold"> Nama Pasien </HeaderCell>
                                     <Cell dataKey="patient.name" />
                                 </Column>
 
-                                <Column width={200} resizable>
+                                <Column width={200} flexGrow={1}>
                                     <HeaderCell className="text-dark font-bold"> Nama Dokter </HeaderCell>
                                     <Cell dataKey="prescription.diagnose.doctor.fullName" />
                                 </Column>
 
-                                <Column width={200} resizable>
+                                <Column width={200} flexGrow={1}>
                                     <HeaderCell className="text-dark font-bold"> Nama Farmasi </HeaderCell>
                                     <Cell dataKey="pharmacist.fullName" />
                                 </Column>
 
-                                <Column width={200} resizable>
+                                <Column width={200} flexGrow={1}>
                                     <HeaderCell className="text-dark font-bold"> Total Harga </HeaderCell>
                                     <Cell dataKey="totalPrice" />
                                 </Column>
@@ -270,9 +270,7 @@ export default function index() {
                                             return (
                                                 <div className="flex justify-center flex-row gap-6">
                                                     <button className="inline-flex items-center justify-center w-8 h-8 text-center bg-transparent border-0 rounded-lg"
-                                                        onClick={() => {
-                                                            handleDetailPrescriptionFromTransaction(index)
-                                                        }}>
+                                                        onClick={() => router.push(`/prescription/edit/${rowData.prescription.id}`) }>
                                                         <PiListMagnifyingGlass />
                                                     </button>
                                                 </div>

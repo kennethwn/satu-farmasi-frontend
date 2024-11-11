@@ -13,30 +13,14 @@ import {
 } from "@/helpers/validation";
 import Text from "@/components/Text";
 import { toast } from "react-toastify";
-import { Loader } from "rsuite";
+import { Checkbox, Loader } from "rsuite";
+import Label from "@/components/Input/Label";
 
 const loginSchema = z.object({
     email: isRequiredEmail(),
     password: isRequiredString(),
     isRemember: isOptionalBoolean(),
 });
-
-const credentialInputField = [
-    {
-        label: "Email",
-        type: "email",
-        name: "email",
-        placeholder: "johndoe@gmail.com",
-        autofocus: true,
-    },
-    {
-        label: "Password",
-        type: "password",
-        name: "password",
-        placeholder: "**********",
-    },
-    { label: "Keep Me Logged In", name: "isRemember", type: "checkbox" },
-];
 
 export default function Login() {
     const { router, getUser } = useUser();
@@ -47,14 +31,18 @@ export default function Login() {
         register,
         handleSubmit,
         formState: { errors },
+        setValue,
+        getValues,
     } = useForm({
-        resolver: zodResolver(loginSchema)
+        resolver: zodResolver(loginSchema), defaultValues: {
+            isRemember: false
+        }
     });
 
     const LoginHandler = async (data) => {
         try {
             setIsLoading(true);
-            const response = await getUser(data);
+            await getUser(data);
             toast.success("Login successful!", { autoClose: 2000, position: 'top-right' });
             setTimeout(() => {
                 router.push("/");
@@ -84,27 +72,37 @@ export default function Login() {
                             <Text type="heading_3">Welcome Back</Text>
                             <Text type="body">Sign in to access your pharmacy dashboard</Text>
                         </div>
-                        {credentialInputField.map((input) => {
-                            return (
-                                <Input
-                                    key={input.name}
-                                    label={input.label}
-                                    type={input.type}
-                                    placeholder={input.placeholder}
-                                    name={input.name}
-                                    register={register}
-                                    error={errors[input.name]?.message}
-                                    autofocus={input.autofocus}
-                                />
-                            );
-                        })}
+                        <Input
+                            label={"Email"}
+                            id={"email"}
+                            type={"email"}
+                            placeholder={"Input your email"}
+                            name={"email"}
+                            register={register}
+                            error={errors["email"]?.message}
+                            autofocus={true}
+                        />
+                        <Input
+                            label={"Password"}
+                            id={"password"}
+                            type={"password"}
+                            placeholder={"Input your password"}
+                            name={"password"}
+                            register={register}
+                            error={errors["password"]?.message}
+                            autofocus={true}
+                        />
+                        <div className='flex justify-start items-center w-full'>
+                            <Checkbox id="isRemember" name="isRemember" onChange={() => setValue("isRemember", !getValues("isRemember"))}/>
+                            <Label name={"isRemember"} label={"Keep Me Logged In"} />
+                        </div>
                         {
                             isLoading ?
-                                <Button type="primary" isDisabled={true} isLoading={isLoading} className="w-full">
+                                <Button type="button" isDisabled={true} isLoading={isLoading} className="w-full">
                                     Login
                                 </Button>
                                 :
-                                <Button type="primary" onClick={submitForm} isLoading={isLoading} className="w-full">
+                                <Button type="button" onClick={submitForm} isLoading={isLoading} className="w-full">
                                     Login
                                 </Button>
                         }

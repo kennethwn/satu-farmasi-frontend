@@ -235,7 +235,7 @@ export default function Layout(props) {
               open={askForLogout}
               onClose={() => setAskForLogout(false)}
               body={ <> Apakah Anda yakin ingin logout? </> }
-              btnText="Finalize"
+              btnText="Logout"
               onClick={() => logoutHandler()}
             />
         </Container>
