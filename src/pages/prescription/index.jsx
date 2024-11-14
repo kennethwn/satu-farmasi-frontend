@@ -5,24 +5,26 @@ import usePrescription from "../api/prescription";
 import { useEffect, useState } from "react";
 import { Checkbox, Pagination, SelectPicker, Table } from "rsuite";
 import SearchBar from "@/components/SearchBar";
-import formatDate from "@/helpers/dayHelper";
+import { formatDateWithTime, convertToTimestampString } from "@/helpers/dayHelper";
 import { MdOutlineEdit } from "react-icons/md";
 import Button from "@/components/Button";
 import { IoMdAdd } from "react-icons/io";
 import { useRouter } from "next/router";
 import PrescriptionDetail from "@/components/Modal/PrescriptionDetail";
 import prescriptionStatusMapped from "@/helpers/prescriptionStatusMap";
+import { PiListMagnifyingGlass } from "react-icons/pi";
 
 export default function index() {
     const { user } = useUserContext();
     const [prescriptionsData, setPrescriptionsData] = useState([])
     const { isLoading: loading, getAllPrescription, getSearchedPrescription } = usePrescription()
-    const [filter, setFilter] = useState('');
+    const [statusChanged, setStatusChanged] = useState({})
     const prescriptionStatusMap = prescriptionStatusMapped
     const [search, setSearch] = useState("");
     const [page, setPage] = useState(1);
     const [totalPage, setTotalPage] = useState(0);
     const [limit, setLimit] = useState(10);
+    const [filterStatus, setFilterStatus] = useState("")
     const [sortColumn, setSortColumn] = useState();
     const [sortType, setSortType] = useState();
     const status = ["UNPROCESSED", "ON_PROGRESS", "WAITING_FOR_PAYMENT", "DONE"];
@@ -31,16 +33,9 @@ export default function index() {
     const [selectedPrescriptionId, setSelectedPrescriptionId] = useState(-1)
     const [openModal, setOpenModal] = useState(false)
 
-    // const handleSortColumn = (sortColumn, sortType) => {
-    //     setTimeout(() => {
-    //         setSortColumn(sortColumn);
-    //         setSortType(sortType);
-    //     }, 500);
-    // };
-
     const handleFetchPrescriptionData = async () => {
         try {
-            const res = await getAllPrescription(search, limit, page);
+            const res = await getAllPrescription(search, limit, page, filterStatus);
             if (res.code !== 200) {
                 toast.error(res.message, { autoClose: 2000, position: "top-center" });
                 return;
@@ -53,36 +48,33 @@ export default function index() {
         }
     }
 
-    // const handleFetchSearchedPrescriptionData = async () => {
-    //     try {
-    //         const res = await getSearchedPrescription(search)
-    //         if (res.code !== 200) {
-    //             toast.error(res.message, { autoClose: 2000, position: "top-center" });
-    //             return;
-    //         }
-    //         setPrescriptionsData(res.data)
-    //     } catch (error) {
-    //         console.error(error);
-    //     }
-    // }
-
     const getData = (data) => {
         console.log("getData:", prescriptionsData)
 
-        if (filter) {
-            data = data.filter((value) => value.status === filter);
+        if (filterStatus) {
+            data = data.filter((value) => value.status === filterStatus);
         }
         
         return data;
     }
 
+    useEffect(() => {
+        const temp = [...prescriptionsData]
+        temp.map(prescription => {
+            if (prescription.id === statusChanged.prescriptionId) {
+                prescription.status = statusChanged.status
+            }
+        })
+
+        setPrescriptionsData(temp)
+    }, [statusChanged])
     
     useEffect(() => {
         async function fetchData() {
             handleFetchPrescriptionData();
         }
         fetchData();
-    }, [page, limit, search]);
+    }, [page, limit, search, filterStatus]);
 
     useEffect(() => {
         console.log(openModal)
@@ -92,14 +84,6 @@ export default function index() {
     useEffect(() => {
         setPage(1)
     }, [search, limit])
-
-
-    // useEffect(() => {
-    //     async function fetchSearchData(){
-    //         await handleFetchSearchedPrescriptionData();
-    //     }
-    //     fetchSearchData();
-    // }, [search])
 
     return (
         <Layout active="prescription" user={user}>
@@ -123,9 +107,9 @@ export default function index() {
                         }}
                         label="Status"
                         data={Array.from(prescriptionStatusMap.values()).map((status) => ({ label: status.label, value: status.value }))}
-                        value={filter}
+                        value={filterStatus}
                         onChange={(value) => {
-                            setFilter(value);
+                            setFilterStatus(value);
                             console.log(value);
                         }}
                     />   
@@ -134,25 +118,23 @@ export default function index() {
                         // className="w-1/4"
                         placeholder="Search by patient name..."
                         onChange={(value) => {
+                            setSearch(value)
                             console.log(value);
                         }}
                         value={search}
                     />
                 </div>
             </div>
-                <div className="w-full pt-6">
+                <div className="w-full h-full pt-6">
                     <Table
                         data={getData(prescriptionsData)}
                         bordered
                         cellBordered
                         shouldUpdateScroll={false}
-                        height={400}
+                        // height={600}
+                        fillHeight
                         affixHorizontalScrollbar
-                        // sortColumn={sortColumn}
-                        // sortType={sortType}
-                        // onSortColumn={handleSortColumn}
                         loading={loading}
-                        // wordWrap
                     >
                         <Column width={50} fixed="left">
                             <HeaderCell className="text-center text-dark">No</HeaderCell>
@@ -169,7 +151,7 @@ export default function index() {
                         <Column flexGrow={1} resizable>
                             <HeaderCell className="text-dark">Timestamp</HeaderCell>
                             <Cell className="text-dark">
-                                {rowData => formatDate(rowData?.created_at)}
+                                {rowData => formatDateWithTime(rowData?.created_at)}
                             </Cell>
                         </Column>
 
@@ -197,7 +179,7 @@ export default function index() {
 
                         <Column width={100} fixed="right">
                             <HeaderCell className="text-center text-dark">Detail</HeaderCell>
-                            <Cell className="text-center">
+                            <Cell className="text-center"  style={{padding: '6px'}}>
                                 {
                                     rowData => {
                                         return (
@@ -209,7 +191,9 @@ export default function index() {
                                                 setOpenModal(true);
                                             }}
                                         >
-                                            <MdOutlineEdit size="2em" color="#FFD400" />
+                                        <PiListMagnifyingGlass 
+                                            size='1.5em'
+                                        />
                                         </button>
                                         )
                                     }
@@ -240,6 +224,7 @@ export default function index() {
             </ContentLayout>
 
             <PrescriptionDetail 
+                setStatusChanged={setStatusChanged}
                 prescriptionId={selectedPrescriptionId}
                 openModal={openModal}
                 setOpenModal={setOpenModal}

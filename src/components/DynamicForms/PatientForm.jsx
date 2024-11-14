@@ -90,7 +90,7 @@ function PatientForm(props) {
                         onChange={(value) => handlePatientChange(value)}
                         value={selectedPatient.patientId}
                         block
-                        // cleanable={false}
+                        cleanable={false}
                     />
                     : 
                     <InputField type="text" id="name" name="name" onChange={(e) => handleNameChange(e.target.value)} placeholder="name" value={selectedPatient.PatientName} />

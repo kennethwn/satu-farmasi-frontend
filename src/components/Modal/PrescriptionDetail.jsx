@@ -10,7 +10,7 @@ import { toast } from "react-toastify";
 import Toaster from "./Toaster";
 
 export default function PrescriptionDetail(props) {
-    const { prescriptionId, openModal, setOpenModal } = props
+    const { setStatusChanged, prescriptionId, openModal, setOpenModal } = props
     const { Header, Body, Footer } = Modal;
     const router = useRouter();
     const { createTransaction, finishTransaction, publishNotification } = useTransaction();
@@ -74,6 +74,7 @@ export default function PrescriptionDetail(props) {
                 return;
             } else {
                 toast.success(`Status Change to Waiting for Payment`, { autoClose: 2000, position: "top-center" });
+                setStatusChanged({prescriptionId: prescriptionId, status: "WAITING_FOR_PAYMENT"})
                 setPrescriptionsData(prescriptionData => ({
                     ...prescriptionData,
                     status: "WAITING_FOR_PAYMENT"
@@ -105,6 +106,7 @@ export default function PrescriptionDetail(props) {
                 return;
             } else {
                 toast.success(`Status Change to Waiting for Payment`, { autoClose: 2000, position: "top-center" });
+                setStatusChanged({prescriptionId: prescriptionId, status: "DONE"})
                 setPrescriptionsData(prescriptionData => ({
                     ...prescriptionData,
                     status: "DONE"
@@ -146,6 +148,7 @@ export default function PrescriptionDetail(props) {
             newEvent.onmessage = (event) => {
                 try {
                     const parsedData = JSON.parse(event?.data);
+                    setStatusChanged(parsedData)
                     setNewEvent(existingEvent => ({
                         ...existingEvent,
                         prescriptionId: parsedData.prescriptionId,
@@ -193,7 +196,7 @@ export default function PrescriptionDetail(props) {
             size="lg"
         >
             <Header className="text-2xl font-bold">Detail Prescription</Header>
-            <Body className="pt-2">
+            <Body className="flex flex-col pt-2 gap-2">
                 <div>
                     <Input
                         type="text"
