@@ -154,7 +154,7 @@ function PrescriptionForm(props) {
                   block
                   style={{ }}
                   placement="bottomStart"
-                  // cleanable={false}
+                  cleanable={false}
                 />
               </div>
               <div className="col-span-2">
@@ -207,7 +207,7 @@ function PrescriptionForm(props) {
               </div>
               <div className="max-lg:col-span-2 justify-center lg:flex lg:flex-col lg:justify-end">
                 <button
-                    className={`flex justify-center w-full rounded-md py-2 stroke-2 shadow-sm ${formFields.length > 1 ? 'stroke-white bg-button-danger lg:bg-white' : 'lg:stroke-gray-300 bg-border-box stroke-white'} lg:shadow-none lg:border-0 border-2 border-gray-300 placeholder:text-gray-400 sm:text-sm sm:leading-6`}
+                    className={`flex justify-center w-full rounded-md py-2 stroke-2 shadow-sm ${formFields.length > 1 ? 'stroke-white bg-button-danger lg:bg-white' : 'lg:stroke-gray-300 stroke-white'} lg:shadow-none lg:border-0 border-2 border-gray-300 placeholder:text-gray-400 sm:text-sm sm:leading-6`}
                     disabled={formFields?.length > 1 ? false : true}
                     onClick={(e) => handleRemoveFormFieldRow(index)}
                 >

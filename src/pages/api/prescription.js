@@ -5,34 +5,18 @@ import { useState } from 'react';
 export default function usePrescription() {
     const [isLoading, setIsLoading] = useState(false);
 
-    const getAllPrescription = async (patientName, limit, page) => {
+    const getAllPrescription = async (patientName, limit, page, filterStatus) => {
         setIsLoading(true)
         try {
-            let response
-            
-            if (patientName !== "") {
-                response = await api.get(`/api/v1/prescriptions?name=${patientName}&limit=${limit}&page=${page}`)
-                .then((response) => {
-                    setIsLoading(false)
-                    return response;
-                })
-                .catch((error) => {
-                    setIsLoading(false)
-                    return error;
-                })
-            } else {
-                response = await api.get(`/api/v1/prescriptions?limit=${limit}&page=${page}`)
-                .then((response) => {
-                    setIsLoading(false)
-                    return response;
-                })
-                .catch((error) => {
-                    setIsLoading(false)
-                    return error;
-                })
-            }
-            
-            return response 
+            return await api.get(`/api/v1/prescriptions?name=${patientName}&status=${filterStatus}&limit=${limit}&page=${page}`)
+            .then((response) => {
+                setIsLoading(false)
+                return response;
+            })
+            .catch((error) => {
+                setIsLoading(false)
+                return error;
+            })
         } catch (error) {
             return error;
         }
