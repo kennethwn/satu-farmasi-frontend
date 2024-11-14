@@ -185,10 +185,6 @@ export default function Index() {
             setErrors({});
             medicineSchema.parse(payload);
             const res = await EditMedicine(payload);
-            if (res.code !== 200) {
-                toast.error(res.message, { autoClose: 2000, position: "top-right" });
-                return;
-            }
             toast.success(res.message, { autoClose: 2000, position: "top-right" });
             setIsSubmitted(true);
             setTimeout(() => {
@@ -209,6 +205,9 @@ export default function Index() {
                     }
                 });
                 setErrors(newErrors);
+            }
+            else {
+                toast.error(error.message, { autoClose: 2000, position: "top-right" });
             }
         }
     }
