@@ -30,6 +30,12 @@ const isRequiredEmail = () =>
         .min(1, { message: "This field is required" })
         .email({ message: "Invalid email address" });
 
+const isRequiredDate = () =>
+    z.date()
+    .refine((val) => val instanceof Date && !isNaN(val.getTime()), {
+        message: "This field is required and must be a valid date"
+    });
+
 export {
     isString,
     isBoolean,
@@ -41,4 +47,5 @@ export {
     isRequiredEmail,
     isRequiredNumber,
     isRequiredOptions,
+    isRequiredDate
 };

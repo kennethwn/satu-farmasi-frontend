@@ -13,13 +13,13 @@ import useMedicineDropdownOption from "@/pages/api/medicineDropdownOption";
 import { useUserContext } from "@/pages/api/context/UserContext";
 import { ErrorForm } from "@/helpers/errorForm";
 
-const medicineSchema = z.object({
+export const medicineSchema = z.object({
     medicineId: isRequiredNumber(),
     quantity: isRequiredNumber(),
     reasonOfDispose: isRequiredString(),
 });
 
-const createExpenseMedicineField = [
+export const createExpenseMedicineField = [
     {
         label: "Nama Obat",
         type: "text",
@@ -40,7 +40,7 @@ const createExpenseMedicineField = [
     },
 ];
 
-export default function index() {
+export default function Index() {
     const router = useRouter();
     const { user } = useUserContext();
     const id = router.query.id;
@@ -105,12 +105,6 @@ export default function index() {
         }
     };
 
-    const reasonOfDisposeListData = ["Broken", "Lost", "Expired"]
-        .map(item => ({ label: item, value: item.toUpperCase() }));
-
-    const data = Object.entries(medicineDropdownOptions)
-        .map(([key, item]) => ({ label: item.name, value: key, }));
-
     useEffect(() => {
         const fetchData = async () => await handleFetchMedicineById();
         if (router.isReady) fetchData();
@@ -149,15 +143,16 @@ export default function index() {
                     <div className="grid grid-cols-1 gap-x-6 gap-y-6 sm:grid-cols-6">
                         {createExpenseMedicineField.map((input, index) => {
                             return (
-                                <div className="sm:col-span-6">
+                                <div key={index} className="sm:col-span-6">
                                     {
                                         input.name == "reasonOfDispose" &&
                                         <Dropdown
                                             id={index}
                                             name={input.name}
                                             label={input.label}
-                                            data={reasonOfDisposeListData}
-                                            value={formData.reasonOfDispose}
+                                            data={["Broken", "Lost", "Expired"]
+                                                .map(item => ({ label: item, value: item.toUpperCase() }))}
+                                            value={formData.reasonOfDispose.toUpperCase()}
                                             onChange={e => inputOnChangeHandler(e, input.name)}
                                             searchable={false}
                                             placeholder="Select Reason of Dispose"
@@ -170,7 +165,8 @@ export default function index() {
                                             id={index}
                                             name={input.name}
                                             label={input.label}
-                                            data={data}
+                                            data={Object.entries(medicineDropdownOptions)
+                                                .map(([key, item]) => ({ label: item.name, value: key, }))}
                                             value={formData.medicineId.toString()}
                                             onChange={e => inputOnChangeHandler(e, input.name)}
                                             placeholder="Select Medicine Name"

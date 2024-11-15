@@ -48,15 +48,14 @@ export default function MedicineClassificationForm(props) {
 				{formFields?.map((form, index) => (
 					<div key={index} className='col-span-12 w-full grid lg:grid-cols-12 gap-x-6'>
 						<div className='max-lg:w-full'>
-							{/* TODO: cari cara biar bisa ga usah print object/element  */}
 							{index === 0 && (
 								<div className="flex text-sm invisible font-medium leading-6 text-gray-900 lg:justify-center">
 									.
 								</div>
 							)}
-							<div className="flex items-center w-full justify-start mt-2 lg:gap-2">
-								{((disabled === undefined || disabled === null || disabled === false) && (index === formFields.length - 1)) ?
-									<Button size="small" onClick={(e) => addFormField()}>
+							<div className="flex items-center w-full justify-start lg:mt-4 lg:gap-2">
+								{((index === formFields.length - 1)) ?
+									<Button size="small" onClick={(e) => addFormField()} isDisabled={disabled}>
 										<IoIosAdd size={"1.6rem"} />
 									</Button>
 									:
@@ -67,14 +66,14 @@ export default function MedicineClassificationForm(props) {
 						</div>
 						<div className="col-span-10">
 							{(index === 0) && (
-								<label className="block text-sm font-medium leading-6 text-gray-900">
+								<label className="block text-body font-medium leading-6 text-gray-900">
 									Klasifikasi obat
 								</label>
 							)
 							}
 							<div className="mt-2">
 								{isLoading ?
-									<SelectPicker
+									<Dropdown
 										id='classification'
 										name='classification'
 										placeholder='Klasifikasi'
@@ -89,7 +88,7 @@ export default function MedicineClassificationForm(props) {
 									/>
 									:
 									<>
-										<SelectPicker
+										<Dropdown
 											id='classification'
 											name='classification'
 											placeholder='Klasifikasi'
@@ -100,6 +99,7 @@ export default function MedicineClassificationForm(props) {
 											value={formFields.length == 0 ? 0 : form?.id}
 											valueKey='id'
 											labelKey='label'
+											disabled={disabled}
 											onChange={(value) => {
 												handleChangeFormFields(value, index)
 												setErrors({
@@ -108,26 +108,26 @@ export default function MedicineClassificationForm(props) {
 												});
 											}}
 										/>
-										<div style={{ minHeight: '22px' }}>
-											{
-												errors[`classificationList[${index}]`] &&
-												<Text type="danger">{errors[`classificationList[${index}]`]}</Text>
-											}
-										</div>
+										{
+											errors[`classificationList[${index}]`] &&
+												<div style={{ minHeight: '22px' }}>
+													<Text type="danger">{errors[`classificationList[${index}]`]}</Text>
+												</div>
+										}
 									</>
 								}
 							</div>
 						</div>
 						{(disabled === undefined || disabled === null || disabled === false) && (
-							<div className="">
+							<div className="max-lg:col-span-10 lg:w-full">
 								{(index === 0) && (
-									<label className="flex text-sm font-medium leading-6 text-gray-900 lg:justify-center">
+									<label className="flex text-md font-medium leading-6 text-gray-900 lg:justify-center">
 										Action
 									</label>
 								)
 								}
 								<button
-									className={`flex justify-center w-full rounded-md py-2 mt-2 stroke-2 shadow-sm ${formFields.length > 1 ? ' stroke-white' : 'lg:stroke-gray-300 stroke-white'} lg:shadow-none lg:border-0 border-2 border-gray-300 placeholder:text-gray-400 sm:text-sm sm:leading-6`}
+									className={`flex justify-center w-full block w-full rounded-md py-2 lg:mt-3 stroke-2 shadow-sm ${formFields.length > 1 ? ' stroke-white' : 'lg:stroke-gray-300 stroke-white'} lg:shadow-none lg:border-0 border-2 border-gray-300 placeholder:text-gray-400 sm:text-sm sm:leading-6`}
 									disabled={formFields?.length > 1 ? false : true}
 									onClick={(e) => {
 										e.preventDefault();

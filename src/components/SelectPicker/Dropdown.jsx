@@ -57,6 +57,7 @@ export default function Dropdown({
             <div ref={containerRef} style={{ position: 'relative' }}>
                 <SelectPicker
                     container={() => containerRef.current}
+                    menuMaxHeight={100}
                     preventOverflow={false}
                     placeholder={placeholder}
                     onChange={onChange}

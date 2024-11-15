@@ -40,7 +40,7 @@ const createExpenseMedicineField = [
     },
 ];
 
-export default function create() {
+export default function Index() {
     const router = useRouter();
     const { user } = useUserContext();
     const { isLoading, CreateMedicine } = useExpenseMedicineAPI();
@@ -83,9 +83,6 @@ export default function create() {
         }
     };
 
-    const reasonOfDisposeListData = ["Broken", "Lost", "Expired"].map(item => ({ label: item, value: item.toUpperCase() }));
-    const data = Object.entries(medicineDropdownOptions).map(([key, item]) => ({ label: item.name, value: key, }));
-
     useEffect(() => {
         async function fetchMedicineDropdownOptionsData() {
             try {
@@ -119,14 +116,14 @@ export default function create() {
                     <div className="grid grid-cols-1 gap-x-6 gap-y-6 sm:grid-cols-6">
                         {createExpenseMedicineField.map((input, index) => {
                             return (
-                                <div className="sm:col-span-6">
+                                <div key={index} className="sm:col-span-6">
                                     {
                                         input.name == "reasonOfDispose" &&
                                         <Dropdown
                                             id={index}
                                             name={input.name}
                                             label={input.label}
-                                            data={reasonOfDisposeListData}
+                                            data={["Broken", "Lost", "Expired"].map(item => ({ label: item, value: item.toUpperCase() }))}
                                             onChange={e => inputOnChangeHandler(e, input.name)}
                                             searchable={false}
                                             placeholder="Select Reason of Dispose"
@@ -139,7 +136,7 @@ export default function create() {
                                             id={index}
                                             name={input.name}
                                             label={input.label}
-                                            data={data}
+                                            data={Object.entries(medicineDropdownOptions).map(([key, item]) => ({ label: item.name, value: key, }))}
                                             onChange={e => inputOnChangeHandler(e, input.name)}
                                             placeholder="Select Medicine Name"
                                             error={errors[input.name]}
