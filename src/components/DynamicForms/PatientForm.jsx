@@ -8,7 +8,9 @@ function PatientForm(props) {
     const {
         selectedPatient,
         setSelectedPatient,
-        existingPatient
+        existingPatient,
+        errors,
+        setErrors,
     } = props
 
     const { getPatientDropdownOptions } = usePatientAPI();
@@ -87,25 +89,58 @@ function PatientForm(props) {
                         size='lg'
                         name='name'
                         data={data} 
-                        onChange={(value) => handlePatientChange(value)}
+                        onChange={(value) => {
+                            handlePatientChange(value)
+                            setErrors({ ...errors, "prescription.patient.patientId": "" })
+                        }}
                         value={selectedPatient.patientId}
                         block
                         cleanable={false}
+                        error={errors["prescription.patient.patientId"]}
                     />
                     : 
-                    <InputField type="text" id="name" name="name" onChange={(e) => handleNameChange(e.target.value)} placeholder="name" value={selectedPatient.PatientName} />
+                    <InputField 
+                        type="text" 
+                        id="name" name="name" 
+                        onChange={(e) => {
+                            handleNameChange(e.target.value)
+                        setErrors({ ...errors, "prescription.patient.patientName": "" })
+                        }} 
+                        placeholder="name" 
+                        error={errors["prescription.patient.patientName"]}
+                        value={selectedPatient.PatientName} 
+                    />
                     }
                 </div>
             </div>
             <div className='flex flex-col gap-2'>
                 <p> Credential Number </p>
-                <InputField type="text" id="name" name="name" onChange={(e) => handleCredentialNumChange(e.target.value)} placeholder="credential number" value={selectedPatient.credentialNum} 
+                <InputField 
+                    type="text" 
+                    id="name" name="name" 
+                    onChange={(e) => {
+                        handleCredentialNumChange(e.target.value)
+                        setErrors({ ...errors, "prescription.patient.credentialNum": "" })
+                    }} 
+                    placeholder="credential number" 
+                    value={selectedPatient.credentialNum} 
+                    error={errors["prescription.patient.credentialNum"]}
                     disabled={existingPatient}
                 />
             </div>
             <div className='flex flex-col gap-2'>
                 <p> No Handphone </p>
-                <InputField type="text" id="name" name="name" onChange={(e) => handlePhoneNumChange(e.target.value)} placeholder="no handphone" value={selectedPatient.phoneNum}
+                <InputField 
+                    type="text" 
+                    id="name" 
+                    name="name" 
+                    onChange={(e) => {
+                        handlePhoneNumChange(e.target.value)
+                        setErrors({ ...errors, "prescription.patient.phoneNum": "" })
+                    }} 
+                    placeholder="no handphone" 
+                    error={errors["prescription.patient.phoneNum"]}
+                    value={selectedPatient.phoneNum}
                     disabled={existingPatient}
                 />
             </div>

@@ -8,7 +8,7 @@ import { formatRupiah } from "@/helpers/currency";
 import Dropdown from "../SelectPicker/Dropdown";
 
 function PrescriptionForm(props) {
-  const { formFields, setFormFields } = props;
+  const { formFields, setFormFields, errors, setErrors } = props;
 
   const { getMedicineDropdownOptions } = useMedicineDropdownOption();
   const [medicineDropdownOptions, setMedicineDropdownOptions] = useState([]);
@@ -37,7 +37,7 @@ function PrescriptionForm(props) {
   const handleMedicineChange = (formFieldId, medicineId) => {
     let updatedData = {
       medicineId: medicineId,
-      medicineName: medicineDropdownOptions[medicineId].name,
+      medicineName: medicineDropdownOptions[medicineId]?.name,
       quantity: 0,
       price: medicineDropdownOptions[medicineId].price,
       totalPrice: 0,
@@ -148,13 +148,17 @@ function PrescriptionForm(props) {
                   size="lg"
                   name="name"
                   data={data}
-                  onChange={(value) => handleMedicineChange(index, value)}
+                  onChange={(value) => {
+                        handleMedicineChange(index, value)
+                        setErrors({ ...errors, [`prescription.medicineList.${index}.medicineId`]: "" });
+                  }}
                   value={formField.medicineId}
                   renderValue={formField.medicineId != -1 ? (value) => <div className="text-sm">{medicineDropdownOptions[value].name}</div> : null}
                   block
                   style={{ }}
                   placement="bottomStart"
                   cleanable={false}
+                error={errors[`prescription.medicineList.${index}.medicineId`]}
                 />
               </div>
               <div className="col-span-2">
@@ -165,9 +169,12 @@ function PrescriptionForm(props) {
                   name="quantity"
                   placeholder="Jumlah"
                   value={formField.quantity}
-                  onChange={(e) =>
+                  disabled={formField.medicineId == -1}
+                  onChange={(e) => {
                     handleMedicineQuantity(index, e.target.value)
-                  }
+                    setErrors({ ...errors, [`prescription.medicineList.${index}.quantity`]: "" });
+                  }}
+                error={errors[`prescription.medicineList.${index}.quantity`]}
                 />
               </div>
               <div className="col-span-2">
@@ -202,7 +209,11 @@ function PrescriptionForm(props) {
                     name="instruction"
                     value={formField?.instruction} // TODO: fix handle change
                     placeholder="Instruction"
-                    onChange={(e) => handleInstructionField(index, e.target.value)}
+                    onChange={(e) => {
+                        handleInstructionField(index, e.target.value)
+                        setErrors({ ...errors, [`prescription.medicineList.${index}.instruction`]: "" });
+                    }}
+                    error={errors[`prescription.medicineList.${index}.instruction`]}
                   />
               </div>
               <div className="max-lg:col-span-2 justify-center lg:flex lg:flex-col lg:justify-end">
