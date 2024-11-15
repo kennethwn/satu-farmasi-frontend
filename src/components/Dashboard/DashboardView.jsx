@@ -8,7 +8,7 @@ import { month } from "@/data/date";
 
 export default function DashboardView(props) {
     const {Column, Cell, HeaderCell} = Table;
-    const { dataCard, dataExpired, dataTransaction, dataMonthlyReport, setCurrentMonth, onChangeMonthlyReport } = props;
+    const { dataCard, dataExpired, dataTransaction, dataMonthlyReport, setCurrentMonth, onChangeMonthlyReport, linkTransaction } = props;
 
     const TableExpired = (props) => (
         <Table {...props}>
@@ -99,15 +99,16 @@ export default function DashboardView(props) {
                             value={item.value}
                             icon={item.icon}
                             link={item.link}
+                            status={item.status}
                         />
                     )
                 })}
             </div>
             <div className="flex flex-col max-lg:gap-y-4 lg:flex-row gap-x-4 w-full">
                 <TableLayout title="Expiring List">
-                    <TableExpired data={dataExpired} />
+                    <TableExpired data={dataExpired} link="/master/medicine" />
                 </TableLayout>
-                <TableLayout title="Remaining Transaction">
+                <TableLayout title="Remaining Transaction" link="/transaction/dashboard">
                     <TableMedicineOrder data={dataTransaction}/>
                 </TableLayout>
             </div>

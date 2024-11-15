@@ -5,6 +5,7 @@ import Toaster from "@/components/Modal/Toaster";
 import SearchBar from "@/components/SearchBar";
 import { formatRupiah } from "@/helpers/currency";
 import formatDate from "@/helpers/dayHelper";
+import { resolveStatusStockMedicine } from "@/helpers/resolveStatus";
 import { useUserContext } from "@/pages/api/context/UserContext";
 import useMedicineAPI from "@/pages/api/master/medicine";
 import { useRouter } from "next/router";
@@ -195,6 +196,13 @@ export default function index() {
                         <Column width={250} fullText resizable>
                             <HeaderCell className="text-dark ">Efek Samping</HeaderCell>
                             <Cell dataKey='sideEffect'/>
+                        </Column>
+
+                        <Column width={150} fullText fixed="right" resizable>
+                            <HeaderCell className="text-dark ">Status Stok</HeaderCell>
+                            <Cell dataKey='status_stock'>
+                                {rowData => resolveStatusStockMedicine(rowData.currStock, rowData.status_stock)}
+                            </Cell>
                         </Column>
 
                         <Column width={150} fixed="right">

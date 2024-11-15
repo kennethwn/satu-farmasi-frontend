@@ -5,28 +5,32 @@ export default function getDataCard(totalPatient, totalMedicine, totalProfit, to
             icon: "person",
             link: "/",
             label: "Total Patient",
-            value: totalPatient
+            value: totalPatient,
+            status: "active"
         },
         {
             colorBackground: "green",
             icon: "medicine",
             link: "/master/medicine",
             label: "Total Medicine",
-            value: totalMedicine
+            value: totalMedicine,
+            status: "active"
         },
         {
             colorBackground: "yellow",
             icon: "profit",
             link: "/transaction/dashboard",
             label: "Total Profit",
-            value: totalProfit
+            value: totalProfit,
+            status: "today"
         },
         {
             colorBackground: "red",
             icon: "stock",
             link: "/",
             label: "Need to Retock",
-            value: totalRestock
+            value: totalRestock,
+            status: "active"
         },
     ]
 
