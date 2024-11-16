@@ -9,16 +9,10 @@ export default function usePrescription() {
         setIsLoading(true)
         try {
             return await api.get(`/api/v1/prescriptions?name=${patientName}&status=${filterStatus}&limit=${limit}&page=${page}`)
-            .then((response) => {
-                setIsLoading(false)
-                return response;
-            })
-            .catch((error) => {
-                setIsLoading(false)
-                return error;
-            })
         } catch (error) {
-            return error;
+            throw error.response.data.errors
+        } finally {
+            setIsLoading(false)
         }
     }
 
@@ -47,18 +41,11 @@ export default function usePrescription() {
     const addNewPrescription = async (data) => {
         setIsLoading(true)
         try {
-            const response = await api.post('/api/v1/prescriptions', {data})
-            .then((response) => {
-                setIsLoading(false);
-                return response;
-            })
-            .catch((error) => {
-                setIsLoading(false);
-                return error;
-            })
-            return response
+            return  await api.post('/api/v1/prescriptions', {data})
         } catch (error) {
-            console.error(error);
+            throw error.response.data.errors
+        } finally {
+            setIsLoading(false)
         }
     }
 
@@ -83,18 +70,11 @@ export default function usePrescription() {
     const updatePrescription = async (data) => {
         setIsLoading(true)
         try {
-            const response = await api.put('/api/v1/prescriptions', {data})
-            .then((response) => {
-                setIsLoading(false);
-                return response;
-            })
-            .catch((error) => {
-                setIsLoading(false);
-                return error;
-            })
-            return response;
+            return await api.put('/api/v1/prescriptions', {data})
         } catch (error) {
-            console.error(error);
+            throw error.response.data.errors
+        } finally {
+            setIsLoading(false)
         }
     }
 
