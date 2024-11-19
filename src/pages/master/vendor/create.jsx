@@ -3,7 +3,7 @@ import Input from "@/components/Input";
 import Layout from "@/components/Layouts";
 import ContentLayout from "@/components/Layouts/Content";
 import { useRouter } from "next/router";
-import { useRef } from "react";
+import { useRef, useState } from "react";
 import { toast } from "react-toastify";
 import useVendorAPI from "@/pages/api/master/vendor";
 import { z } from "zod";
@@ -54,6 +54,7 @@ export default function create() {
     const router = useRouter();
     const { user } = useUserContext();
     const { isLoading, CreateVendor } = useVendorAPI();
+    const [isSubmitted, setSubmitted] = useState(false)
     const formRef = useRef(null);
     const {
         register,
@@ -70,6 +71,7 @@ export default function create() {
                     position: "top-right",
                 });
             toast.success(res.message, { autoClose: 2000, position: "top-right" });
+            setSubmitted(true)
             setTimeout(() => {
                 router.push("/master/vendor");
             }, 2000);
@@ -107,7 +109,7 @@ export default function create() {
                     </div>
 
                     <div className="flex justify-center gap-2 my-6 lg:justify-end">
-                        {isLoading ? (
+                        {isSubmitted ? (
                             <Button
                                 appearance="primary"
                                 isDisabled={true}

@@ -47,6 +47,10 @@ input[type="number"] {
     border-color: #ef4444 !important;
 }
 
+.success-field {
+    border-color: #10b981 !important;
+}
+
 /* NOTE: Modal styles for rsuite */
 .rs-modal-wrapper {
     display: flex;
@@ -109,3 +113,15 @@ input:active {
 .rs-picker-toggle-active {
     transition: none !important;
 }
+
+.rs-panel-body {
+    height: 100%
+}
+
+.rs-toggle-checked .rs-toggle-presentation, .rs-toggle-checked .rs-toggle-presentation:hover {
+    background-color: #2f4852
+}
+
+/* .rs-table-cell-wrap{
+    height: 100%;
+} */

@@ -18,6 +18,22 @@ export default function formatDate(date){
     return `${da} ${mo} ${ye}`
 }
 
+export function formatDateWithTime(date){
+    const d = new Date(date)
+    const dtf = new Intl.DateTimeFormat("en", {
+        year: "numeric",
+        month: "short",
+        day: "2-digit",
+        hour: "2-digit",
+        minute: "2-digit",
+        second: "2-digit",
+        hour12: false
+    })
+
+    const [{ value: mo }, , { value: da }, , { value: ye }, , { value: hr }, , { value: min }, , { value: sec }] = dtf.formatToParts(d)
+    return `${da} ${mo} ${ye}\n${hr}:${min}:${sec}`
+}
+
 export const formatCalendar = (timestamp) => {
     let date = new Date(timestamp)
     let year = date.getFullYear()

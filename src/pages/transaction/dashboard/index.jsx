@@ -2,6 +2,7 @@ import Layout from "@/components/Layouts";
 import ContentLayout from "@/components/Layouts/Content";
 import TransactionDetail from "@/components/Modal/TransactionDetail";
 import SearchBar from "@/components/SearchBar";
+import { formatDateWithTime } from "@/helpers/dayHelper";
 import prescriptionStatusMapped from "@/helpers/prescriptionStatusMap";
 import { useUserContext } from "@/pages/api/context/UserContext";
 import useTransaction from "@/pages/api/transaction/transaction";
@@ -15,6 +16,7 @@ export default function index() {
   const { HeaderCell, Cell, Column } = Table;
   const { isLoading, getAllTransaction } = useTransaction();
   const prescriptionStatusMap = prescriptionStatusMapped;
+  const [statusUpdated, setStatusUpdated] = useState({})
   const [data, setData] = useState([]);
   const [search, setSearch] = useState("");
   const [page, setPage] = useState(1);
@@ -32,6 +34,7 @@ export default function index() {
         return;
       }
       setData(res.data.results);
+      console.log(res.data.results);
       setTotalPage(res.data.total);
     } catch (error) {
       console.error(error);
@@ -49,6 +52,7 @@ export default function index() {
             try {
                 const parsedData = JSON.parse(event?.data);
                 console.log(parsedData)// Append new data to the state
+                setStatusUpdated(parsedData)
                 if (parsedData.status === "WAITING_FOR_PAYMENT") {
                   toast.info(`New Transaction Created, Refresh to See New Transaction`, { autoClose: 2000, position: "top-right" });
                 } else if (parsedData.status === "DONE") {
@@ -81,6 +85,14 @@ export default function index() {
       console.log("selectedID:", selectedTransactionId)
   }, [openModal])
 
+  useEffect(() => {
+    const temp = [...data]
+    temp.map(transaction => {
+      if (transaction.prescription.id === setStatusUpdated.prescriptionId) {
+        transaction.prescription.status = setStatusUpdated.status
+      }
+    })
+  }, [setStatusUpdated])
 
   useEffect(() => {
     async function fetchData() {
@@ -130,6 +142,13 @@ export default function index() {
               <Cell dataKey="id" />
             </Column>
 
+            <Column flexGrow={1} resizable>
+                <HeaderCell className="text-dark font-bold">Timestamp</HeaderCell>
+                <Cell className="text-dark">
+                    {rowData => formatDateWithTime(rowData?.updated_at)}
+                </Cell>
+            </Column>
+
             <Column flexGrow={1}>
               <HeaderCell className="text-dark font-bold">
                 Patient
@@ -167,17 +186,19 @@ export default function index() {
               <HeaderCell className="text-center text-dark font-bold">
                 Action
               </HeaderCell>
-              <Cell className="text-center">
+              <Cell className="text-center" style={{padding: '6px'}}>
                 {(rowData) => {
                   return (
-                    <div className="flex justify-center flex-row gap-6">
+                    <div className="flex justify-center flex-row gap-6 items-center">
                       <button className="inline-flex items-center justify-center w-8 h-8 text-center bg-transparent border-0 rounded-lg"
                         onClick={() => {
                             console.log(rowData.id);
                             setSelectedTransactionId(rowData.id);
                             setOpenModal(true);
                         }}>
-                        <PiListMagnifyingGlass />
+                        <PiListMagnifyingGlass 
+                          size='1.5em'
+                        />
                       </button>
                     </div>
                   );
@@ -208,6 +229,7 @@ export default function index() {
       </ContentLayout>
 
         <TransactionDetail
+            statusUpdated={statusUpdated}
             transactionId={selectedTransactionId}
             openModal={openModal}
             setOpenModal={setOpenModal}

@@ -4,7 +4,7 @@ import { useState } from "react";
 import { formatRupiah } from "@/helpers/currency";
 
 export default function MedicineList(props) {
-    const {medicineList} = props;
+    const { medicineList } = props;
     const [filter, setFilter] = useState('');
     const [search, setSearch] = useState('');
     const [searchResult, setSearchResult] = useState([])
@@ -20,33 +20,31 @@ export default function MedicineList(props) {
             const end = start + limit;
             return index >= start && index < end
         })
-        .sort((a, b) => {
-            if (sortColumn && sortType) {
-                let x = a[sortColumn]?.toString();
-                let y = b[sortColumn]?.toString();
-                return sortType === 'asc' ? x.localeCompare(y) : y.localeCompare(x);
-            }
-        })
+            .sort((a, b) => {
+                if (sortColumn && sortType) {
+                    let x = a[sortColumn]?.toString();
+                    let y = b[sortColumn]?.toString();
+                    return sortType === 'asc' ? x.localeCompare(y) : y.localeCompare(x);
+                }
+            })
 
         if (filter) {
             data = data.filter((value) => value.status === filter);
         }
-        
+
         return data;
     }
 
-    return(<div className="flex flex-col gap-4">
+    return (<div className="flex flex-col gap-4">
         <Table
             data={getData()}
             bordered
             cellBordered
             shouldUpdateScroll={false}
-            autoHeight
+            autoHeight={true}
             wordWrap="break-word"
             // height={400}
             affixHorizontalScrollbar
-            sortColumn={sortColumn}
-            sortType={sortType}
         >
             <Column width={50} fixed="left">
                 <HeaderCell className="text-center text-dark">No</HeaderCell>
@@ -55,18 +53,14 @@ export default function MedicineList(props) {
                 </Cell>
             </Column>
 
-            <Column flexGrow={2} fullText resizable>
+            <Column flexGrow={4} fullText>
                 <HeaderCell className="text-dark">Nama Obat</HeaderCell>
                 <Cell>
                     {(rowData) => {
-                        return (
-                            <div className="flex flex-col">
-                                <p>{rowData.medicine.name}</p>
-                                <p>{rowData.instruction}</p>
-                            </div>
-                        )
-                    }}
-                        {/* // <Grid>
+                        return (<div className="flex flex-col h-full">
+                            <p>{rowData.medicine.name} <br /> <span className="text-gray-500">{rowData.instruction}</span></p>
+                        </div>)
+                        // <Grid>
                         //     <Row>
                         //         {rowData.medicine.name}
                         //     </Row>
@@ -74,23 +68,23 @@ export default function MedicineList(props) {
                         //         {rowData.instruction}
                         //     </Row>
                         // </Grid>
-                    // } */}
+                    }}
                 </Cell>
             </Column>
 
-            <Column width={75} resizable sortable>
+            <Column flexGrow={1}>
                 <HeaderCell className="text-dark">Jumlah</HeaderCell>
-                <Cell dataKey='quantity'/>
+                <Cell dataKey='quantity' />
             </Column>
 
-            <Column flexGrow={1} resizable sortable>
+            <Column flexGrow={2}>
                 <HeaderCell className="text-dark">Harga Per Obat (Rp.)</HeaderCell>
                 <Cell dataKey='medicine.price'>
                     {rowData => formatRupiah(rowData?.medicine?.price)}
                 </Cell>
             </Column>
 
-            <Column flexGrow={1} resizable sortable>
+            <Column flexGrow={2} fixed="right">
                 <HeaderCell className="text-dark">Total Sub Harga (Rp.)</HeaderCell>
                 <Cell dataKey='totalPrice'>
                     {rowData => formatRupiah(rowData?.totalPrice)}
@@ -102,6 +96,6 @@ export default function MedicineList(props) {
                 <Cell dataKey='instruction'/>
             </Column> */}
         </Table>
-      </div>
+    </div>
     )
 };

@@ -200,7 +200,7 @@ export default function index() {
                                     return (
                                         <div className="flex justify-center flex-row gap-6">
                                             <button
-                                                disabled={rowData?.report?.id} className={`${rowData?.report?.id ? 'hidden' : ''} inline-flex items-center justify-center w-8 h-8 text-center bg-transparent border-0 rounded-lg`}
+                                                disabled={rowData?.report?.isFinalized} className={`${rowData?.report?.isFinalized ? 'hidden' : ''} inline-flex items-center justify-center w-8 h-8 text-center bg-transparent border-0 rounded-lg`}
                                                 onClick={() =>
                                                     router.push(`/transaction/expense/edit/${rowData?.id}`)
                                                 }
@@ -209,8 +209,8 @@ export default function index() {
                                             </button>
 
                                             <button
-                                                disabled={rowData?.report?.id}
-                                                className={`${rowData?.report?.id ? 'hidden' : ''} inline-flex items-center justify-center w-8 h-8 text-center bg-transparent border-0 rounded-lg`}
+                                                disabled={rowData?.report?.isFinalized}
+                                                className={`${rowData?.report?.isFinalized ? 'hidden' : ''} inline-flex items-center justify-center w-8 h-8 text-center bg-transparent border-0 rounded-lg`}
                                                 onClick={() => {
                                                     setEditInput({ ...rowData, is_active: false });
                                                     setOpen({ ...open, delete: true });

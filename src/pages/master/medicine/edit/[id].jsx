@@ -54,6 +54,7 @@ export default function Index() {
     const { GetAllClassificationsDropdown } = useClassificationsAPI();
     const { GetPackagingDropdown } = usePackagingAPI();
     const { GetGenericDropdown } = useGenericAPI();
+    const [isSubmitted, setIsSubmitted] = useState(false);
 
     const [input, setInput] = useState({});
     const [errors, setErrors] = useState({});
@@ -184,11 +185,8 @@ export default function Index() {
             setErrors({});
             medicineSchema.parse(payload);
             const res = await EditMedicine(payload);
-            if (res.code !== 200) {
-                toast.error(res.message, { autoClose: 2000, position: "top-right" });
-                return;
-            }
             toast.success(res.message, { autoClose: 2000, position: "top-right" });
+            setIsSubmitted(true);
             setTimeout(() => {
                 router.push("/master/medicine");
             }, 2000)
@@ -207,6 +205,9 @@ export default function Index() {
                     }
                 });
                 setErrors(newErrors);
+            }
+            else {
+                toast.error(error.message, { autoClose: 2000, position: "top-right" });
             }
         }
     }
@@ -584,7 +585,7 @@ export default function Index() {
                     </div>
 
                     <div className="flex justify-center gap-2 my-6 lg:justify-end">
-                        {isLoading ?
+                        {isSubmitted ?
                             <Button
                                 appearance="primary"
                                 isDisabled={true}

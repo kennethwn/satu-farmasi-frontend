@@ -149,18 +149,11 @@ export default function useMedicineAPI() {
     const EditMedicine = async (data) => {
         setIsLoading(true)
         try {
-            const response = await axios.post('/api/v1/medicines/edit', data)
-            .then((response) => {
-                setIsLoading(false);
-                return response;
-            })
-            .catch((error) => {
-                setIsLoading(false);
-                return error;
-            })
-            return response
+            return await axios.post('/api/v1/medicines/edit', data)
         } catch (error) {
-            console.error(error);
+            throw error.response.data;
+        } finally {
+            setIsLoading(false);
         }
     }
 
