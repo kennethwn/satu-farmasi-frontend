@@ -1,5 +1,5 @@
-import { useState } from "react";
-import usePrescription from "../api/prescription"
+import { useEffect, useState } from "react";
+import usePrescription from "../api/prescription";
 import { useUserContext } from "../api/context/UserContext";
 import Layout from "@/components/Layouts";
 import ContentLayout from "@/components/Layouts/Content";
@@ -9,91 +9,156 @@ import PrescriptionForm from "@/components/DynamicForms/PrescriptionForm";
 import { useRouter } from "next/router";
 import Button from "@/components/Button";
 import { toast } from "react-toastify";
+import { z, ZodError } from "zod";
+import { isRequiredNumber, isRequiredString } from "@/helpers/validation";
+import { ErrorForm } from "@/helpers/errorForm";
+
+const medicineSchema = z.object({
+    instruction: isRequiredString(),
+    medicineId: isRequiredNumber(),
+    quantity: isRequiredNumber(),
+});
+
+const prescriptionSchemaWithExistingPatient = z.object({
+    prescription: z.object({
+        medicineList: z.array(medicineSchema),
+        patient: z.object({
+            patientId: isRequiredNumber(),
+        }),
+    }),
+});
+
+const prescriptionSchemaWithNewPatient = z.object({
+    prescription: z.object({
+        medicineList: z.array(medicineSchema),
+        patient: z.object({
+            patientName: isRequiredString(),
+            credentialNum: isRequiredString(),
+            phoneNum: isRequiredString(),
+        }),
+    }),
+});
 
 export default function create() {
     const { user } = useUserContext();
     const { isLoading, addNewPrescription } = usePrescription();
-    const [existingPatient, setExistingPatient] = useState(true)
+    const [existingPatient, setExistingPatient] = useState(true);
     const router = useRouter();
+    const [errors, setErrors] = useState({});
 
     const [formFields, setFormFields] = useState([
-        {   
+        {
             medicineId: -1,
             medicineName: "",
             quantity: 0,
             price: 0,
             totalPrice: 0,
-            instruction: ""
-        }
-    ])
-    const [selectedPatient, setSelectedPatient] = useState(
-        {
-            patientId: -1,
-            patientName: "",
-            credentialNum: "",
-            phoneNum: ""
-        }
-    )
+            instruction: "",
+        },
+    ]);
+    const [selectedPatient, setSelectedPatient] = useState({
+        patientId: -1,
+        patientName: "",
+        credentialNum: "",
+        phoneNum: "",
+    });
 
     const handleSubmitPrescription = async (e) => {
-        e.preventDefault()
+        e.preventDefault();
         try {
-            let data = {        
+            let data = {
                 patient: {
                     patientId: -1,
                     patientName: "",
                     credentialNum: "",
-                    phoneNum: ""
+                    phoneNum: "",
                 },
-                medicineList : [{
-                    medicineId : -1,
-                    price: 0,
-                    quantity : 0,
-                    instruction: ""
-                }]
-            }
+                medicineList: [
+                    {
+                        medicineId: -1,
+                        price: 0,
+                        quantity: 0,
+                        instruction: "",
+                    },
+                ],
+            };
 
-            data.patient = selectedPatient
-            data.medicineList.pop()
-            const temp = [...formFields]
-            console.log(temp)
-            temp.map(item => data.medicineList.push({
-                medicineId: parseInt(item.medicineId),
-                quantity: parseInt(item.quantity),
-                instruction: item.instruction,
-                price: item.totalPrice,
-            }))
+            data.patient = selectedPatient;
+            data.medicineList.pop();
+            const temp = [...formFields];
+            console.log(temp);
+            temp.map((item) =>
+                data.medicineList.push({
+                    medicineId: parseInt(item.medicineId),
+                    quantity: parseInt(item.quantity),
+                    instruction: item.instruction,
+                    price: item.totalPrice,
+                }),
+            );
 
-            console.log(data)
+            setErrors({});
+            const dataToValidate = { prescription: data };
+            if (existingPatient)
+                prescriptionSchemaWithExistingPatient.parse(dataToValidate);
+            else prescriptionSchemaWithNewPatient.parse(dataToValidate);
 
             const res = await addNewPrescription(data);
-            console.log(res)
-            if (res == undefined || res == null || res.status != 200 || res.code != 200) {
-                toast.error(res.message, { autoClose: 2000, position: "top-center" });
-                return
-            }
-            toast.success(res.message, { autoClose: 2000, position: "top-center" });
-            router.push(`/prescription`);
+            toast.success(res.message, {
+                autoClose: 2000,
+                position: "top-right",
+            });
+            setTimeout(() => {
+                router.push(`/prescription`);
+            }, 2000);
         } catch (error) {
-            console.log("error when #submitPrescription")
+            console.log("error: ", error);
+            if (error instanceof ZodError) {
+                const newErrors = { ...errors };
+                error.issues.forEach((issue) => {
+                    if (issue.path.length > 0) {
+                        const fieldName = issue.path.join(".");
+                        newErrors[fieldName] = issue.message;
+                    }
+                });
+                setErrors(newErrors);
+            } else {
+                ErrorForm(error, setErrors, false);
+            }
         }
-    }
+    };
 
     return (
         <Layout active="prescription" user={user}>
-            <ContentLayout title="Create Prescription" type="child" backpageUrl="/prescription">
-                <form onSubmit={handleSubmitPrescription} className="flex flex-col gap-4">
+            <ContentLayout
+                title="Create Prescription"
+                type="child"
+                backpageUrl="/prescription"
+            >
+                <form
+                    onSubmit={handleSubmitPrescription}
+                    className="flex flex-col gap-4"
+                >
                     <div className="flex flex-col gap-2">
-                        <Toggle size="lg" checkedChildren="Existing Patient" unCheckedChildren="New Patient" defaultChecked onChange={(e) => setExistingPatient(e)}/>
+                        <Toggle
+                            size="lg"
+                            checkedChildren="Existing Patient"
+                            unCheckedChildren="New Patient"
+                            defaultChecked
+                            onChange={(e) => setExistingPatient(e)}
+                        />
                         <PatientForm
-                            selectedPatient = {selectedPatient}
-                            setSelectedPatient = {setSelectedPatient}
-                            existingPatient = {existingPatient}
+                            selectedPatient={selectedPatient}
+                            setSelectedPatient={setSelectedPatient}
+                            existingPatient={existingPatient}
+                            errors={errors}
+                            setErrors={setErrors}
                         />
                     </div>
-                    <PrescriptionForm 
-                        formFields={formFields} 
+                    <PrescriptionForm
+                        formFields={formFields}
                         setFormFields={setFormFields}
+                        errors={errors}
+                        setErrors={setErrors}
                     />
                     {/* <input
                         type="submit"
@@ -101,7 +166,7 @@ export default function create() {
                     /> */}
 
                     <div className="flex justify-center gap-2 mt-6 lg:justify-end">
-                        {isLoading ?
+                        {isLoading ? (
                             <Button
                                 appearance="primary"
                                 isDisabled={true}
@@ -109,7 +174,7 @@ export default function create() {
                             >
                                 Simpan
                             </Button>
-                            :
+                        ) : (
                             <Button
                                 isLoading={isLoading}
                                 appearance="primary"
@@ -117,10 +182,10 @@ export default function create() {
                             >
                                 Simpan
                             </Button>
-                        }
+                        )}
                     </div>
                 </form>
             </ContentLayout>
         </Layout>
-    )
-};
+    );
+}

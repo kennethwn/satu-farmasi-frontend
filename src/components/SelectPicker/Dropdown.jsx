@@ -71,12 +71,6 @@ export default function Dropdown({
                     <Text type="danger">{error}</Text>
                 }
             </div>
-            {
-                error &&
-                    <div style={{ minHeight: '22px' }}>
-                            <Text type="danger">{error}</Text>
-                    </div>
-            }
         </>
         // <div className="block w-full rounded-full px-4 border py-1.5 text-dark border-dark placeholder:text-gray-400 sm:text-base sm:leading-6 ">
         // </div>
