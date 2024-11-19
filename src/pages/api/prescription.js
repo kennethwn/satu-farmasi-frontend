@@ -5,36 +5,14 @@ import { useState } from 'react';
 export default function usePrescription() {
     const [isLoading, setIsLoading] = useState(false);
 
-    const getAllPrescription = async (patientName, limit, page) => {
+    const getAllPrescription = async (patientName, limit, page, filterStatus) => {
         setIsLoading(true)
         try {
-            let response
-            
-            if (patientName !== "") {
-                response = await api.get(`/api/v1/prescriptions?name=${patientName}&limit=${limit}&page=${page}`)
-                .then((response) => {
-                    setIsLoading(false)
-                    return response;
-                })
-                .catch((error) => {
-                    setIsLoading(false)
-                    return error;
-                })
-            } else {
-                response = await api.get(`/api/v1/prescriptions?limit=${limit}&page=${page}`)
-                .then((response) => {
-                    setIsLoading(false)
-                    return response;
-                })
-                .catch((error) => {
-                    setIsLoading(false)
-                    return error;
-                })
-            }
-            
-            return response 
+            return await api.get(`/api/v1/prescriptions?name=${patientName}&status=${filterStatus}&limit=${limit}&page=${page}`)
         } catch (error) {
-            return error;
+            throw error.response.data.errors
+        } finally {
+            setIsLoading(false)
         }
     }
 
@@ -63,18 +41,11 @@ export default function usePrescription() {
     const addNewPrescription = async (data) => {
         setIsLoading(true)
         try {
-            const response = await api.post('/api/v1/prescriptions', {data})
-            .then((response) => {
-                setIsLoading(false);
-                return response;
-            })
-            .catch((error) => {
-                setIsLoading(false);
-                return error;
-            })
-            return response
+            return  await api.post('/api/v1/prescriptions', {data})
         } catch (error) {
-            console.error(error);
+            throw error.response.data.errors
+        } finally {
+            setIsLoading(false)
         }
     }
 
@@ -99,18 +70,11 @@ export default function usePrescription() {
     const updatePrescription = async (data) => {
         setIsLoading(true)
         try {
-            const response = await api.put('/api/v1/prescriptions', {data})
-            .then((response) => {
-                setIsLoading(false);
-                return response;
-            })
-            .catch((error) => {
-                setIsLoading(false);
-                return error;
-            })
-            return response;
+            return await api.put('/api/v1/prescriptions', {data})
         } catch (error) {
-            console.error(error);
+            throw error.response.data.errors
+        } finally {
+            setIsLoading(false)
         }
     }
 

@@ -9,9 +9,10 @@ import useTransaction from "@/pages/api/transaction/transaction";
 import { toast } from "react-toastify";
 import prescriptionStatusMapped from "@/helpers/prescriptionStatusMap";
 import Toaster from "./Toaster";
+import { formatRupiah } from "@/helpers/currency";
 
 export default function TransactionDetail(props) {
-    const { transactionId, openModal, setOpenModal } = props
+    const { statusUpdated, transactionId, openModal, setOpenModal } = props
     const { Header, Body, Footer } = Modal;
     const router = useRouter();
     const prescriptionStatusMap = prescriptionStatusMapped
@@ -104,6 +105,12 @@ export default function TransactionDetail(props) {
         console.log("transactionData: ", transactionData)
     }, [transactionData])
 
+    useEffect(() => {
+        if (transactionId === statusUpdated.transactionId) {
+            transactionData.prescription.status = statusUpdated.status
+        }
+    }, [statusUpdated])
+
     return (
         <Modal
             backdrop="static"
@@ -119,10 +126,10 @@ export default function TransactionDetail(props) {
                     <Grid className="w-full pt-0">
                         <Row>
                             <Col xs={4}>
-                                <p>Nama Pasien : </p>
+                                <p>Nama Pasien </p>
                             </Col>
                             <Col xs={4}>
-                                <p>{transactionData.prescription.patient.name}</p>
+                                <p>: {transactionData.prescription.patient.name}</p>
                             </Col>
                             <Col xs={10}>
                             </Col>
@@ -136,18 +143,18 @@ export default function TransactionDetail(props) {
                         </Row>
                         <Row>
                             <Col xs={4}>
-                                <p>Nama Apoteker : </p>
+                                <p>Nama Apoteker</p>
                             </Col>
                             <Col xs={4}>
-                                <p>{transactionData.pharmacist.firstName + " " + transactionData.pharmacist.lastName}</p>
+                                <p>: {transactionData.pharmacist.firstName + " " + transactionData.pharmacist.lastName}</p>
                             </Col>
                         </Row>
                         <Row>
                             <Col xs={4}>
-                                <p>Total Harga : </p>
+                                <p>Total Harga</p>
                             </Col>
                             <Col xs={4}>
-                                <p>{transactionData.totalPrice}</p>
+                                <p>: {formatRupiah(transactionData.totalPrice)}</p>
                             </Col>
                         </Row>
                     </Grid>
