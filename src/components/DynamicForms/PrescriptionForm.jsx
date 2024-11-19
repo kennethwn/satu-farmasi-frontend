@@ -133,7 +133,7 @@ function PrescriptionForm(props) {
         formFields.map((formField, index) => (
           <div className="flex flex-col gap-2">
             <div key={index} className="grid grid-cols-1 w-full lg:grid-cols-10 gap-4 mb-2">
-              <div className="flex lg:flex-col w-3/4">
+              <div className="flex lg:flex-col lg:w-3/4 w-full">
                 {index == formFields.length - 1 && (
                   <Button size="small" onClick={(e) => handleAddFormFieldRow()}>
                     <IoIosAdd size={"1.6rem"} />

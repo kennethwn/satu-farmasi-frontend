@@ -49,8 +49,6 @@ export default function Dropdown({
         else removeClass('error-field');
     }, [error])
 
-    if (label) className.push('my-2 container-select');
-
     return (
         <>
             {label && <Label id={id} label={label} />}
@@ -61,7 +59,7 @@ export default function Dropdown({
                     preventOverflow={false}
                     placeholder={placeholder}
                     onChange={onChange}
-                    className={className}
+                    className={`${className} pb-2`}
                     defaultValue={defaultValue}
                     value={value}
                     placement={placement}

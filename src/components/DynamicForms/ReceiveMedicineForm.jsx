@@ -1,11 +1,9 @@
-import React, { useEffect, useState } from "react";
+import React, { useEffect } from "react";
 import Dropdown from "../SelectPicker/Dropdown";
 import InputField from "../Input";
 import MedicineClassificationForm from "@/components/DynamicForms/MedicineClassificationForm";
 import { DatePicker, Radio, RadioGroup } from "rsuite";
-import PropTypes, { object } from "prop-types";
-import formatDate from "@/helpers/dayHelper";
-import Input from "../Input";
+import propTypes, { object } from "prop-types";
 
 const ReceiveMedicineForm = (props) => {
     const {
@@ -42,15 +40,6 @@ const ReceiveMedicineForm = (props) => {
         { id: 4, label: 'PAYPAL', value: 'PAYPAL'},
         { id: 5, label: 'CASH', value: 'CASH'},
     ]
-
-    const renderMedicineLabel = (label, expDate) => {
-        return (
-            <div className="flex flex-col w-full">
-                <span>{label}</span>
-                <span className="text-gray-500">{formatDate(expDate)}</span>
-            </div>
-        )
-    }
 
     useEffect(() => {
         console.log("debug: ", (dataMedicines?.find(item => item.id == input?.medicineId)?.classifications)?.map(item => ({ id: item.classification.id, label: item.classification.label, value: item.classification.value })))
@@ -849,7 +838,7 @@ const ReceiveMedicineForm = (props) => {
                     }
                 </div>
             </div>
-            {/* TODO: isPaid Checkbox */}
+            {/* isPaid Checkbox */}
             <div className="sm:col-span-6">
                 <label htmlFor="isPaid" className="block text-body font-medium leading-6 text-dark">
                     Status Pembayaran
@@ -887,17 +876,19 @@ const ReceiveMedicineForm = (props) => {
 
 export default ReceiveMedicineForm;
 
-ReceiveMedicineForm.PropTypes = {
-    isLoading: PropTypes.bool,
-    setInput: PropTypes.func,
-    input: PropTypes.object,
-    errors: PropTypes.object,
-    setErrors: PropTypes.func,
-    dataGenerics: PropTypes.array,
-    dataPackagings: PropTypes.array,
-    dataClassifications: PropTypes.array,
-    formFields: PropTypes.arrayOf(object),
-    setFormFields: PropTypes.func,
-    unitOfMeasure: PropTypes.arrayOf(object),
-    existingMedicine: PropTypes.bool
+ReceiveMedicineForm.propTypes = {
+    isLoading: propTypes.bool,
+    setInput: propTypes.func,
+    input: propTypes.object,
+    errors: propTypes.object,
+    setErrors: propTypes.func,
+    dataGenerics: propTypes.array,
+    dataPackagings: propTypes.array,
+    dataClassifications: propTypes.array,
+    dataMedicines: propTypes.array,
+    dataVendors: propTypes.array,
+    formFields: propTypes.arrayOf(object),
+    setFormFields: propTypes.func,
+    unitOfMeasure: propTypes.arrayOf(object),
+    existingMedicine: propTypes.bool
 }
