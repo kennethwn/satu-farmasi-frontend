@@ -11,6 +11,7 @@ import propTypes from 'prop-types';
 import { useRouter } from 'next/router';
 import useUser from '@/pages/api/user';
 import Toaster from "@/components/Modal/Toaster";
+import Image from 'next/image';
 
 export default function Layout(props) {
     const {
@@ -218,7 +219,7 @@ export default function Layout(props) {
                     {expand ?
                         <React.Fragment>
                             <div className='flex flex-row items-center justify-between gap-2 py-2'>
-                                <img src={user?.icon || "https://i.pravatar.cc/300"} alt="Profile" className='rounded-full w-7 h-7' />
+                                <Image width={7} height={7} src={user?.icon || "https://i.pravatar.cc/300"} alt="Profile" className='rounded-full w-7 h-7' />
                                 <span className='text-sm font-semibold text-dark'>{user?.name || "Kenneth William N"}</span>
                             </div>
                             <div className='px-[18px] overflow-hidden w-full whitespace-nowrap'>
@@ -226,7 +227,7 @@ export default function Layout(props) {
                             </div>
                         </React.Fragment>
                         :
-                        <img src="https://i.pravatar.cc/300" alt="Profile" className='rounded-full w-7 h-7' />
+                        <Image src="https://i.pravatar.cc/300" alt="Profile" className='rounded-full w-7 h-7' width={7} height={7} />
                     }
                 </div>
                 <div className='bg-background-sidebar'>
