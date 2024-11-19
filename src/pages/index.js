@@ -9,6 +9,10 @@ import getDataCard from "@/data/dashboard";
 import useMedicineAPI from "./api/master/medicine";
 import { useRouter } from "next/router";
 import { Button } from "rsuite";
+import useTransaction from "./api/transaction/transaction";
+import usePrescription from "./api/prescription";
+import { formatRupiah } from "@/helpers/currency";
+import getFirstAndLastDateOfMonth from "@/data/date";
 
 export default function Home() {
   const { getTotalPatient } = usePatientAPI();
