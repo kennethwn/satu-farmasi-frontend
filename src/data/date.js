@@ -12,3 +12,14 @@ export const month = [
     {id: 11, label: 'November'},
     {id: 12, label: 'December'}, 
 ];
+
+export default function getFirstAndLastDateOfMonth(monthId) {
+    const year = new Date().getFullYear();
+    const firstDate = new Date(year, monthId-1, 2);
+    const lastDate = new Date(year, monthId, 1);
+
+    return {
+        firstDate,
+        lastDate
+    };
+}

@@ -14,6 +14,7 @@ export default function Chart({
     monthPicker = false,
     className = "",
     report,
+    setCurrentMonth,
     ...props
 }) {
 
@@ -31,19 +32,26 @@ export default function Chart({
 
     return (
         <Panel {...props} className={`overflow-auto ${className}`} bordered shaded>
-            <div className="w-full gap-y-8 max-lg:min-h-28 flex flex-col items-start justify-between">
-                <div className="flex flex-row w-full justify-between">
+            <div className="w-full gap-y-8 max-lg:min-h-28 flex flex-col">
+                <div className="flex flex-row w-full justify-between items-start">
                     <span className="font-bold w-full text-2xl">{title}</span>
                     {monthPicker && 
                         <Dropdown 
                             value={curMonth}
                             data={month?.map(item => ({label: item.label, value: item.id}))}
-                            onChange={value => setCurMonth(value)}
+                            onChange={value => {
+                                setCurMonth(value);
+                                console.log("monthid: ", value)
+                                setCurrentMonth(value);
+                            }}
                         />
                     }
                 </div>
-                <div className="w-full">
-                    <ApexChart type={options?.chart?.type} options={options} series={series} height={300} width="100%" />
+                <div className="w-full justify-center items-center h-full">
+                    {series.length > 0 ? 
+                        <ApexChart type={options?.chart?.type} options={options} series={series} height={300} width="100%" />
+                        : <div className="text-center">no data</div>
+                    }
                 </div>
             </div>
         </Panel>
@@ -58,4 +66,5 @@ Chart.propTypes = {
     series: propTypes.array,
     className: propTypes.string,
     report: propTypes.node,
+    setCurrentMonth: propTypes.func,
 }
