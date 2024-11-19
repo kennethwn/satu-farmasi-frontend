@@ -52,25 +52,30 @@ export default function Layout(props) {
         let firstIconName = typeof icon === "string" ? icon.split("-")[0] : null;
         switch (firstIconName) {
             case "dashboard":
-                return <DashboardIcon size="1.2em" style={{ ...iconStyle, color }} />;
+                return <DashboardIcon size="1.2em" style={{ ...iconStyle, color: color }} />;
             case "diagnose":
-                return <PrescribeIcon stroke={color} style={{ ...iconStyle, color }} />;
+                return <PrescribeIcon stroke={color} style={{ ...iconStyle, color: color }} />;
             case "prescription":
-                return <PrescribeIcon stroke={color} style={{ ...iconStyle, color }} />;
+                return <PrescribeIcon stroke={color} style={{ ...iconStyle, color: color }} />;
             case "transaction":
-                return <TransactionIcon size="1.2em" style={{ ...iconStyle, color }} />;
+                return <TransactionIcon size="1.2em" style={{ ...iconStyle, color: color }} />;
             case "report":
-                return <ReportIcon size="1.2em" style={{ ...iconStyle, color }} />;
+                return <ReportIcon size="1.2em" style={{ ...iconStyle, color: color }} />;
             case "master":
-                return <GroupIcon size="1.2em" style={{ ...iconStyle, color }} />;
+                return <GroupIcon size="1.2em" style={{ ...iconStyle, color: color }} />;
             default:
                 return null;
         }
     };
 
-    const renderTitle = (title, isActive) => {
-        const color = isActive ? '#659BB0' : '#333333';
-        return <span style={{ color }}>{title}</span>;
+    const renderTitle = (title, type, isActive) => {
+        let color = ""
+        if (isActive) {
+            color = '#659BB0';
+        } else if (expand || type === 'child') {
+            color = '#333333';
+        }
+        return <span style={{ color: color }}>{title}</span>;
     }
 
     return (
@@ -103,7 +108,7 @@ export default function Layout(props) {
                                     setActiveKey("dashboard");
                                 }}
                             >
-                                {renderTitle("Dashboard", activeKey === "dashboard")}
+                                {renderTitle("Dashboard", "parent",  activeKey === "dashboard")}
                             </Nav.Item>
                             {userRole === 'doctor' &&
                                 <Nav.Item
@@ -113,7 +118,7 @@ export default function Layout(props) {
                                         router.push("/diagnose", undefined, { shallow: true });
                                         setActiveKey("diagnose");
                                     }}
-                                >{renderTitle("Diagnosis", activeKey === "diagnose")}</Nav.Item>
+                                >{renderTitle("Diagnosis", "parent", activeKey === "diagnose")}</Nav.Item>
                             }
                             {(userRole === 'pharmacist' ) &&
                                 <Nav.Item
@@ -123,7 +128,7 @@ export default function Layout(props) {
                                         router.push("/prescription", undefined, { shallow: true });
                                         setActiveKey("prescription");
                                     }}
-                                >{renderTitle("Resep", activeKey === "prescription")}</Nav.Item>
+                                >{renderTitle("Resep", "parent", activeKey === "prescription")}</Nav.Item>
                             }
                             {userRole === 'pharmacist' &&
                                 <Nav.Menu
@@ -160,21 +165,21 @@ export default function Layout(props) {
                                             setActiveKey("transaction-dashboard");
                                         }}
                                         eventKey="transaction-dashboard"
-                                    >{renderTitle("Riwayat Transaksi", activeKey === "transaction-dashboard")}</Nav.Item>
+                                    >{renderTitle("Riwayat Transaksi", "child", activeKey === "transaction-dashboard")}</Nav.Item>
                                     <Nav.Item
                                         onClick={() => {
                                             router.push("/transaction/receive", undefined, { shallow: true });
                                             setActiveKey("transaction-receive");
                                         }}
                                         eventKey="transaction-receive"
-                                    >{renderTitle("Penerimaan Obat", activeKey === "transaction-receive")}</Nav.Item>
+                                    >{renderTitle("Penerimaan Obat", "child", activeKey === "transaction-receive")}</Nav.Item>
                                     <Nav.Item
                                         onClick={() => {
                                             router.push("/transaction/expense", undefined, { shallow: true });
                                             setActiveKey("transaction-expense");
                                         }}
                                         eventKey="transaction-expense"
-                                    >{renderTitle("Pengeluaran Obat", activeKey === "transaction-expense")}</Nav.Item>
+                                    >{renderTitle("Pengeluaran Obat", "child", activeKey === "transaction-expense")}</Nav.Item>
                                 </Nav.Menu>
                             }
                             {(userRole === 'pharmacist' || userRole === 'admin') &&
@@ -194,14 +199,14 @@ export default function Layout(props) {
                                     placement="rightStart"
                                 >
                                     {userRole === 'admin'
-                                        ? <Nav.Item onClick={() => { setActiveKey("master-staff"); router.push("/master/staff", undefined, { shallow: true }) }} eventKey="master-staff">{renderTitle("Staf", activeKey === "master-staff")}</Nav.Item>
+                                        ? <Nav.Item onClick={() => { setActiveKey("master-staff"); router.push("/master/staff", undefined, { shallow: true }) }} eventKey="master-staff">{renderTitle("Staf", "parent", activeKey === "master-staff")}</Nav.Item>
                                         :
                                         <>
-                                            <Nav.Item onClick={() => { setActiveKey("master-medicine"); router.push("/master/medicine", undefined, { shallow: true }) }} eventKey="master-medicine">{renderTitle("Obat", activeKey === "master-medicine")}</Nav.Item>
-                                            <Nav.Item onClick={() => { setActiveKey("master-vendor"); router.push("/master/vendor", undefined, { shallow: true }) }} eventKey="master-vendor">{renderTitle("Vendor", activeKey === "master-vendor")}</Nav.Item>
-                                            <Nav.Item onClick={() => { setActiveKey("master-packaging"); router.push("/master/packaging", undefined, { shallow: true }) }} eventKey="master-packaging">{renderTitle("Kemasan", activeKey === "master-packaging")}</Nav.Item>
-                                            <Nav.Item onClick={() => { setActiveKey("master-generic"); router.push("/master/generic", undefined, { shallow: true }) }} eventKey="master-generic">{renderTitle("Generik Obat", activeKey === "master-generic")}</Nav.Item>
-                                            <Nav.Item onClick={() => { setActiveKey("master-classification"); router.push("/master/classification", undefined, { shallow: true }) }} eventKey="master-classification">{renderTitle("Klasifikasi Obat", activeKey === "master-classification")}</Nav.Item>
+                                            <Nav.Item onClick={() => { setActiveKey("master-medicine"); router.push("/master/medicine", undefined, { shallow: true }) }} eventKey="master-medicine">{renderTitle("Obat", "child", activeKey === "master-medicine")}</Nav.Item>
+                                            <Nav.Item onClick={() => { setActiveKey("master-vendor"); router.push("/master/vendor", undefined, { shallow: true }) }} eventKey="master-vendor">{renderTitle("Vendor", "child", activeKey === "master-vendor")}</Nav.Item>
+                                            <Nav.Item onClick={() => { setActiveKey("master-packaging"); router.push("/master/packaging", undefined, { shallow: true }) }} eventKey="master-packaging">{renderTitle("Kemasan", "child", activeKey === "master-packaging")}</Nav.Item>
+                                            <Nav.Item onClick={() => { setActiveKey("master-generic"); router.push("/master/generic", undefined, { shallow: true }) }} eventKey="master-generic">{renderTitle("Generik Obat", "child", activeKey === "master-generic")}</Nav.Item>
+                                            <Nav.Item onClick={() => { setActiveKey("master-classification"); router.push("/master/classification", undefined, { shallow: true }) }} eventKey="master-classification">{renderTitle("Klasifikasi Obat", "child", activeKey === "master-classification")}</Nav.Item>
                                         </>
                                     }
                                 </Nav.Menu>

@@ -14,7 +14,7 @@ import { Pagination, SelectPicker, Table } from "rsuite";
 import { toast } from "react-toastify";
 import formatCalendar from "@/helpers/dayHelper";
 
-export default function index() {
+export default function Index() {
     const { user } = useUserContext();
     const { HeaderCell, Cell, Column } = Table;
     const { isLoading, GetAllMedicine, GetMedicineByParams, DeleteMedicine } = useExpenseMedicineAPI();

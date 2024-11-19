@@ -1,7 +1,7 @@
 import { useState } from "react";
 import axios from "@/configs/axios/satufarmasi-service-axios";
 
-export default function useClassifiVendorAPI() {
+export default function useVendorAPI() {
     const [isLoading, setIsLoading] = useState(false);
 
     const GetAllVendor = async (page, limit) => {
@@ -32,6 +32,17 @@ export default function useClassifiVendorAPI() {
         setIsLoading(true);
         try {
             return await axios.get(`/api/v1/vendors?label=${label}`);
+        } catch (error) {
+            console.error(error);
+        } finally {
+            setIsLoading(false);
+        }
+    };
+
+    const GetAllActiveVendor = async () => {
+        setIsLoading(true);
+        try {
+            return await axios.get(`/api/v1/vendors/active`);
         } catch (error) {
             console.error(error);
         } finally {
@@ -80,6 +91,7 @@ export default function useClassifiVendorAPI() {
         GetAllVendor,
         GetVendorById,
         GetVendorByLabel,
+        GetAllActiveVendor,
         CreateVendor,
         EditVendor,
         DeleteVendor,

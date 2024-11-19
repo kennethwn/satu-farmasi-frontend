@@ -4,6 +4,24 @@ import { useState } from "react";
 export default function useMedicineAPI() {
     const [isLoading, setIsLoading] = useState(false);
 
+    const GetMedicineDropdownList = async () => {
+        setIsLoading(true);
+        try {
+            const response = await axios.get(`/api/v1/medicines/dropdownOptions`)
+            .then((response) => {
+                setIsLoading(false);
+                return response;
+            })
+            .catch((error) => {
+                setIsLoading(false);
+                return error;
+            })
+            return response
+        } catch (error) {
+            console.error(error);
+        }
+    }
+
     const GetAllMedicines = async (page, limit) => {
         setIsLoading(true)
         try {
@@ -177,6 +195,7 @@ export default function useMedicineAPI() {
 
     return {
         isLoading,
+        GetMedicineDropdownList,
         GetAllMedicines,
         GetTotalMedicine,
         GetTotalNeedToRestockMedicine,

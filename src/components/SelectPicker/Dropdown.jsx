@@ -48,8 +48,6 @@ export default function Dropdown({
         else removeClass('error-field');
     }, [error])
 
-    if (label) classNames.push('my-2 container-select');
-
     return (
         <>
             {label && <Label id={id} label={label} />}
@@ -57,9 +55,10 @@ export default function Dropdown({
                 <SelectPicker
                     container={() => containerRef.current}
                     preventOverflow={true}
+                    menuMaxHeight={100}
                     placeholder={placeholder}
                     onChange={onChange}
-                    className={className}
+                    className={`${className} pb-2`}
                     defaultValue={defaultValue}
                     value={value}
                     placement={placement}
