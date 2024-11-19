@@ -4,14 +4,14 @@ import Layout from "@/components/Layouts";
 import ContentLayout from "@/components/Layouts/Content";
 import { useRouter } from "next/router";
 import { useEffect, useState } from "react";
-import { toast, ToastContainer } from "react-toastify";
-import { Loader } from "rsuite";
+import { toast } from "react-toastify";
 import { z, ZodError } from "zod";
 import useExpenseMedicineAPI from "@/pages/api/transaction/expenseMedicine";
 import Dropdown from "@/components/SelectPicker/Dropdown";
 import { isRequiredNumber, isRequiredString } from "@/helpers/validation";
 import useMedicineDropdownOption from "@/pages/api/medicineDropdownOption";
 import { useUserContext } from "@/pages/api/context/UserContext";
+import { ErrorForm } from "@/helpers/errorForm";
 
 const medicineSchema = z.object({
     medicineId: isRequiredNumber(),
@@ -43,13 +43,19 @@ const createExpenseMedicineField = [
 export default function Index() {
     const router = useRouter();
     const { user } = useUserContext();
-    const { isLoading, CreateMedicine } = useExpenseMedicineAPI();
+    const { isLoading, CreateMedicine, GetMedicineById } = useExpenseMedicineAPI();
     const { getMedicineDropdownOptions } = useMedicineDropdownOption();
     const [medicineDropdownOptions, setMedicineDropdownOptions] = useState([])
+    const [currStockMedicine, setCurrStockMedicine] = useState(0);
+    const [data, setData] = useState([]);
     const [formData, setFormData] = useState({
         medicineId: 0,
         quantity: 0,
         reasonOfDispose: "",
+        oldQuantity: 0,
+        medicine: {
+            currstock: null,
+        }
     });
     const [errors, setErrors] = useState({});
 
@@ -65,7 +71,6 @@ export default function Index() {
                     position: "top-right",
                 });
             toast.success(res.message, { autoClose: 2000, position: "top-right" });
-            console.log("res", res.message)
             setTimeout(() => {
                 router.push("/transaction/expense");
             }, 2000)
@@ -79,9 +84,18 @@ export default function Index() {
                     }
                 });
                 setErrors(newErrors);
+            } else {
+                ErrorForm(error, setErrors, false);
             }
         }
     };
+
+    const reasonOfDisposeListData = ["Broken", "Lost", "Expired"].map(item => ({ label: item, value: item.toUpperCase() }));
+
+    useEffect(() => {
+        setData(Object.entries(medicineDropdownOptions)
+            .map(([key, item]) => ({ label: item.name, value: key, })));
+    }, [medicineDropdownOptions])
 
     useEffect(() => {
         async function fetchMedicineDropdownOptionsData() {
@@ -100,10 +114,41 @@ export default function Index() {
             setFormData({ ...formData, [name]: name === "medicineId" ? parseInt(e) : e });
             setErrors((prevErrors) => ({ ...prevErrors, [name]: "" }));
         } else {
-            setFormData({ ...formData, [e.target.name]: Number(e.target.value) });
+            setFormData({ ...formData, [e.target.name]: parseInt(e.target.value) });
             setErrors((prevErrors) => ({ ...prevErrors, [e.target.name]: "" }));
         }
     };
+
+    const handleFetchCurrentMedicineStock = async () => {
+        try {
+            const currMedicineId = formData.medicineId;
+            const res = await GetMedicineById(currMedicineId);
+            if (res.code !== 200)
+                return toast.error(res.message, {
+                    autoClose: 2000,
+                    position: "top-right",
+                });
+            setFormData({
+                ...formData,
+                medicine: {
+                    currstock: res.data.currStock
+                }
+            })
+            if (res.data.quantity === 0) {
+                const newErrors = { ...errors };
+                newErrors["currStock"] = "Current Medicine Stock is empty";
+                setErrors(newErrors);
+            }
+        } catch (error) {
+            console.error(error);
+        }
+    }
+
+    useEffect(() => {
+        if (formData.medicineId !== 0) {
+            handleFetchCurrentMedicineStock();
+        }
+    }, [formData.medicineId])
 
     return (
         <Layout active="master-expense-medicine" user={user}>
@@ -144,14 +189,27 @@ export default function Index() {
                                     }
                                     {
                                         input.name == "quantity" &&
-                                        <Input
-                                            label={input.label}
-                                            type={input.type}
-                                            name={input.name}
-                                            onChange={e => inputOnChangeHandler(e, input.name)}
-                                            placeholder={input.placeholder}
-                                            error={errors[input.name]}
-                                        />
+                                        (
+                                            <div class="flex gap-x-5">
+                                                <Input
+                                                    label={"jumlah Obat keluar"}
+                                                    type={"number"}
+                                                    name={"quantity"}
+                                                    onChange={e => inputOnChangeHandler(e, input.name)}
+                                                    placeholder={0}
+                                                    error={errors["quantity"]}
+                                                />
+                                                <Input
+                                                    label={"Stock Obat Sekarang"}
+                                                    type={"number"}
+                                                    name={"currstock"}
+                                                    value={formData.medicine.currstock}
+                                                    error={errors["currStock"]}
+                                                    disabled={true}
+                                                    placeholder={0}
+                                                />
+                                            </div>
+                                        )
                                     }
                                 </div>
                             );
@@ -159,25 +217,17 @@ export default function Index() {
                     </div>
 
                     <div className="flex justify-center gap-2 my-6 lg:justify-end">
-                        {isLoading ? (
-                            <Button
-                                appearance="primary"
-                                isDisabled={true}
-                                isLoading={isLoading}
-                            >
-                                Simpan
-                            </Button>
-                        ) : (
-                            <Button appearance="primary" type="submit">
-                                Simpan
-                            </Button>
-                        )}
+                        <Button
+                            appearance="primary"
+                            type="submit"
+                            isDisabled={isLoading}
+                            isLoading={isLoading}
+                        >
+                            Simpan
+                        </Button>
                     </div>
                 </form>
             </ContentLayout>
-
-            <ToastContainer />
-            {isLoading && <Loader />}
         </Layout>
     );
 }

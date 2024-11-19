@@ -175,4 +175,4 @@ function PatientForm(props) {
     );
 }
 
-export default PatientForm;
+export default PatientForm

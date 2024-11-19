@@ -75,7 +75,7 @@ export default function index() {
         e.preventDefault()
         try {
             let data = {
-                doctorId : -1,
+                doctorId : 1,
                 title : "",
                 description : "",
                 prescription : {
@@ -102,7 +102,7 @@ export default function index() {
             const temp = [...formFields]
             console.log(temp)
             temp.map(item => data.prescription.medicineList.push({
-                medicineId: item.medicineId,
+                medicineId: parseInt(item.medicineId),
                 quantity: parseInt(item.quantity),
                 instruction: item.instruction,
                 price: item.totalPrice,

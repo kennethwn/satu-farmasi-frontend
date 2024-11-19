@@ -119,7 +119,7 @@ export default function Layout(props) {
                                     }}
                                 >{renderTitle("Diagnosis", "parent", activeKey === "diagnose")}</Nav.Item>
                             }
-                            {(userRole === 'pharmacist' || userRole === 'doctor') &&
+                            {(userRole === 'pharmacist' ) &&
                                 <Nav.Item
                                     eventKey="prescription"
                                     icon={renderIcon("prescription", activeKey === "prescription")}
@@ -128,6 +128,25 @@ export default function Layout(props) {
                                         setActiveKey("prescription");
                                     }}
                                 >{renderTitle("Resep", "parent", activeKey === "prescription")}</Nav.Item>
+                            }
+                            {userRole === 'pharmacist' &&
+                                <Nav.Menu
+                                    eventKey="report"
+                                    trigger="hover"
+                                    title="Laporan"
+                                    icon={renderIcon("report", activeKey === "report-dashboard"
+                                        || activeKey === "report-receive" 
+                                        || activeKey === "report-expense")}
+                                    placement="rightStart"
+                                >
+                                    <Nav.Item
+                                        onClick={() => {
+                                            router.push("/report/medicine", undefined, { shallow: true });
+                                            setActiveKey("report-dashboard");
+                                        }}
+                                        eventKey="report-dashboard"
+                                    >{renderTitle("Laporan Obat", activeKey === "report-dashboard")}</Nav.Item>
+                                </Nav.Menu>
                             }
                             {userRole === 'pharmacist' &&
                                 <Nav.Menu

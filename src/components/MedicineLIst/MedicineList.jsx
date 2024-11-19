@@ -4,7 +4,7 @@ import { useState } from "react";
 import { formatRupiah } from "@/helpers/currency";
 
 export default function MedicineList(props) {
-    const {medicineList} = props;
+    const { medicineList } = props;
     const [filter, setFilter] = useState('');
     const [search, setSearch] = useState('');
     const [searchResult, setSearchResult] = useState([])
@@ -20,28 +20,28 @@ export default function MedicineList(props) {
             const end = start + limit;
             return index >= start && index < end
         })
-        .sort((a, b) => {
-            if (sortColumn && sortType) {
-                let x = a[sortColumn]?.toString();
-                let y = b[sortColumn]?.toString();
-                return sortType === 'asc' ? x.localeCompare(y) : y.localeCompare(x);
-            }
-        })
+            .sort((a, b) => {
+                if (sortColumn && sortType) {
+                    let x = a[sortColumn]?.toString();
+                    let y = b[sortColumn]?.toString();
+                    return sortType === 'asc' ? x.localeCompare(y) : y.localeCompare(x);
+                }
+            })
 
         if (filter) {
             data = data.filter((value) => value.status === filter);
         }
-        
+
         return data;
     }
 
-    return(<div className="flex flex-col gap-4">
+    return (<div className="flex flex-col gap-4">
         <Table
             data={getData()}
             bordered
             cellBordered
             shouldUpdateScroll={false}
-            autoHeight
+            autoHeight={true}
             wordWrap="break-word"
             // height={400}
             affixHorizontalScrollbar
@@ -74,7 +74,7 @@ export default function MedicineList(props) {
 
             <Column flexGrow={1}>
                 <HeaderCell className="text-dark">Jumlah</HeaderCell>
-                <Cell dataKey='quantity'/>
+                <Cell dataKey='quantity' />
             </Column>
 
             <Column flexGrow={2}>
@@ -96,6 +96,6 @@ export default function MedicineList(props) {
                 <Cell dataKey='instruction'/>
             </Column> */}
         </Table>
-      </div>
+    </div>
     )
 };

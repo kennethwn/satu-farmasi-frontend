@@ -9,12 +9,13 @@ export default function useUser() {
     const { user, setUser } = useUserContext();
 
     const getUser = async (data) => {
-        const { email, password } = data;
+        const { email, password, isRemember } = data;
 
         try {
             const response = await api.post("/api/v1/users/", {
                 email,
                 password,
+                isRemember,
             });
             setUser(response);
             const fullName = response.data.firstName + " " + response.data.lastName;

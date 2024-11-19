@@ -53,7 +53,6 @@ function PrescriptionForm(props) {
                 item.totalPrice = 0;
             }
         });
-
         setFormFields(temp);
     };
 
