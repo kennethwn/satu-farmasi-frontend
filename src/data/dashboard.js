@@ -28,7 +28,7 @@ export default function getDataCard(totalPatient, totalMedicine, totalProfit, to
             colorBackground: "red",
             icon: "stock",
             link: "/",
-            label: "Need to Retock",
+            label: "Need to Restock",
             value: totalRestock,
             status: "active"
         },
