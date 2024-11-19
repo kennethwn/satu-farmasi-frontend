@@ -31,7 +31,6 @@ export default function Dropdown({
 
     const addNewClass = (newClass) => {
         const selectPicker = containerRef.current?.querySelectorAll('.rs-picker-toggle');
-        console.log('selectPicker', selectPicker);
         selectPicker.forEach((element) => {
             element.classList.add(newClass);
         });
@@ -49,7 +48,7 @@ export default function Dropdown({
         else removeClass('error-field');
     }, [error])
 
-    if (label) className.push('my-2 container-select');
+    if (label) classNames.push('my-2 container-select');
 
     return (
         <>
@@ -57,20 +56,21 @@ export default function Dropdown({
             <div ref={containerRef} style={{ position: 'relative' }}>
                 <SelectPicker
                     container={() => containerRef.current}
-                    preventOverflow={false}
+                    preventOverflow={true}
                     placeholder={placeholder}
                     onChange={onChange}
                     className={className}
                     defaultValue={defaultValue}
                     value={value}
                     placement={placement}
+                    block
                     {...props}
                 />
-                {
-                    error &&
-                    <Text type="danger">{error}</Text>
-                }
             </div>
+            {
+                error &&
+                <Text className="my-2" type="danger">{error}</Text>
+            }
         </>
         // <div className="block w-full rounded-full px-4 border py-1.5 text-dark border-dark placeholder:text-gray-400 sm:text-base sm:leading-6 ">
         // </div>

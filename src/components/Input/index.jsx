@@ -90,7 +90,7 @@ export default function Input(props) {
             }
             {
                 error &&
-                <Text type="danger">{error}</Text>
+                <Text className="my-2" type="danger">{error}</Text>
             }
         </div>
     )
