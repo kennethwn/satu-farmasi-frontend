@@ -15,6 +15,7 @@ export default function PrescriptionDetail(props) {
     const { createTransaction, publishNotification } = useTransaction();
 
     const { getPrescriptionDetail } = usePrescription();
+    const [ finalized, setFinalized ] = useState(false)
     const [ prescriptionData, setPrescriptionsData ] = useState({
         id: -1,
         status: "",
@@ -118,6 +119,7 @@ export default function PrescriptionDetail(props) {
                 </div>
                 
                 <MedicineList 
+                    status = {prescriptionData?.status}
                     medicineList = {prescriptionData?.medicineList}
                 />
             </Body>

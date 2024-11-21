@@ -14,15 +14,15 @@ function PrescriptionForm(props) {
   const [medicineDropdownOptions, setMedicineDropdownOptions] = useState([]);
 
   const data = Object.entries(medicineDropdownOptions).map(([key, item]) => ({
-    label: item.name,
-    value: parseInt(key),
+    label: key + "-" + item.name,
+    value: key,
   }));
 
   useEffect(() => {
     async function fetchMedicineDropdownOptionsData(){
         try {
             const response = await getMedicineDropdownOptions()
-            setMedicineDropdownOptions(response)
+            setMedicineDropdownOptions(response.data)
         } catch (error) {
             console.log("error #getMedicineOptions")
         }
@@ -34,19 +34,24 @@ function PrescriptionForm(props) {
     console.log(formFields)
   }, [formFields])
 
-  const handleMedicineChange = (formFieldId, medicineId) => {
+  const handleMedicineChange = (formFieldId, code) => {
+    const checkIfStockIsInsufficient = (medicineDropdownOption, quantity) => {
+      return medicineDropdownOption.currStock - quantity < 0
+    }
+
     let updatedData = {
-      medicineId: medicineId,
-      medicineName: medicineDropdownOptions[medicineId].name,
+      code: code,
+      medicineName: medicineDropdownOptions[code]?.name,
       quantity: 0,
-      price: medicineDropdownOptions[medicineId].price,
+      price: medicineDropdownOptions[code]?.price,
       totalPrice: 0,
+      insufficientStock: checkIfStockIsInsufficient(medicineDropdownOptions[code], quantity)
     };
     let temp = [...formFields];
 
     temp.forEach((item, index) => {
       if (index === formFieldId) {
-        item.medicineId = updatedData.medicineId;
+        item.code = updatedData.code;
         item.medicineName = updatedData.medicineName;
         item.quantity = 0;
         item.price = updatedData.price;
@@ -59,7 +64,7 @@ function PrescriptionForm(props) {
 
   const handleAddFormFieldRow = () => {
     const newFormField = {
-      medicineId: -1,
+      code: "",
       medicineName: "",
       quantity: 0,
       price: 0,
@@ -71,25 +76,25 @@ function PrescriptionForm(props) {
   };
 
   const handleMedicineQuantity = (formFieldId, quantity) => {
-    const medicineId = formFields[formFieldId].medicineId;
+    const code = formFields[formFieldId].code;
     const checkIfStockIsInsufficient = (medicineDropdownOption, quantity) => {
-      return medicineDropdownOption.currStock - quantity < medicineDropdownOption.minStock
+      return medicineDropdownOption.currStock - quantity < 0
     }
 
     let updatedData = {
       id: formFieldId,
-      medicineId: medicineId,
-      medicineName: medicineDropdownOptions[medicineId].name,
+      code: code,
+      medicineName: medicineDropdownOptions[code] && medicineDropdownOptions[code].name,
       quantity: quantity,
-      price: medicineDropdownOptions[medicineId].price,
-      totalPrice: medicineDropdownOptions[medicineId].price * quantity,
-      insufficientStock: checkIfStockIsInsufficient(medicineDropdownOptions[medicineId], quantity)
+      price: medicineDropdownOptions[code] ? medicineDropdownOptions[code].price : 0,
+      totalPrice: medicineDropdownOptions[code] ? medicineDropdownOptions[code].price * quantity : 0,
+      insufficientStock: medicineDropdownOptions[code] && checkIfStockIsInsufficient(medicineDropdownOptions[code], quantity)
     };
     let temp = [...formFields];
 
     temp.forEach((item, index) => {
       if (index === formFieldId) {
-        item.medicineId = updatedData.medicineId;
+        item.code = updatedData.code;
         item.medicineName = updatedData.medicineName;
         item.quantity = updatedData.quantity;
         item.price = updatedData.price;
@@ -149,10 +154,9 @@ function PrescriptionForm(props) {
                   name="name"
                   data={data}
                   onChange={(value) => handleMedicineChange(index, value)}
-                  value={formField.medicineId}
-                  renderValue={formField.medicineId != -1 ? (value) => <div className="text-sm">{medicineDropdownOptions[value].name}</div> : null}
+                  value={formField.code}
+                  renderValue={formField.code != "" ? (value) => <div className="text-sm">{medicineDropdownOptions[value]?.name}</div> : null}
                   block
-                  style={{ }}
                   placement="bottomStart"
                   // cleanable={false}
                 />

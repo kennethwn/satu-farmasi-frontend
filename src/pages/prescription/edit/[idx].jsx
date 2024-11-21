@@ -16,7 +16,7 @@ export default function Page() {
 
     const [formFields, setFormFields] = useState([
         {   
-            medicineId: -1,
+            code: "",
             medicineName: "",
             quantity: 0,
             price: 0,
@@ -92,11 +92,11 @@ export default function Page() {
             let tempFormFields = []
             medicineList.map(medicineData => {
                 const tempMedicine = {
-                    medicineId: medicineData.medicine.id,
-                    medicineName: medicineData.medicine.name,
+                    code: medicineData.medicineCode,
+                    medicineName: medicineData.medicineName,
                     quantity: medicineData.quantity,
                     totalPrice: medicineData.totalPrice,
-                    price: medicineData.medicine.price,
+                    price: medicineData.totalPrice / medicineData.quantity,
                     instruction: medicineData.instruction
                 }
                 tempFormFields.push(tempMedicine)
@@ -117,7 +117,7 @@ export default function Page() {
             let data = {        
                 prescriptionId: -1,
                 medicineList : [{
-                    medicineId : -1,
+                    code : -1,
                     price: 0,
                     quantity : 0,
                     instruction: ""
@@ -129,7 +129,7 @@ export default function Page() {
             const temp = [...formFields]
             console.log(temp)
             temp.map(item => data.medicineList.push({
-                medicineId: item.medicineId,
+                code: item.code,
                 quantity: parseInt(item.quantity),
                 instruction: item.instruction,
                 price: item.totalPrice,

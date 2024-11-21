@@ -23,7 +23,7 @@ function PatientForm(props) {
         async function fetchPatientDropdownOptionsData(){
             try {
                 const response = await getPatientDropdownOptions()
-                setPatientDropdownOptions(response)
+                setPatientDropdownOptions(response.data)
             } catch (error) {
                 console.log("error #getPatientOptions")
             }

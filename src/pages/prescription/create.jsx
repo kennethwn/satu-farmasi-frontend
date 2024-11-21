@@ -18,7 +18,7 @@ export default function create() {
 
     const [formFields, setFormFields] = useState([
         {   
-            medicineId: -1,
+            code: "",
             medicineName: "",
             quantity: 0,
             price: 0,
@@ -46,7 +46,7 @@ export default function create() {
                     phoneNum: ""
                 },
                 medicineList : [{
-                    medicineId : -1,
+                    code: "",
                     price: 0,
                     quantity : 0,
                     instruction: ""
@@ -58,7 +58,7 @@ export default function create() {
             const temp = [...formFields]
             console.log(temp)
             temp.map(item => data.medicineList.push({
-                medicineId: parseInt(item.medicineId),
+                code: item.code,
                 quantity: parseInt(item.quantity),
                 instruction: item.instruction,
                 price: item.totalPrice,
@@ -67,8 +67,8 @@ export default function create() {
             console.log(data)
 
             const res = await addNewPrescription(data);
-            console.log(res)
-            if (res == undefined || res == null || res.status != 200 || res.code != 200) {
+            console.log("response create: ", res)
+            if (res == undefined || res == null || res.code != 200) {
                 toast.error(res.message, { autoClose: 2000, position: "top-center" });
                 return
             }
