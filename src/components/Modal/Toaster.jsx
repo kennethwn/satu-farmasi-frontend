@@ -10,6 +10,7 @@ export default function Toaster({
     btnText = 'Lanjutkan',
     onClick,
     isLoading,
+    btnAppearance = 'danger',
     ...props
 }) {
 
@@ -32,11 +33,11 @@ export default function Toaster({
                 return (
                     <div className="w-full flex flex-row items-center gap-4 justify-between">
                         <Button className="w-full" onClick={() => props.onClose()}>Batalkan</Button>
-                        <Button className="w-full" isLoading={isLoading} appearance="danger" onClick={() => onClick()}>{btnText}</Button>
+                        <Button className="w-full" isLoading={isLoading} appearance={btnAppearance} onClick={() => onClick()}>{btnText}</Button>
                     </div>
                 )
             default:
-                return <Button className="w-full">Lanjutkan</Button>
+                return <Button className="w-full" onClick={() => onClick()}>Lanjutkan</Button>
         }
     }
 

@@ -46,6 +46,7 @@ module.exports = {
         button: {
           primary: '#2F4852',
           danger: '#FEE9E8',
+          subtle: '#F4F5F7'
         },
         checkbox: {
           primary: '#3598FF'

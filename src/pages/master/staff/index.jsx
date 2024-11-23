@@ -85,6 +85,7 @@ export default function Index() {
                         label="Role"
                         data={roles.map((role) => ({ label: role, value: role }))}
                         value={filter}
+                        cleanable={false}
                         onChange={(value) => { setFilter(value); }}
                         onClean={() => { setFilter('DOCTOR'); }}
                     />

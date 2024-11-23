@@ -10,7 +10,8 @@ export default function Card(props) {
         icon,
         link,
         label,
-        value
+        value,
+        status
     } = props;
 
     const route = useRouter();
@@ -60,6 +61,7 @@ export default function Card(props) {
                     </div>
                     <div className="flex flex-col w-full justify-start items-start">
                         <span className="font-bold text-dark text-lg">{label}</span>
+                        { status && <span className="text-green-500">{status}</span> }
                         <span className="font-extrabold text-dark text-3xl">{value}</span>
                     </div>
                 </div>
@@ -78,4 +80,5 @@ Card.propTypes = {
     link: propTypes.string,
     label: propTypes.string,
     value: propTypes.number,
+    status: propTypes.string
 }

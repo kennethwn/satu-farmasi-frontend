@@ -10,13 +10,13 @@ export default function MedicineList(props) {
         console.log("getData: ", medicineList)
     }
 
-    return(<div className="flex flex-col gap-4">
+    return (<div className="flex flex-col gap-4">
         <Table
             data={medicineList}
             bordered
             cellBordered
             shouldUpdateScroll={false}
-            autoHeight
+            autoHeight={true}
             wordWrap="break-word"
             // height={400}
             affixHorizontalScrollbar
@@ -28,35 +28,38 @@ export default function MedicineList(props) {
                 </Cell>
             </Column>
 
-            <Column width={250} fullText resizable sortable>
+            <Column flexGrow={4} fullText>
                 <HeaderCell className="text-dark">Nama Obat</HeaderCell>
                 <Cell>
-                    {(rowData) => 
-                        <Grid>
-                            <Row>
-                                {status === "UNPROCESSED" ? rowData?.medicineName : rowData?.medicine?.name}
-                            </Row>
-                            <Row>
-                                {rowData.instruction}
-                            </Row>
-                        </Grid>
-                    }
+                    {(rowData) => {
+                        return (<div className="flex flex-col h-full">
+                            <p>{status === "UNPROCESSED" ? rowData?.medicineName : rowData?.medicine?.name} <br /> <span className="text-gray-500">{rowData.instruction}</span></p>
+                        </div>)
+                        // <Grid>
+                        //     <Row>
+                        //         {rowData.medicine.name}
+                        //     </Row>
+                        //     <Row className="text-gray-500">
+                        //         {rowData.instruction}
+                        //     </Row>
+                        // </Grid>
+                    }}
                 </Cell>
             </Column>
 
-            <Column width={75} resizable sortable>
+            <Column flexGrow={1}>
                 <HeaderCell className="text-dark">Jumlah</HeaderCell>
-                <Cell dataKey='quantity'/>
+                <Cell dataKey='quantity' />
             </Column>
 
-            <Column flexGrow={1} resizable sortable>
+            <Column flexGrow={2}>
                 <HeaderCell className="text-dark">Harga Per Obat (Rp.)</HeaderCell>
                 <Cell dataKey='medicine.price'>
                     {rowData => formatRupiah(rowData?.medicine?.price || rowData?.totalPrice/rowData?.quantity)}
                 </Cell>
             </Column>
 
-            <Column flexGrow={1} resizable sortable>
+            <Column flexGrow={2} fixed="right">
                 <HeaderCell className="text-dark">Total Sub Harga (Rp.)</HeaderCell>
                 <Cell dataKey='totalPrice'>
                     {rowData => formatRupiah(rowData?.totalPrice)}
@@ -68,6 +71,6 @@ export default function MedicineList(props) {
                 <Cell dataKey='instruction'/>
             </Column> */}
         </Table>
-      </div>
+    </div>
     )
 };

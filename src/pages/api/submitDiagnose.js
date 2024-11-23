@@ -8,18 +8,13 @@ export default function useSubmitDiagnose() {
 
     const submitDiagnose = async(data) => {
         try {
-            const response = await api.post('/api/v1/diagnose', {data})
-            .then((response) => {
-                setIsLoading(false);
-                return response;
-            })
-            .catch((error) => {
-                setIsLoading(false);
-                return error;
-            })
-            return response
+            setIsLoading(true)
+            return await api.post('/api/v1/diagnose', {data})
         } catch (error) {
-            console.error(error);
+            console.log("error bro: ", error)
+            throw error.response.data.errors
+        } finally {
+            setIsLoading(false)
         }
     }
 

@@ -9,7 +9,7 @@ export default function Label(props) {
     } = props;
 
     return (
-        <label htmlFor={id} className={`block text-body font-medium leading-6 text-dark ${className}`}>
+        <label htmlFor={id} className={`block text-body font-medium leading-6 ${className}`}>
             {label}
         </label>
     )
