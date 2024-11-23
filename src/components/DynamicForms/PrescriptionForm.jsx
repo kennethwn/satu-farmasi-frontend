@@ -8,10 +8,10 @@ import { formatRupiah } from "@/helpers/currency";
 import Dropdown from "../SelectPicker/Dropdown";
 
 function PrescriptionForm(props) {
-    const { formFields, setFormFields, errors, setErrors } = props;
+  const { formFields, setFormFields, errors, setErrors } = props;
 
-    const { getMedicineDropdownOptions } = useMedicineDropdownOption();
-    const [medicineDropdownOptions, setMedicineDropdownOptions] = useState([]);
+  const { getMedicineDropdownOptions } = useMedicineDropdownOption();
+  const [medicineDropdownOptions, setMedicineDropdownOptions] = useState([]);
 
   const data = Object.entries(medicineDropdownOptions).map(([key, item]) => ({
     label: key + "-" + item.name,
@@ -26,12 +26,13 @@ function PrescriptionForm(props) {
         } catch (error) {
             console.log("error #getMedicineOptions")
         }
-        fetchMedicineDropdownOptionsData();
-    }, []);
+    } 
+    fetchMedicineDropdownOptionsData();
+  }, []);
 
-    useEffect(() => {
-        console.log(formFields);
-    }, [formFields]);
+  useEffect(() => {
+      console.log(formFields);
+  }, [formFields]);
 
   const handleMedicineChange = (formFieldId, code) => {
     const checkIfStockIsInsufficient = (medicineDropdownOption, quantity) => {
@@ -167,19 +168,19 @@ function PrescriptionForm(props) {
                                         });
                                     }}
                                     value={formField.code}
-                                    renderValue={
-                                        formField.medicineId != ""
-                                            ? (value) => (
-                                                <div className="text-sm">
-                                                    {
-                                                        medicineDropdownOptions[
-                                                            value
-                                                        ]?.name
-                                                    }
-                                                </div>
-                                            )
-                                            : null
-                                    }
+                                    // renderValue={
+                                    //     formField.medicineId != ""
+                                    //         ? (value) => (
+                                    //             <div className="text-sm">
+                                    //                 {
+                                    //                     medicineDropdownOptions[
+                                    //                         value
+                                    //                     ]?.name
+                                    //                 }
+                                    //             </div>
+                                    //         )
+                                    //         : null
+                                    // }
                                     block
                                     style={{}}
                                     placement="bottomStart"
