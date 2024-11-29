@@ -16,9 +16,10 @@ export default function PrescriptionDetail(props) {
     const { createTransaction, finishTransaction, publishNotification } = useTransaction();
     const [isListening, setIsListening] = useState(false)
 
-    const { getPrescriptionDetail } = usePrescription();
+    const { getPrescriptionDetail, cancelPrescription } = usePrescription();
     const [open, setOpen] = useState({
         proceedToPayment: false,
+        canceled: false,
         markAsDone: false
       });
     const [ finalized, setFinalized ] = useState(false)
@@ -62,6 +63,26 @@ export default function PrescriptionDetail(props) {
         status: ""
     })
 
+    const handleCancelProcess = async () => {
+        try {
+            const res = await cancelPrescription(prescriptionId);
+            console.log("cancel: ", res)
+            if (res.code !== 200) {
+                toast.error(res.message, { autoClose: 2000, position: "top-center" });
+                return;
+            } else {
+                toast.success(`Status Change to Canceled`, { autoClose: 2000, position: "top-center" });
+                setStatusChanged({prescriptionId: prescriptionId, status: "CANCELED"})
+                setPrescriptionsData(prescriptionData => ({
+                    ...prescriptionData,
+                    status: "CANCELED"
+                }))
+                setOpen({ ...open, canceled: false })
+            }
+        } catch (error) {
+            console.error(error)
+        }
+    }
     const handleProcess = async () => {
         try {
             const data = {
@@ -214,18 +235,23 @@ export default function PrescriptionDetail(props) {
                     medicineList = {prescriptionData?.medicineList}
                 />
             </Body>
-            <Footer className="flex flex-row justify-end gap-4">
+            <div className="flex flex-row justify-between gap-4">
                 
                 {
                     prescriptionData?.status === "UNPROCESSED" && 
-                    <div className="flex flex-row gap-4">
-                        <Button appearance="primary" onClick={() => router.push(`/prescription/edit/` + prescriptionData.id)}>
-                            Edit
+                    <>
+                        <Button appearance="danger" onClick={() => setOpen({...open, canceled: true})}>
+                            Cancel
                         </Button>
-                        <Button appearance="primary" onClick={() => setOpen({...open, proceedToPayment: true})}>
-                            Proceed to Payment
-                        </Button>
-                    </div>
+                        <div className="flex flex-row gap-4">
+                            <Button appearance="primary" onClick={() => router.push(`/prescription/edit/` + prescriptionData.id)}>
+                                Edit
+                            </Button>
+                            <Button appearance="primary" onClick={() => setOpen({...open, proceedToPayment: true})}>
+                                Proceed to Payment
+                            </Button>
+                        </div>
+                    </>
                 }
                 {
                     prescriptionData?.status === "ON_PROGRESS" &&
@@ -233,7 +259,7 @@ export default function PrescriptionDetail(props) {
                         Mark as Done
                     </Button>
                 }
-            </Footer>
+            </div>
 
             <Toaster
                 type="warning"
@@ -259,6 +285,20 @@ export default function PrescriptionDetail(props) {
                 }
                 title={"Mark Prescription as Done"}
                 onClick={handleMarkAsDone}
+            />
+
+            <Toaster
+                type="warning"
+                open={open.canceled}
+                onClose={() => setOpen({ ...open, canceled: false })}
+                body={
+                    <>
+                        Are you sure you want to cancel this prescription,
+                        <b> after confirmation prescription cannot be updated and these changes cannot be revert</b>
+                    </>
+                }
+                btnText="Confirm"
+                onClick={handleCancelProcess}
             />
         </Modal>
     )

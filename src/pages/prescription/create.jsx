@@ -15,7 +15,7 @@ import { ErrorForm } from "@/helpers/errorForm";
 
 const medicineSchema = z.object({
     instruction: isRequiredString(),
-    medicineId: isRequiredNumber(),
+    code: isRequiredString(),
     quantity: isRequiredNumber(),
 });
 
@@ -93,8 +93,10 @@ export default function create() {
             }))
             setErrors({});
             const dataToValidate = { prescription: data };
-            if (existingPatient)
+            if (existingPatient){
+                console.log("to be validate", dataToValidate)
                 prescriptionSchemaWithExistingPatient.parse(dataToValidate);
+            }
             else prescriptionSchemaWithNewPatient.parse(dataToValidate);
 
             console.log(data)
