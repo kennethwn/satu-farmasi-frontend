@@ -21,6 +21,7 @@ export default function PrescriptionDetail(props) {
         proceedToPayment: false,
         markAsDone: false
       });
+    const [ finalized, setFinalized ] = useState(false)
     const [ prescriptionData, setPrescriptionsData ] = useState({
         id: prescriptionId,
         status: "",
@@ -209,6 +210,7 @@ export default function PrescriptionDetail(props) {
                 </div>
                 
                 <MedicineList 
+                    status = {prescriptionData?.status}
                     medicineList = {prescriptionData?.medicineList}
                 />
             </Body>
