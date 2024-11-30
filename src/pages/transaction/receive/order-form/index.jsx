@@ -75,7 +75,7 @@ export default function Index() {
                         setInput={setInput}
                     />
                 </div>
-                <div className="flex w-full justify-end">
+                <div className="flex w-full pb-4 justify-end">
                     {type == 0 && <Button onClick={() => generateOrderBasicMedicine(input, formFields)}>Cetak Surat</Button>}
                     {type == 1 && <Button onClick={() => generateOrderNarcoticsMedicine(input, formFields)}>Cetak Surat</Button>}
                     {type == 2 && <Button onClick={() => generateOrderPsychotropicMedicine(input, formFields)}>Cetak Surat</Button>}

@@ -106,10 +106,9 @@ Input.propTypes = {
     onChange: propTypes.func,
     disabled: propTypes.bool,
     placeholder: propTypes.string,
-    value: propTypes.string,
+    value: propTypes.any,
     className: propTypes.string,
     checked: propTypes.bool,
     register: propTypes.func,
-    currency: propTypes.string,
-    checked: propTypes.bool,
+    currency: propTypes.any,
 }

@@ -73,7 +73,7 @@ export default function Index() {
     const { GetAllActiveVendor } = useVendorAPI();
     const { CreateReceiveMedicine } = useReceiveMedicineAPI();
 
-    const [existingMedicine, setExistingMedicine] = useState(true);
+    const [existingMedicine, setExistingMedicine] = useState(false);
     const [input, setInput] = useState({});
     const [errors, setErrors] = useState({});
     const [medicines, setMedicines] = useState([]);
@@ -127,7 +127,12 @@ export default function Index() {
     const handleFetchMedicineDropdown = async () => {
         try {
             const res = await GetMedicineDropdownList();
-            setMedicines(Object.entries(res).map(([key, item]) => ({
+            console.log(Object.entries(res.data).map(([key, item]) => ({
+                ...item,
+                label: item.name,
+                value: parseInt(item.id),
+            })));
+            setMedicines(Object.entries(res.data).map(([key, item]) => ({
                 ...item,
                 label: item.name,
                 value: parseInt(item.id),
@@ -202,7 +207,6 @@ export default function Index() {
         try {
             let classifications = [];
             input.classifications = [];
-            console.log("medicine has classification: ", formFields)
             formFields.forEach((item, index) => {
                 input.classifications[index] = {
                     classification: {
@@ -218,11 +222,10 @@ export default function Index() {
                 classifications.push(temp);
             })
             
-            console.log("masuk 2: ",);
             const medicineRequest = {
                 code: input.code || medicines?.find(item => item.id == input.medicineId)?.code || "",
                 name: input.name || medicines?.find(item => item.id == input.medicineId)?.name,
-                genericNameId: parseInt(input.genericNameId) || parseInt(medicines?.find(item => item.id == input.medicineId)?.genericName.id),
+                genericNameId: parseInt(input.genericNameId) || parseInt(medicines?.find(item => item.id == input.medicineId)?.genericname.id),
                 merk: input.merk || medicines?.find(item => item.id == input.medicineId)?.merk,
                 description: input.description || medicines?.find(item => item.id == input.medicineId)?.description || "",
                 unitOfMeasure: input.unitOfMeasure || medicines?.find(item => item.id == input.medicineId)?.unitOfMeasure,
@@ -233,7 +236,7 @@ export default function Index() {
                 maxStock: parseInt(input.maxStock) || medicines?.find(item => item.id == input.medicineId)?.maxStock,
                 packagingId: parseInt(input.packagingId) || medicines?.find(item => item.id == input.medicineId)?.packaging.id,
                 sideEffect: input.sideEffect || medicines?.find(item => item.id == input.medicineId)?.sideEffect,
-                classificationList: !existingMedicine ? classifications :  (medicines?.find(item => item.id == input?.medicineId)?.classifications?.map(item => ({ medicineId: input.medicineId, classificationId: item.classification.id }))),
+                classificationList: !existingMedicine ? classifications :  (medicines?.find(item => item.id == input?.medicineId)?.classifications?.map(item => ({ medicineId: input.medicineId, classificationId: item.id }))),
             }
 
             const payload = {
@@ -301,7 +304,7 @@ export default function Index() {
                         size="lg" 
                         checkedChildren="Existing Medicine" 
                         unCheckedChildren="New Medicine" 
-                        defaultChecked onChange={e => {
+                        defaultChecked={false} onChange={e => {
                             handleClearInput();
                             setExistingMedicine(e)
                         }} />
@@ -323,7 +326,7 @@ export default function Index() {
                         existingMedicine={existingMedicine}
                     />
 
-                    <div className="flex justify-center gap-2 my-6 lg:justify-end">
+                    <div className="flex justify-center gap-2 my-6 pb-4 lg:justify-end">
                         {isLoading ?
                             <Button
                                 appearance="primary"

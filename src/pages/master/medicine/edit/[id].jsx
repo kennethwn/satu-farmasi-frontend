@@ -320,36 +320,7 @@ export default function Index() {
                                 }
                             </div>
                         </div>
-                        <div className="sm:col-span-2">
-                            <div className="mt-2">
-                                {isLoading ?
-                                    <InputField
-                                        type="number"
-                                        id="currStock"
-                                        name="currStock"
-                                        placeholder="0"
-                                        label="Stok Sekarang"
-                                        value={input?.currStock}
-                                        disabled={true}
-                                    />
-                                    :
-                                    <InputField
-                                        type="number"
-                                        id="currStock"
-                                        name="currStock"
-                                        placeholder="0"
-                                        label="Stok Sekarang"
-                                        value={input?.currStock}
-                                        error={errors['currStock']}
-                                        onChange={e => {
-                                            setInput({ ...input, currStock: parseInt(e.target.value) })
-                                            setErrors({ ...errors, "currStock": "" });
-                                        }}
-                                    />
-                                }
-                            </div>
-                        </div>
-                        <div className="sm:col-span-2">
+                        <div className="sm:col-span-3">
                             <div className="mt-2">
                                 {isLoading ?
                                     <InputField
@@ -378,7 +349,7 @@ export default function Index() {
                                 }
                             </div>
                         </div>
-                        <div className="sm:col-span-2">
+                        <div className="sm:col-span-3">
                             <div className="mt-2">
                                 {isLoading ?
                                     <InputField
@@ -425,6 +396,7 @@ export default function Index() {
                                         labelKey="label"
                                         data={generics}
                                         block
+                                        cleanable={false}
                                     />
                                     :
                                     <>
@@ -441,6 +413,7 @@ export default function Index() {
                                                 setInput({ ...input, genericName: { id: value } })
                                                 setErrors({ ...errors, "genericNameId": "" });
                                             }}
+                                            cleanable={false}
                                             data={generics}
                                             block
                                         />
@@ -470,6 +443,7 @@ export default function Index() {
                                         value={input?.packaging?.id}
                                         labelKey="label"
                                         valueKey="id"
+                                        cleanable={false}
                                         data={packagings}
                                         block
                                     />
@@ -484,6 +458,7 @@ export default function Index() {
                                             size='lg'
                                             className="py-1.5"
                                             valueKey="id"
+                                            cleanable={false}
                                             onChange={value => {
                                                 setInput({ ...input, packaging: { id: value } })
                                                 setErrors({ ...errors, "packagingId": "" });
@@ -519,6 +494,7 @@ export default function Index() {
                                         disabled={true}
                                         size='lg'
                                         block
+                                        cleanable={false}
                                         className="py-1.5"
                                         data={unitOfMeasure}
                                         value={input?.unitOfMeasure}
@@ -527,11 +503,12 @@ export default function Index() {
                                     />
                                     :
                                     <>
-                                        <SelectPicker
+                                        <Dropdown
                                             id="unitOfMeasure"
                                             name="unitOfMeasure"
                                             placeholder="Satuan"
                                             size='lg'
+                                            cleanable={false}
                                             className="py-1.5"
                                             data={unitOfMeasure}
                                             block
@@ -584,7 +561,7 @@ export default function Index() {
                         </div>
                     </div>
 
-                    <div className="flex justify-center gap-2 my-6 lg:justify-end">
+                    <div className="flex justify-center gap-2 my-6 pb-6 lg:justify-end">
                         {isSubmitted ?
                             <Button
                                 appearance="primary"

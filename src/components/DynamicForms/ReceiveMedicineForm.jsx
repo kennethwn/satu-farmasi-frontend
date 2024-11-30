@@ -41,10 +41,6 @@ const ReceiveMedicineForm = (props) => {
         { id: 5, label: 'CASH', value: 'CASH'},
     ]
 
-    useEffect(() => {
-        console.log("debug: ", (dataMedicines?.find(item => item.id == input?.medicineId)?.classifications)?.map(item => ({ id: item.classification.id, label: item.classification.label, value: item.classification.value })))
-    }, [input?.medicineId]);
-
     return (
         <div className="grid grid-cols-1 gap-x-6 gap-y-2 sm:grid-cols-6">
             <div className="sm:col-span-6">
@@ -167,7 +163,7 @@ const ReceiveMedicineForm = (props) => {
                             label="Nama Obat"
                             placeholder="nama obat"
                             value={existingMedicine
-                                ? dataMedicines?.find(item => item.id == input.medicineId)?.name
+                                ? dataMedicines?.find(item => item?.id == input.medicineId)?.name
                                 : input?.name || ""
                             }
                         />
@@ -184,7 +180,7 @@ const ReceiveMedicineForm = (props) => {
                             placeholder="nama obat"
                             error={errors['name']}
                             value={existingMedicine 
-                                ? dataMedicines?.find(item => item.id == input.medicineId)?.name
+                                ? dataMedicines?.find(item => item?.id == input.medicineId)?.name
                                 : input?.name || ""
                             }
                             disabled={existingMedicine}
@@ -203,7 +199,7 @@ const ReceiveMedicineForm = (props) => {
                             disabled={true}
                             placeholder="merek"
                             value={existingMedicine 
-                                ? dataMedicines?.find(item => item.id == input.medicineId)?.merk
+                                ? dataMedicines?.find(item => item?.id == input.medicineId)?.merk
                                 : input?.merk || ""
                             }
                         />
@@ -220,7 +216,7 @@ const ReceiveMedicineForm = (props) => {
                             placeholder="merek"
                             error={errors['merk']}
                             value={existingMedicine 
-                                ? dataMedicines?.find(item => item.id == input.medicineId)?.merk
+                                ? dataMedicines?.find(item => item?.id == input.medicineId)?.merk
                                 : input?.merk || ""
                             }
                             disabled={existingMedicine}
@@ -240,7 +236,7 @@ const ReceiveMedicineForm = (props) => {
                             placeholder="0"
                             label="Harga Jual Obat"
                             value={existingMedicine
-                                ? dataMedicines?.find(item => item.id == input.medicineId)?.price
+                                ? dataMedicines?.find(item => item?.id == input.medicineId)?.price
                                 : input?.price || 0
                             }                            
                             currency={true}
@@ -258,7 +254,7 @@ const ReceiveMedicineForm = (props) => {
                             placeholder="0"
                             label="Harga Jual Obat"
                             value={existingMedicine
-                                ? dataMedicines?.find(item => item.id == input.medicineId)?.price
+                                ? dataMedicines?.find(item => item?.id == input.medicineId)?.price
                                 : input?.price || 0
                             }
                             error={errors['price']}
@@ -307,7 +303,7 @@ const ReceiveMedicineForm = (props) => {
                             placeholder="0"
                             label="Stok Minimum"
                             value={existingMedicine
-                                ? dataMedicines?.find(item => item.id == input?.medicineId)?.minStock
+                                ? dataMedicines?.find(item => item?.id == input?.medicineId)?.minStock
                                 : input?.minStock || 0
                             }
                             disabled={true}
@@ -321,7 +317,7 @@ const ReceiveMedicineForm = (props) => {
                             label="Stok Minimum"
                             error={errors['minStock']}
                             value={existingMedicine
-                                ? dataMedicines?.find(item => item.id == input?.medicineId)?.minStock
+                                ? dataMedicines?.find(item => item?.id == input?.medicineId)?.minStock
                                 : input?.minStock || 0
                             }
                             onChange={e => {
@@ -343,7 +339,7 @@ const ReceiveMedicineForm = (props) => {
                             placeholder="0"
                             label="Stok Maksimum"
                             value={existingMedicine
-                                ? dataMedicines?.find(item => item.id == input?.medicineId)?.maxStock
+                                ? dataMedicines?.find(item => item?.id == input?.medicineId)?.maxStock
                                 : input?.maxStock || 0
                             }
                             disabled={true}
@@ -357,7 +353,7 @@ const ReceiveMedicineForm = (props) => {
                             label="Stok Maksimum"
                             error={errors['maxStock']}
                             value={existingMedicine
-                                ? dataMedicines?.find(item => item.id == input?.medicineId)?.maxStock
+                                ? dataMedicines?.find(item => item?.id == input?.medicineId)?.maxStock
                                 : input?.maxStock || 0
                             }
                             onChange={e => {
@@ -383,7 +379,7 @@ const ReceiveMedicineForm = (props) => {
                             size='lg'
                             disabled={true}
                             value={existingMedicine
-                                ? dataMedicines?.find(item => item.id == input?.medicineId)?.genericName.id
+                                ? dataMedicines?.find(item => item?.id == input?.medicineId)?.genericname.id
                                 : input?.genericNameId
                             }
                             valueKey="id"
@@ -399,7 +395,7 @@ const ReceiveMedicineForm = (props) => {
                                 placeholder={<span className="text-sm">generik</span>}
                                 size='lg'
                                 value={existingMedicine
-                                    ? dataMedicines?.find(item => item.id == input?.medicineId)?.genericName.id
+                                    ? dataMedicines?.find(item => item?.id == input?.medicineId)?.genericname.id
                                     : input?.genericNameId
                                 }
                                 valueKey="id"
@@ -437,7 +433,7 @@ const ReceiveMedicineForm = (props) => {
                             className="py-1.5"
                             size='lg'
                             value={existingMedicine
-                                ? dataMedicines?.find(item => item.id == input?.medicineId)?.packaging.id
+                                ? dataMedicines?.find(item => item?.id == input?.medicineId)?.packaging.id
                                 : input?.packagingId
                             }
                             labelKey="label"
@@ -452,7 +448,7 @@ const ReceiveMedicineForm = (props) => {
                                 name="packagingId"
                                 placeholder={<span className="text-sm">kemasan</span>}
                                 value={existingMedicine
-                                    ? dataMedicines?.find(item => item.id == input?.medicineId)?.packaging.id
+                                    ? dataMedicines?.find(item => item?.id == input?.medicineId)?.packaging.id
                                     : input?.packagingId
                                 }
                                 labelKey="label"
@@ -479,7 +475,7 @@ const ReceiveMedicineForm = (props) => {
             </div>
             <div className="sm:col-span-6 max-lg:mb-12 mb-8">
                 {existingMedicine
-                    ? <MedicineClassificationForm disabled={existingMedicine} errors={errors} setErrors={setErrors} classifications={dataClassifications} isLoading={isLoading} formFields={(dataMedicines?.find(item => item.id == input?.medicineId)?.classifications)?.map(item => ({ id: item.classification.id, label: item.classification.label, value: item.classification.value }))} setFormFields={setFormFields} />
+                    ? <MedicineClassificationForm disabled={existingMedicine} errors={errors} setErrors={setErrors} classifications={dataClassifications} isLoading={isLoading} formFields={(dataMedicines?.find(item => item?.id == input?.medicineId)?.classifications)?.map(item => ({ id: item.id, label: item.label, value: item.value }))} setFormFields={setFormFields} />
                     : <MedicineClassificationForm disabled={existingMedicine} errors={errors} setErrors={setErrors} classifications={dataClassifications} isLoading={isLoading} formFields={formFields} setFormFields={setFormFields} />
                 }
             </div>
@@ -499,7 +495,7 @@ const ReceiveMedicineForm = (props) => {
                             className="py-1.5"
                             data={unitOfMeasure}
                             value={existingMedicine
-                                ? dataMedicines?.find(item => item.id == input?.medicineId)?.unitOfMeasure
+                                ? dataMedicines?.find(item => item?.id == input?.medicineId)?.unitOfMeasure
                                 : input?.unitOfMeasure || ""
                             }
                             valueKey="value"
@@ -520,7 +516,7 @@ const ReceiveMedicineForm = (props) => {
                                     setErrors({ ...errors, "unitOfMeasure": "" });
                                 }}
                                 value={existingMedicine
-                                    ? dataMedicines?.find(item => item.id == input?.medicineId)?.unitOfMeasure
+                                    ? dataMedicines?.find(item => item?.id == input?.medicineId)?.unitOfMeasure
                                     : input?.unitOfMeasure || ""
                                 }
                                 disabled={existingMedicine}
@@ -594,7 +590,7 @@ const ReceiveMedicineForm = (props) => {
                             name="sideEffect"
                             placeholder="efek samping"
                             value={existingMedicine
-                                ? dataMedicines?.find(item => item.id == input?.medicineId)?.sideEffect
+                                ? dataMedicines?.find(item => item?.id == input?.medicineId)?.sideEffect
                                 : input?.sideEffect || ""
                             }
                             disabled={true}
@@ -607,7 +603,7 @@ const ReceiveMedicineForm = (props) => {
                             name="sideEffect"
                             placeholder="efek samping"
                             value={existingMedicine
-                                ? dataMedicines?.find(item => item.id == input?.medicineId)?.sideEffect
+                                ? dataMedicines?.find(item => item?.id == input?.medicineId)?.sideEffect
                                 : input?.sideEffect || ""
                             }
                             error={errors['sideEffect']}
@@ -630,7 +626,7 @@ const ReceiveMedicineForm = (props) => {
                             name="description"
                             placeholder="deskripsi"
                             value={existingMedicine
-                                ? dataMedicines?.find(item => item.id == input?.medicineId)?.description
+                                ? dataMedicines?.find(item => item?.id == input?.medicineId)?.description
                                 : input?.description || ""
                             }
                             disabled={true}
@@ -643,7 +639,7 @@ const ReceiveMedicineForm = (props) => {
                             name="description"
                             placeholder="deskripsi"
                             value={existingMedicine
-                                ? dataMedicines?.find(item => item.id == input?.medicineId)?.description
+                                ? dataMedicines?.find(item => item?.id == input?.medicineId)?.description
                                 : input?.description || ""
                             }
                             error={errors['description']}

@@ -85,6 +85,7 @@ export default function MedicineClassificationForm(props) {
 										valueKey='id'
 										labelKey='label'
 										block
+										cleanable={false}
 									/>
 									:
 									<>
@@ -107,6 +108,7 @@ export default function MedicineClassificationForm(props) {
 													[`classificationList[${index}]`]: ""
 												});
 											}}
+											cleanable={false}
 										/>
 										{
 											errors[`classificationList[${index}]`] &&
