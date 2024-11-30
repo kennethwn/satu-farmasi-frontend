@@ -30,8 +30,8 @@ function PatientForm(props) {
     useEffect(() => {
         async function fetchPatientDropdownOptionsData() {
             try {
-                const response = await getPatientDropdownOptions();
-                setPatientDropdownOptions(response);
+                const response = await getPatientDropdownOptions()
+                setPatientDropdownOptions(response.data)
             } catch (error) {
                 console.log("error #getPatientOptions");
             }
