@@ -14,7 +14,10 @@ function PatientForm(props) {
     } = props;
 
     if (errors) {
-        console.log("erros in patient: ",  errors["prescription.patient.patientId"])
+        console.log(
+            "erros in patient: ",
+            errors["prescription.patient.patientId"],
+        );
     }
 
     const { getPatientDropdownOptions } = usePatientAPI();
@@ -30,8 +33,8 @@ function PatientForm(props) {
     useEffect(() => {
         async function fetchPatientDropdownOptionsData() {
             try {
-                const response = await getPatientDropdownOptions()
-                setPatientDropdownOptions(response.data)
+                const response = await getPatientDropdownOptions();
+                setPatientDropdownOptions(response.data);
             } catch (error) {
                 console.log("error #getPatientOptions");
             }
@@ -81,11 +84,18 @@ function PatientForm(props) {
             credentialNum: "",
             phoneNum: "",
         });
+        setErrors({
+            ...errors,
+            "prescription.patient.patientName": "",
+            "prescription.patient.patientId": "",
+            "prescription.patient.credentialNum": "",
+            "prescription.patient.phoneNum": "",
+        });
     }, [existingPatient]);
 
     useEffect(() => {
-        console.log("erros here:", errors)
-    }, [errors])
+        console.log("erros here:", errors);
+    }, [errors]);
 
     return (
         <>
@@ -175,4 +185,4 @@ function PatientForm(props) {
     );
 }
 
-export default PatientForm
+export default PatientForm;
