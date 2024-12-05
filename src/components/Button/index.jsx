@@ -21,8 +21,12 @@ export default function Button(props) {
     if (size === 'small') className.push(`text-sm font-medium inline-block py-2 ${isLoading || appendIcon ? 'px-4' : 'px-6'}`)
     if (size === 'medium') className.push(`inline-block font-semibold py-2.5 ${isLoading || appendIcon ? 'px-4' : 'px-6'}`)
 
+    // WHY THIS BUTTON IS NOT WORKING!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
     const onClick = () => {
-        if (props.onClick && !isLoading) props.onClick()
+        if (props.onClick && !isLoading) {
+            console.log("hello")
+            props.onClick()
+        }     
     }
 
     return (

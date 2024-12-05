@@ -109,7 +109,7 @@ export default function index() {
                         <SearchBar
                             size="md"
                             className="w-1/4"
-                            placeholder="Search..."
+                            placeholder="Cari Vendor ..."
                             onChange={(value) => setSearch(value)}
                         />
                     </div>
@@ -157,7 +157,7 @@ export default function index() {
 
                         <Column width={150} fixed="right">
                             <HeaderCell className="text-center text-dark font-bold">
-                                Action
+                                Aksi
                             </HeaderCell>
                             <Cell className="text-center">
                                 {(rowData) => {
@@ -216,7 +216,7 @@ export default function index() {
                 body={
                     <>
                         Apakah anda yakin untuk menghapus data{" "}
-                        <span className="text-danger">{editInput.name}</span>?
+                        <p><span className="text-danger">{editInput.name}</span> ?</p>
                     </>
                 }
                 btnText="Hapus"

@@ -58,6 +58,7 @@ export default function Home() {
       const date = new Date;
       const response = await CheckExpirationByDate({expiredDate: date.toISOString()});
       if (response.code != 200) return;
+        console.log("expired", response.data);
       setDataExp(response.data);
     } catch (error) {
       console.error(error);
@@ -116,7 +117,7 @@ export default function Home() {
 
   return (
     <Layouts user={user}>
-      <ContentLayout title={`Welcome, ${user?.name}`}>
+      <ContentLayout title={`Selamat Datang, ${user?.name}`}>
         <DashboardView 
           dataCard={getDataCard(totalPatient, totalMedicine, formatRupiah(52000), totalNeedToRestock)}
           dataExpired={dataExp}

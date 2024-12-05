@@ -12,14 +12,14 @@ import { useUserContext } from "@/pages/api/context/UserContext";
 
 export default function Index() {
     const { user } = useUserContext();
-    const [filter, setFilter] = useState('DOCTOR');
+    const [filter, setFilter] = useState('Dokter');
     const [search, setSearch] = useState('');
     const [page, setPage] = useState(1);
     const [totalPage, setTotalPage] = useState(0);
     const [limit, setLimit] = useState(10);
     const [sortColumn, setSortColumn] = useState();
     const [sortType, setSortType] = useState();
-    const roles = ["DOCTOR", "PHARMACIST", "ADMIN"];
+    const roles = ["Dokter", "Farmasi", "Admin"];
     const [data, setData] = useState([]);
 
     const router = useRouter();
@@ -40,8 +40,9 @@ export default function Index() {
 
             let res = null;
             if (selectedData.role.toLowerCase() === "admin") res = await EditAdmin(selectedData);
-            else if (selectedData.role.toLowerCase() === "doctor") res = await EditDoctor(selectedData);
-            else if (selectedData.role.toLowerCase() === "pharmacist") res = await EditPharmacist(selectedData);
+            else if (selectedData.role.toLowerCase() === "dokter") res = await EditDoctor(selectedData);
+            else if (selectedData.role.toLowerCase() === "farmasi") res = await EditPharmacist(selectedData);
+                console.log("res: ", res);
             toast.success(res.message, { autoClose: 2000, position: "top-right" });
             handleFetchStaffData();
         } catch (error) {
@@ -51,7 +52,11 @@ export default function Index() {
 
     const handleFetchStaffData = async () => {
         try {
-            const res = await GetAllStaff(page, limit, search, filter);
+            let filterToSubmit = ""
+            if (filter === "Dokter") filterToSubmit = "doctor";
+            else if (filter === "Farmasi") filterToSubmit = "pharmacist";
+            else if (filter === "Admin") filterToSubmit = "admin";
+            const res = await GetAllStaff(page, limit, search,filterToSubmit);
             const dataArr = res.data.results.map(item => ({
                 ...item,
                 oldEmail: item.email,
@@ -87,7 +92,7 @@ export default function Index() {
                         value={filter}
                         cleanable={false}
                         onChange={(value) => { setFilter(value); }}
-                        onClean={() => { setFilter('DOCTOR'); }}
+                        onClean={() => { setFilter('Dokter'); }}
                     />
 
                     <SearchBar
@@ -119,41 +124,36 @@ export default function Index() {
                             </Cell>
                         </Column>
 
-                        <Column width={150} resizable sortable>
+                        <Column flexGrow={1}>
                             <HeaderCell className="text-dark">NIK</HeaderCell>
                             <Cell dataKey='nik' />
                         </Column>
 
-                        <Column width={200} resizable sortable>
+                        <Column flexGrow={1}>
                             <HeaderCell className="text-dark">Nama Lengkap</HeaderCell>
                             <Cell>
                                 {rowData => `${rowData?.firstName} ${rowData?.lastName}`}
                             </Cell>
                         </Column>
 
-                        <Column width={200} resizable sortable>
+                        <Column flexGrow={1}>
                             <HeaderCell className="text-dark">Email</HeaderCell>
                             <Cell className="text-dark" dataKey='email' />
                         </Column>
 
-                        <Column width={100} resizable sortable>
-                            <HeaderCell className="text-dark">Role</HeaderCell>
-                            <Cell className="text-dark" dataKey='role' />
-                        </Column>
-
-                        <Column width={150} resizable sortable>
+                        <Column flexGrow={1}>
                             <HeaderCell className="text-dark">No Handphone</HeaderCell>
                             <Cell className="text-dark" dataKey='phoneNum' />
                         </Column>
 
-                        <Column width={150} resizable sortable>
+                        <Column flexGrow={1}>
                             <HeaderCell className="text-dark">Tanggal Lahir</HeaderCell>
                             <Cell className="text-dark">
                                 {rowData => formatDate(rowData?.dob)}
                             </Cell>
                         </Column>
 
-                        <Column width={100} fixed="right" sortable>
+                        <Column width={100} fixed="right">
                             <HeaderCell className="text-center text-dark">Status Aktif</HeaderCell>
                             <Cell className="text-center">
                                 {
@@ -173,7 +173,7 @@ export default function Index() {
                         </Column>
 
                         <Column width={100} fixed="right">
-                            <HeaderCell className="text-center text-dark">Action</HeaderCell>
+                            <HeaderCell className="text-center text-dark">Aksi</HeaderCell>
                             <Cell className="text-center">
                                 {
                                     rowData => {

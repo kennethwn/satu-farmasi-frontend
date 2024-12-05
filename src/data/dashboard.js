@@ -4,17 +4,17 @@ export default function getDataCard(totalPatient, totalMedicine, totalProfit, to
             colorBackground: "purple",
             icon: "person",
             link: "/",
-            label: "Total Patient",
+            label: "Total Pasien",
             value: totalPatient,
-            status: "active"
+            status: "Aktif"
         },
         {
             colorBackground: "green",
             icon: "medicine",
             link: "/master/medicine",
-            label: "Total Medicine",
+            label: "Total Obat",
             value: totalMedicine,
-            status: "active"
+            status: "Aktif"
         },
         {
             colorBackground: "yellow",
@@ -22,15 +22,15 @@ export default function getDataCard(totalPatient, totalMedicine, totalProfit, to
             link: "/transaction/dashboard",
             label: "Total Profit",
             value: totalProfit,
-            status: "today"
+            status: "Hari Ini"
         },
         {
             colorBackground: "red",
             icon: "stock",
             link: "/",
-            label: "Need to Restock",
+            label: "Butuh Restock",
             value: totalRestock,
-            status: "active"
+            status: "Aktif"
         },
     ]
 

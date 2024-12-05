@@ -129,7 +129,7 @@ export default function create() {
     return (
         <Layout active="prescription" user={user}>
             <ContentLayout
-                title="Create Prescription"
+                title="Tambah Resep"
                 type="child"
                 backpageUrl="/prescription"
             >
@@ -140,8 +140,8 @@ export default function create() {
                     <div className="flex flex-col gap-2">
                         <Toggle
                             size="lg"
-                            checkedChildren="Existing Patient"
-                            unCheckedChildren="New Patient"
+                            checkedChildren="Pasien Lama"
+                            unCheckedChildren="Pasien Baru"
                             defaultChecked
                             onChange={(e) => setExistingPatient(e)}
                         />

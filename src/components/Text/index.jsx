@@ -4,6 +4,8 @@ export default function Text(props) {
     const { type, className, children } = props;
     console.log("className: ", className)
     switch (type) {
+        case "heading_4":
+            return <p className={`text-heading_4 text-dark font-semibold ${className}`}>{children}</p>
         case "heading_3":
             return <p className={`text-heading_3 text-dark font-semibold ${className}`}>{children}</p>
         case "title":

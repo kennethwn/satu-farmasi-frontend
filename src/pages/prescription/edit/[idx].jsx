@@ -31,6 +31,7 @@ export default function Page() {
     const router = useRouter();
     const id = router.query.idx;
     const [errors, setErrors] = useState({});
+    const [ medicineWithCurrStock, setMedicineWithCurrStock ] = useState([])
 
     const [formFields, setFormFields] = useState([
         {   
@@ -57,30 +58,30 @@ export default function Page() {
             phoneNum: "",
         },
         medicineList: [
-            {
-                medicine: {
-                    id: -1,
-                    code: "",
-                    name: "",
-                    merk: "",
-                    currStock: -1,
-                    minStock: -1,
-                    price: "",
-                    classifications: [
-                        {
-                            classification: {
-                                label: "",
-                            },
-                        },
-                    ],
-                    packaging: {
-                        label: "",
-                    },
-                    genericName: {
-                        label: "",
-                    },
-                },
-            },
+            //{
+            //    medicine: {
+            //        id: -1,
+            //        code: "",
+            //        name: "",
+            //        merk: "",
+            //        currStock: -1,
+            //        minStock: -1,
+            //        price: "",
+            //        classifications: [
+            //            {
+            //                classification: {
+            //                    label: "",
+            //                },
+            //            },
+            //        ],
+            //        packaging: {
+            //            label: "",
+            //        },
+            //        genericName: {
+            //            label: "",
+            //        },
+            //    },
+            //},
         ],
     });
 
@@ -88,7 +89,16 @@ export default function Page() {
         async function fetchPrescriptionById(id) {
             try {
                 const response = await getPrescriptionDetail(id);
-                setPrescriptionsData(response.data);
+                 setPrescriptionsData(response.data);
+                //console.log("data: ", response.data);
+                //setPrescriptionsData({
+                //    ...response.data,
+                //    medicineList: [
+                //        ...response.data.medicineList.map(medicine => {
+                //            originalMedicineCode: medicine.medicineCode
+                //        })
+                //    ]
+                //});
             } catch (error) {
                 console.error("error #getMedicineOptions");
             }
@@ -106,12 +116,15 @@ export default function Page() {
             });
         }
 
+        // const response = await getMedicineDropdownOptions()
+
         async function initializeFormField(medicineList) {
             let tempFormFields = [];
             medicineList.map((medicineData) => {
                 const tempMedicine = {
                     code: medicineData.medicineCode,
                     medicineName: medicineData.medicineName,
+                    currStock: medicineWithCurrStock[medicineData.medicineCode].currStock,
                     quantity: medicineData.quantity,
                     totalPrice: medicineData.totalPrice,
                     price: medicineData.totalPrice / medicineData.quantity,
@@ -125,12 +138,14 @@ export default function Page() {
 
         if (
             prescriptionData?.medicineList !== undefined &&
-            prescriptionData?.medicineList !== undefined
+            prescriptionData?.medicineList.length > 0 &&
+                Object.keys(medicineWithCurrStock).length > 0
         ) {
+            console.log("prescriptionData:", prescriptionData)
             initializePatient(prescriptionData.patient);
             initializeFormField(prescriptionData.medicineList);
         }
-    }, [prescriptionData]);
+    }, [prescriptionData, medicineWithCurrStock]);
 
     const handleUpdatePrescription = async (e) => {
         e.preventDefault();
@@ -189,7 +204,11 @@ export default function Page() {
 
     return (
         <Layout active="prescription" user={user}>
-            <ContentLayout title="Update Prescription">
+            <ContentLayout 
+                title="Ubah Resep"
+                type="child"
+                backpageUrl="/prescription"
+            >
                 <form
                     onSubmit={handleUpdatePrescription}
                     className="flex flex-col gap-6"
@@ -213,6 +232,7 @@ export default function Page() {
                         setFormFields={setFormFields}
                         errors={errors}
                         setErrors={setErrors}
+                        setAvailableStock={setMedicineWithCurrStock}
                     />
                     <div className="flex justify-center gap-2 mt-6 lg:justify-end">
                         {isLoading ? (

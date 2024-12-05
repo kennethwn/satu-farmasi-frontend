@@ -92,7 +92,7 @@ export default function index() {
                 <div>
                     <Button
                         prependIcon={<IoMdAdd size={24} />}
-                        onClick={() => router.push(`/prescription/create`)}
+                         onClick={() => router.push(`/prescription/create`)}
                     >
                         Tambah
                     </Button>
@@ -144,7 +144,7 @@ export default function index() {
                         </Column>
 
                         <Column flexGrow={1} resizable>
-                            <HeaderCell className="text-dark">Prescription ID</HeaderCell>
+                            <HeaderCell className="text-dark">Resep ID</HeaderCell>
                             <Cell dataKey='id'/>
                         </Column>
 
@@ -156,7 +156,7 @@ export default function index() {
                         </Column>
 
                         <Column flexGrow={1} resizable>
-                            <HeaderCell className="text-dark">Patient Name</HeaderCell>
+                            <HeaderCell className="text-dark">Nama Pasien</HeaderCell>
                             <Cell dataKey='patient.name'/>
                         </Column>
 

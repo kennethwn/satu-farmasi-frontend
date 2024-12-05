@@ -43,12 +43,11 @@ export default function Login() {
         try {
             setIsLoading(true);
             await getUser(data);
-            toast.success("Login successful!", { autoClose: 2000, position: 'top-right' });
+            toast.success("Berhasil Masuk!", { autoClose: 2000, position: 'top-right' });
             setTimeout(() => {
                 router.push("/");
             }, 2000)
         } catch (error) {
-            // TODO: Handle if the user is not active anymore
             toast.error(error.message, { autoClose: 2000, position: 'top-right' });
         } finally {
             setIsLoading(false);
@@ -69,8 +68,7 @@ export default function Login() {
                         ref={formRef}
                     >
                         <div className="text-center mb-4">
-                            <Text type="heading_3">Welcome Back</Text>
-                            <Text type="body">Sign in to access your pharmacy dashboard</Text>
+                            <Text type="heading_4">Selamat Datang</Text>
                         </div>
                         <Input
                             label={"Email"}
@@ -94,22 +92,22 @@ export default function Login() {
                         />
                         <div className='flex justify-start items-center w-full'>
                             <Checkbox id="isRemember" name="isRemember" onChange={() => setValue("isRemember", !getValues("isRemember"))}/>
-                            <Label name={"isRemember"} label={"Keep Me Logged In"} />
+                            <Label name={"isRemember"} label={"Ingat Saya"} />
                         </div>
                         {
                             isLoading ?
                                 <Button type="button" isDisabled={true} isLoading={isLoading} className="w-full">
-                                    Login
+                                    Masuk
                                 </Button>
                                 :
                                 <Button type="button" onClick={submitForm} isLoading={isLoading} className="w-full">
-                                    Login
+                                    Masuk
                                 </Button>
                         }
                         <div className="mt-4">
                             <Text type="body">
-                                Already have an account? <Link href="/auth/register">Sign up</Link>{" "}
-                                here
+                                Sudah punya akun? <Link href="/auth/register">Registrasi</Link>{" "}
+                                di sini
                             </Text>
                         </div>
                     </form>

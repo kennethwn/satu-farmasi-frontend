@@ -2,7 +2,7 @@ import PrescriptionForm from "@/components/DynamicForms/PrescriptionForm";
 import Layout from "@/components/Layouts";
 import ContentLayout from "@/components/Layouts/Content";
 import { useUserContext } from "../api/context/UserContext";
-import { useEffect, useState } from "react";
+import {  useState } from "react";
 import PatientForm from "@/components/DynamicForms/PatientForm";
 import Input from "@/components/Input";
 import useSubmitDiagnose from "../api/submitDiagnose";
@@ -11,12 +11,13 @@ import { z, ZodError } from "zod";
 import { isRequiredNumber, isRequiredString } from "@/helpers/validation";
 import { ErrorForm } from "@/helpers/errorForm";
 import { toast } from "react-toastify";
+import Button from "@/components/Button";
 
 // FIX: if thhe token is already expired, the user is still able to access the page
 
 const medicineSchema = z.object({
     instruction: isRequiredString(),
-    medicineId: isRequiredNumber(),
+    code: isRequiredString(),
     quantity: isRequiredNumber(),
 })
 
@@ -54,12 +55,13 @@ export default function index() {
 
     const [formFields, setFormFields] = useState([
         {   
-            medicineId: -1,
+            code: "",
             medicineName: "",
             quantity: 0,
             price: 0,
             totalPrice: 0,
-            instruction: ""
+            instruction: "",
+            currStock: 0
         }
     ])
     const [selectedPatient, setSelectedPatient] = useState(
@@ -86,10 +88,11 @@ export default function index() {
                         phoneNum: ""
                     },
                     medicineList : [{
-                        medicineId : -1,
+                        code : -1,
                         price: 0,
                         quantity : 0,
-                        instruction: ""
+                        instruction: "",
+                        currStock: 0
                     }]
                 }
             }
@@ -100,22 +103,20 @@ export default function index() {
             data.prescription.patient = selectedPatient
             data.prescription.medicineList.pop()
             const temp = [...formFields]
-            console.log(temp)
             temp.map(item => data.prescription.medicineList.push({
-                medicineId: parseInt(item.medicineId),
+                code: item.code,
                 quantity: parseInt(item.quantity),
                 instruction: item.instruction,
                 price: item.totalPrice,
             }))
-
-            console.log(data)
             setErrors({});
+
             if (existingPatient) diagnoseSchemaWithExistingPatient.parse(data);
             else diagnoseSchemaNewPatient.parse(data)
             const res = await submitDiagnose(data)
             toast.success(res.message, { autoClose: 2000, position: "top-right" });
         } catch (error) {
-            console.log("error: ", error)
+            console.log("error try catch: ", error)
             if (error instanceof ZodError) {
                 const newErrors = { ...errors };
                 error.issues.forEach((issue) => {
@@ -132,16 +133,9 @@ export default function index() {
         }
     }
 
-    const styles = {
-        userSelect: "none",
-        borderRadius: "0.5rem",
-        fontWeight: 600,
-        cursor: "pointer"
-    };
-
     return (
         <Layout active="diagnose" user={user}>
-            <ContentLayout title="Diagnosis">
+            <ContentLayout title="Tambah Diagnosis">
                 <form onSubmit={handleSubmitDiagnose} className="flex flex-col gap-6">
                     <div className="flex flex-col gap-2">
                         <p> Judul </p>
@@ -152,15 +146,15 @@ export default function index() {
                                 setTitle(e.target.value)
                                 setErrors({ ...errors, "title": "" });
                             }} 
-                            placeholder="name" 
+                            placeholder="Judul" 
                             error={errors["title"]} 
                         />
                     </div>
                     <div className="flex flex-col gap-2">
                         <Toggle 
                             size="lg" 
-                            checkedChildren="Existing Patient" 
-                            unCheckedChildren="New Patient" 
+                            checkedChildren="Pasien Lama" 
+                            unCheckedChildren="Pasien Baru" 
                             defaultChecked 
                             onChange={(e) => {
                                 setExistingPatient(e)
@@ -187,7 +181,7 @@ export default function index() {
                         setErrors={setErrors}
                     />
                     <div className="flex flex-col gap-2">
-                        <p> Description </p>
+                        <p> Deskripsi </p>
                         <Input 
                             type="text" 
                             id="description" 
@@ -196,13 +190,13 @@ export default function index() {
                                 setDescription(e.target.value)
                                 setErrors({ ...errors, "description": "" });
                             }} 
-                            placeholder="name" error={errors["description"]} />
+                            placeholder="Deskripsi" error={errors["description"]} />
                     </div>
-                    <input
-                        style={styles}
-                        type="submit"
-                        value="Submit Diagnose"
-                    />
+                    <div className="flex justify-center gap-2 my-6 lg:justify-end">
+                        <Button type="submit" appearance="primary">
+                            Simpan
+                        </Button>
+                    </div>
                 </form>
             </ContentLayout>
         </Layout>

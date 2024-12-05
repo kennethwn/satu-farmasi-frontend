@@ -6,7 +6,7 @@ import { useUserContext } from "@/pages/api/context/UserContext";
 import { useEffect, useRef, useState } from "react";
 import { useForm } from "react-hook-form";
 import { IoMdAdd } from "react-icons/io";
-import { Pagination, SelectPicker, Table, Modal } from "rsuite";
+import { Pagination, SelectPicker, Table, Modal, Checkbox } from "rsuite";
 import { MdOutlineEdit } from "react-icons/md";
 import { PiTrash } from "react-icons/pi";
 import { toast } from "react-toastify";
@@ -131,16 +131,17 @@ export default function index(props) {
 		}
 	}
 
-	const HandleDeleteGeneric = async () => {
+	const handledeletegeneric = async (rowData) => {
 		try {
-			const res = await DeleteGeneric(editInput);
+            rowData = { ...rowData, isActive: rowData.is_active };
+			const res = await DeleteGeneric(rowData);
 			if (res.code !== 200) {
 				toast.error(res.message, { autoClose: 2000, position: "top-right" });
 				return;
 			}
 			toast.success(res.message, { autoClose: 2000, position: "top-right" });
 			setOpen({ ...open, delete: false });
-            reset();
+			         reset();
 			HandeFetchGenericData();
 		} catch (error) {
 			console.error(error);
@@ -179,7 +180,7 @@ export default function index(props) {
 					<SearchBar
 						size="md"
 						className="w-1/4"
-						placeholder="Search..."
+						placeholder="Cari Generik Obat ..."
 						onChange={(value) => setSearch(value)}
 					/>
 				</div>
@@ -200,18 +201,33 @@ export default function index(props) {
 							</Cell>
 						</Column>
 
-						<Column width={400}>
-							<HeaderCell className="text-dark font-bold">ID Generik</HeaderCell>
-							<Cell dataKey='label' />
-						</Column>
-
 						<Column flexGrow={1}>
 							<HeaderCell className="text-dark font-bold">Nama Generik</HeaderCell>
 							<Cell dataKey='value' />
 						</Column>
 
+                        <Column width={100} fixed="right">
+                            <HeaderCell className="text-center text-dark">Status Aktif</HeaderCell>
+                            <Cell className="text-center">
+                                {
+                                    rowData => {
+                                        return (
+                                            <div className="inline-flex items-center justify-center w-8 h-8 text-center bg-transparent border-0 rounded-lg">
+                                                <Checkbox
+                                                    checked={rowData?.is_active} 
+                                                    onChange={() => {
+                                                        handledeletegeneric({ ...rowData, is_active: !rowData.is_active, id: parseInt(rowData.id) });
+                                                    }}
+                                                />
+                                            </div>
+                                        )
+                                    }
+                                }
+                            </Cell>
+                        </Column>
+
 						<Column width={150} fixed="right">
-							<HeaderCell className="text-center text-dark font-bold">Action</HeaderCell>
+							<HeaderCell className="text-center text-dark font-bold">Aksi</HeaderCell>
 							<Cell className="text-center">
 								{
 									rowData => {
@@ -230,19 +246,6 @@ export default function index(props) {
 													<MdOutlineEdit
 														size="2em"
 														color="#FFD400"
-													/>
-												</button>
-
-												<button
-													className="inline-flex items-center justify-center w-8 h-8 text-center bg-transparent border-0 rounded-lg"
-													onClick={() => {
-														setEditInput({ ...rowData, is_active: false, id: parseInt(rowData.id) });
-														setOpen({ ...open, delete: true });
-													}}
-												>
-													<PiTrash
-														size="2em"
-														color="#DC4A43"
 													/>
 												</button>
 											</div>
@@ -319,7 +322,7 @@ export default function index(props) {
 				}}
 				size="lg"
 			>
-				<Header className="text-2xl font-bold">Edit Generik Obat</Header>
+				<Header className="text-2xl font-bold">Ubah Generik Obat</Header>
 				<form onSubmit={handleSubmit(HandleEditGeneric)} ref={editFormRef}>
 					<Body className="pt-2">
 						<Input
@@ -345,20 +348,6 @@ export default function index(props) {
 					</Footer>
 				</form>
 			</Modal>
-
-			<Toaster
-				type="warning"
-				open={open.delete}
-				onClose={() => setOpen({ ...open, delete: false })}
-				body={
-					<>
-						Apakah anda yakin untuk menghapus data{" "}
-						<span className="text-danger">{editInput.label}</span>?
-					</>
-				}
-				btnText="Hapus"
-				onClick={HandleDeleteGeneric}
-			/>
 		</Layout>
 	)
 }

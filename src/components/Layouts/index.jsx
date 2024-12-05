@@ -223,7 +223,7 @@ export default function Layout(props) {
                                 <span className='text-sm font-semibold text-dark'>{user?.name || "Kenneth William N"}</span>
                             </div>
                             <div className='px-[18px] overflow-hidden w-full whitespace-nowrap'>
-                                <Button appearance='danger' className='w-full' onClick={() => setAskForLogout(true)}>Logout</Button>
+                                <Button appearance='danger' className='w-full' onClick={() => setAskForLogout(true)}>Keluar</Button>
                             </div>
                         </React.Fragment>
                         :
