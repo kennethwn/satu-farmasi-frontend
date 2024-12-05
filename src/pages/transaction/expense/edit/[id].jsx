@@ -45,9 +45,7 @@ export default function Index() {
     const { user } = useUserContext();
     const id = router.query.id;
     const { isLoading, GetMedicineById, EditMedicine, GetOuputMedicineById } = useExpenseMedicineAPI();
-    const { getMedicineDropdownOptions } = useMedicineDropdownOption();
-    const [medicineDropdownOptions, setMedicineDropdownOptions] = useState([])
-    const [data, setData] = useState([]);
+    const [ medicineData, setMedicineData ] = useState({})
     const [formData, setFormData] = useState({
         medicineId: 0,
         quantity: 0,
@@ -99,6 +97,11 @@ export default function Index() {
                 router.push("/transaction/expense");
             }, 2000)
         } catch (error) {
+            toast.error(error.response.data.message, {
+                autoClose: 2000,
+                position: "top-right",
+            });
+            error = error.response.data.errors
             if (error instanceof ZodError) {
                 const newErrors = { ...errors };
                 error.issues.forEach((issue) => {
@@ -117,28 +120,10 @@ export default function Index() {
     const reasonOfDisposeListData = ["Broken", "Lost", "Expired"]
         .map(item => ({ label: item, value: item.toUpperCase() }));
 
-
-    useEffect(() => {
-        setData(Object.entries(medicineDropdownOptions)
-            .map(([key, item]) => ({ label: item.name, value: key, })))
-    }, [medicineDropdownOptions])
-
     useEffect(() => {
         const fetchData = async () => await handleFetchMedicineById();
         if (router.isReady) fetchData();
     }, [id]);
-
-    useEffect(() => {
-        async function fetchMedicineDropdownOptionsData() {
-            try {
-                const response = await getMedicineDropdownOptions()
-                setMedicineDropdownOptions(response)
-            } catch (error) {
-                console.error(error);
-            }
-        }
-        fetchMedicineDropdownOptionsData()
-    }, [])
 
     const inputOnChangeHandler = (e, name) => {
         if (name === "medicineId" || name === "reasonOfDispose") {
@@ -165,6 +150,7 @@ export default function Index() {
                     currStock: res.data.currStock
                 }
             })
+            setMedicineData(res.data)
             if (res.data.quantity === 0) {
                 const newErrors = { ...errors };
                 newErrors["currStock"] = "Current Medicine Stock is empty";
@@ -210,16 +196,14 @@ export default function Index() {
                                     }
                                     {
                                         input.name == "medicineId" &&
-                                        <Dropdown
+                                        <Input
                                             id={index}
                                             name={input.name}
                                             label={input.label}
-                                            data={Object.entries(medicineDropdownOptions)
-                                                .map(([key, item]) => ({ label: item.name, value: key, }))}
-                                            value={formData.medicineId.toString()}
-                                            onChange={e => inputOnChangeHandler(e, input.name)}
+                                            value={medicineData.name}
                                             placeholder="Select Medicine Name"
                                             error={errors[input.name]}
+                                            disabled="true"
                                         />
                                     }
                                     {

@@ -33,7 +33,7 @@ export default function MedicineList(props) {
                 <Cell>
                     {(rowData) => {
                         return (<div className="flex flex-col h-full">
-                            <p>{status === "UNPROCESSED" ? rowData?.medicineName : rowData?.medicine?.name} <br /> <span className="text-gray-500">{rowData.instruction}</span></p>
+                            <p>{rowData?.medicineName  ? rowData?.medicineName : rowData?.medicine?.name} <br /> <span className="text-gray-500">{rowData.instruction}</span></p>
                         </div>)
                         // <Grid>
                         //     <Row>

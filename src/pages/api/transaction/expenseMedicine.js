@@ -57,7 +57,7 @@ export default function useExpenseMedicineAPI() {
         try {
             return await axios.post("/api/v1/outputMedicines/", data);
         } catch (error) {
-            throw error.response.data.errors;
+            throw error;
         } finally {
             setIsLoading(false);
         }
@@ -68,7 +68,7 @@ export default function useExpenseMedicineAPI() {
         try {
             return await axios.put(`/api/v1/outputMedicines/`, data);
         } catch (error) {
-            throw error.response.data.errors;
+            throw error
         } finally {
             setIsLoading(false);
         }
