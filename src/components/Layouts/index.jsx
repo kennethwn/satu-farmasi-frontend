@@ -75,7 +75,7 @@ export default function Layout(props) {
         } else if (expand || type === 'child') {
             color = '#333333';
         }
-        return <span style={{ color: color }}>{title}</span>;
+        return <span style={{ color: color, paddingLeft: `${type === 'child' && '12px'}` }}>{title}</span>;
     }
 
     return (
