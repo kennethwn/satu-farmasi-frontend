@@ -5,6 +5,7 @@ import propTypes from 'prop-types'
 import Dropdown from "../SelectPicker/Dropdown";
 
 import dynamic from 'next/dynamic';
+import { generateYearList } from "@/helpers/dayHelper";
 const ApexChart = dynamic(() => import('react-apexcharts'), { ssr: false });
 
 export default function Chart({
@@ -12,32 +13,65 @@ export default function Chart({
     options = {},
     series = [],
     monthPicker = false,
+    yearPicker = false,
     className = "",
     report,
     setCurrentMonth,
+    setCurrentYear,
+    description,
     ...props
 }) {
 
     const [curMonth, setCurMonth] = useState(0);
+    const [curYear, setCurYear] = useState(0);
+    const [yearList, setYearList] = useState([]);
 
-    const getCurrentMonth = () => {
+    const getCurrentDate = () => {
         const date = new Date();
         const month = date.getMonth()+1;
+        const year = date.getFullYear();
         setCurMonth(month);
+        setCurYear(year);
+    }
+
+    const getYearList = () => {
+        const list = generateYearList(2000, new Date().getFullYear());
+        setYearList(list);
     }
 
     useEffect(() => {
-        getCurrentMonth();
+        getCurrentDate();
     }, [month]);
+    
+    useEffect(() => {
+        getYearList();
+    }, []);
 
     return (
         <Panel {...props} className={`overflow-auto ${className}`} bordered shaded>
             <div className="w-full gap-y-8 max-lg:min-h-28 flex flex-col">
                 <div className="flex flex-row w-full justify-between items-start">
-                    <span className="font-bold w-full text-2xl">{title}</span>
+                    <div className="flex flex-col gap-2">
+                        <span className="font-bold text-2xl">{title}</span>
+                        <span className="font-extralight text-gray-500 text-md">{description}</span>
+                    </div>
+                    {yearPicker && 
+                        <Dropdown 
+                            value={curYear}
+                            className="w-[10rem]"
+                            placement="topEnd"
+                            data={yearList}
+                            onChange={value => {
+                                setCurYear(value);
+                                setCurrentYear(value);
+                            }}
+                        />
+                    }
                     {monthPicker && 
                         <Dropdown 
                             value={curMonth}
+                            className="w-[10rem]"
+                            placement="topEnd"
                             data={month?.map(item => ({label: item.label, value: item.id}))}
                             onChange={value => {
                                 setCurMonth(value);
@@ -62,9 +96,12 @@ Chart.propTypes = {
     title: propTypes.string,
     type: propTypes.string,
     monthPicker: propTypes.bool,
+    yearPicker: propTypes.bool,
     options: propTypes.object,
     series: propTypes.array,
     className: propTypes.string,
     report: propTypes.node,
     setCurrentMonth: propTypes.func,
+    setCurrentYear: propTypes.func,
+    description: propTypes.string,
 }

@@ -85,6 +85,7 @@ export default function MedicineClassificationForm(props) {
 										valueKey='id'
 										labelKey='label'
 										block
+										cleanable={false}
 									/>
 									:
 									<>
@@ -107,6 +108,7 @@ export default function MedicineClassificationForm(props) {
 													[`classificationList[${index}]`]: ""
 												});
 											}}
+											cleanable={false}
 										/>
 										{
 											errors[`classificationList[${index}]`] &&
@@ -127,7 +129,7 @@ export default function MedicineClassificationForm(props) {
 								)
 								}
 								<button
-									className={`justify-center w-full block rounded-md py-2 lg:mt-3 stroke-2 shadow-sm ${formFields.length > 1 ? ' stroke-white' : 'lg:stroke-gray-300 stroke-white'} lg:shadow-none lg:border-0 border-2 border-gray-300 placeholder:text-gray-400 sm:text-sm sm:leading-6`}
+									className={`flex justify-center w-full rounded-md py-2 lg:mt-3 stroke-2 shadow-sm ${formFields.length > 1 ? 'stroke-white' : 'lg:stroke-gray-300 stroke-white'} lg:shadow-none lg:border-0 border-2 border-gray-300 placeholder:text-gray-400 sm:text-sm sm:leading-6`}
 									disabled={formFields?.length > 1 ? false : true}
 									onClick={(e) => {
 										e.preventDefault();

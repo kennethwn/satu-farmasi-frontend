@@ -1,27 +1,18 @@
 import Button from "@/components/Button";
 import Layout from "@/components/Layouts";
 import ContentLayout from "@/components/Layouts/Content";
+import MasterMedicineList from "@/components/MedicineLIst/MasterMedicineList";
 import Toaster from "@/components/Modal/Toaster";
-import SearchBar from "@/components/SearchBar";
-import { formatRupiah } from "@/helpers/currency";
-import formatDate from "@/helpers/dayHelper";
-import { resolveStatusStockMedicine } from "@/helpers/resolveStatus";
 import { useUserContext } from "@/pages/api/context/UserContext";
 import useMedicineAPI from "@/pages/api/master/medicine";
-import { useRouter } from "next/router";
 import { useEffect, useState } from "react";
-import { MdOutlineEdit } from "react-icons/md";
-import { PiTrash } from "react-icons/pi";
 import { toast } from "react-toastify";
-import { Pagination, Table } from "rsuite";
+import { Divider } from "rsuite";
 
 export default function index() {
-    const router = useRouter();
     const { user } = useUserContext();
-    const { HeaderCell, Cell, Column } = Table;
-    const { isLoading: loading, GetAllMedicines, SearchMedicine, DeleteMedicine } = useMedicineAPI(); 
+    const { isLoading, GetMedicineListById, GetMedicineListByCode, SearchMedicine, DeleteMedicine } = useMedicineAPI(); 
 
-    const [isLoading, setIsLoading] = useState(false);
     const [modalDelete, setModalDelete] = useState(false);
     const [selectedMedicine, setSelectedMedicine] = useState({});
     const [data, setData] = useState([]);
@@ -30,27 +21,32 @@ export default function index() {
     const [page, setPage] = useState(1);
     const [totalPage, setTotalPage] = useState(0);
     const [limit, setLimit] = useState(10);
+    const [type, setType] = useState(0);
+    const [sortBy, setSortBy] = useState("");
+    const [sortMode, setSortMode] = useState("");
 
-    const handleFetchMedicines = async () => {
-        try {
-            const res = await GetAllMedicines(page, limit);
-            console.log(res);
-            if (res.code !== 200) {
-                toast.error(res.message, { autoClose: 2000, position: "top-right" });
-                return;
-            }
-            setData(res.data.results);
-            setTotalPage(res.data.total);
-        } catch (error) {
-            console.error(error);
+    const handleSwitchForm = (typeState) => {
+        switch (typeState) {
+            case 0:
+                setType(0);
+                handleFetchMedicines();
+                break;
+            case 1:
+                setType(1);
+                handleFetchMedicines();
+                break;
+            default:
+                setType(0);
+                break;
         }
     }
 
-    const handleSearchMedicines = async () => {
+    const handleFetchMedicines = async () => {
         try {
-            // TODO: By Name atau By Code
-            const res = await SearchMedicine(page, limit, search);
-            if (res.code != 200) {
+            const res = type == 1
+                ? await GetMedicineListById(page, limit, search, sortBy, sortMode)
+                : await GetMedicineListByCode(page, limit, search, sortBy, sortMode);
+            if (res.code !== 200) {
                 toast.error(res.message, { autoClose: 2000, position: "top-right" });
                 return;
             }
@@ -81,189 +77,61 @@ export default function index() {
 
     useEffect(() => {
         async function fetchData() {
-            if (search === '') {
-                await handleFetchMedicines();
-            } else {
-                await handleSearchMedicines();
-            }
+            await handleFetchMedicines();
         }
         fetchData();
-    }, [page, limit, search]);
+    }, [page, limit, search, type, sortBy, sortMode]);
 
     return (
         <Layout active="master-medicine" user={user}>
             <ContentLayout title="List Obat">
-                <div className="w-full h-[500px]">
-                    <div className="flex flex-row justify-end items-center w-full pb-6">
-                        <SearchBar 
-                            size="md"
-                            className="w-1/4"
-                            placeholder="Search..."
-                            onChange={(value) => setSearch(value)}
-                        />
+                <div className="w-full h-full">
+                    <div className="flex flex-col w-full md:flex-row gap-4">
+                        <Button size="small" appearance={`${type == 0 ? 'primary' : 'subtle'}`} onClick={() => handleSwitchForm(0)}>Master Obat</Button>
+                        <Button size="small" appearance={`${type == 1 ? 'primary' : 'subtle'}`} onClick={() => handleSwitchForm(1)}>List Obat</Button>
                     </div>
-                    <Table
-                        data={data || []}
-                        bordered
-                        cellBordered
-                        height={400}
-                        shouldUpdateScroll={false}
-                        affixHorizontalScrollbar
-                        loading={isLoading}
-                    >
-                        <Column width={50} fixed="left">
-                            <HeaderCell className="text-center text-dark ">No</HeaderCell>
-                            <Cell className="text-center text-dark">
-                                {(rowData, index) => index + 1}
-                            </Cell>
-                        </Column>
-
-                        <Column width={250} fullText resizable>
-                            <HeaderCell className="text-dark ">Kode</HeaderCell>
-                            <Cell dataKey='code'/>
-                        </Column>
-
-                        <Column width={250} fullText resizable>
-                            <HeaderCell className="text-dark ">Nama</HeaderCell>
-                            <Cell dataKey='name'/>
-                        </Column>
-
-                        <Column width={250} fullText resizable>
-                            <HeaderCell className="text-dark ">Merk</HeaderCell>
-                            <Cell dataKey='merk'/>
-                        </Column>
-
-                        <Column width={250} fullText resizable>
-                            <HeaderCell className="text-dark ">Generik</HeaderCell>
-                            <Cell>
-                                {(rowData) => rowData?.genericName?.label}
-                            </Cell>
-                        </Column>
-
-                        <Column width={250} fullText resizable>
-                            <HeaderCell className="text-dark ">Kemasan</HeaderCell>
-                            <Cell>
-                                {(rowData) => rowData?.packaging?.label}
-                            </Cell>
-                        </Column>
-
-                        <Column width={250} fullText resizable>
-                            <HeaderCell className="text-dark ">Deskripsi</HeaderCell>
-                            <Cell dataKey='description'/>
-                        </Column>
-
-                        <Column width={250} fullText resizable>
-                            <HeaderCell className="text-dark ">Satuan</HeaderCell>
-                            <Cell dataKey='unitOfMeasure'/>
-                        </Column>
-
-                        <Column width={250} fullText resizable>
-                            <HeaderCell className="text-dark ">Harga</HeaderCell>
-                            <Cell dataKey='price'>
-                                {(rowData) => formatRupiah(rowData?.price)}    
-                            </Cell>
-                        </Column>
-
-                        <Column width={250} fullText resizable>
-                            <HeaderCell className="text-dark ">Current Stock</HeaderCell>
-                            <Cell dataKey='currStock'/>
-                        </Column>
-
-                        <Column width={250} fullText resizable>
-                            <HeaderCell className="text-dark ">Minimum Stock</HeaderCell>
-                            <Cell dataKey='minStock'/>
-                        </Column>
-
-                        <Column width={250} fullText resizable>
-                            <HeaderCell className="text-dark ">Maximum Stock</HeaderCell>
-                            <Cell dataKey='maxStock'/>
-                        </Column>
-
-                        <Column width={250} fullText resizable>
-                            <HeaderCell className="text-dark ">Tanggal Masuk</HeaderCell>
-                            <Cell dataKey='created_at'>
-                                {rowData => formatDate(rowData?.created_at)}
-                            </Cell>
-                        </Column>
-
-                        <Column width={250} fullText resizable>
-                            <HeaderCell className="text-dark ">Tanggal Expired</HeaderCell>
-                            <Cell dataKey='expiredDate'>
-                                {rowData => formatDate(rowData?.expiredDate)}
-                            </Cell>
-                        </Column>
-
-                        <Column width={250} fullText resizable>
-                            <HeaderCell className="text-dark ">Efek Samping</HeaderCell>
-                            <Cell dataKey='sideEffect'/>
-                        </Column>
-
-                        <Column width={150} fullText fixed="right" resizable>
-                            <HeaderCell className="text-dark ">Status Stok</HeaderCell>
-                            <Cell dataKey='status_stock'>
-                                {rowData => resolveStatusStockMedicine(rowData.currStock, rowData.status_stock)}
-                            </Cell>
-                        </Column>
-
-                        <Column width={150} fixed="right">
-                            <HeaderCell className="text-center text-dark ">Action</HeaderCell>
-                            <Cell className="text-center" style={{ padding: '6px' }}>
-                                {
-                                    rowData => {
-                                        return (
-                                            <div className="flex justify-center flex-row gap-6">
-                                                <button
-                                                    className="inline-flex items-center justify-center w-8 h-8 text-center bg-transparent border-0 rounded-lg"
-                                                    onClick={() => {
-                                                        console.log(rowData);
-                                                        router.push(`/master/medicine/edit/${rowData?.code}`)
-                                                    }}
-                                                >
-                                                    <MdOutlineEdit 
-                                                        size="2em" 
-                                                        color="#FFD400" 
-                                                    />
-                                                </button>
-
-                                                <button
-                                                    className="inline-flex items-center justify-center w-8 h-8 text-center bg-transparent border-0 rounded-lg"
-                                                    onClick={() => {
-                                                        console.log(rowData);
-                                                        setSelectedMedicine(rowData);
-                                                        setModalDelete(!modalDelete);
-                                                    }}
-                                                >
-                                                    <PiTrash 
-                                                        size="2em" 
-                                                        color="#DC4A43" 
-                                                    />
-                                                </button>
-                                            </div>
-                                        )
-                                    }
-                                }
-                            </Cell>
-                        </Column>
-                    </Table>
-                    <div className="pt-4">
-                        <Pagination
-                            prev
-                            next
-                            first
-                            last
-                            ellipsis
-                            boundaryLinks
-                            maxButtons={5}
-                            size="xs"
-                            layout={["total", "-", "limit", "|", "pager"]}
-                            total={totalPage || 0}
-                            limitOptions={[5, 10, 15]}
+                    <Divider />
+                    {type == 0 &&
+                        <MasterMedicineList
+                            data={data}
+                            isLoading={isLoading}
+                            allowEdit={true}
+                            setSelectedMedicine={setSelectedMedicine}
+                            setModalDelete={setModalDelete}
+                            // allowDeleteData={true}
+                            totalPage={totalPage}
                             limit={limit}
-                            activePage={page}
-                            onChangePage={page => setPage(page)}
-                            onChangeLimit={limit => setLimit(limit)}
+                            page={page}
+                            isMaster={true}
+                            setLimit={setLimit}
+                            setPage={setPage}
+                            setSearch={setSearch}
+                            setSortBy={setSortBy}
+                            setSortMode={setSortMode}
+                            sortBy={sortBy}
+                            sortMode={sortMode}
                         />
-                    </div>
+                    }
+                    {type == 1 && 
+                        <MasterMedicineList
+                            data={data}
+                            isLoading={isLoading}
+                            editPageUrl="/"
+                            setSelectedMedicine={setSelectedMedicine}
+                            setModalDelete={setModalDelete}
+                            allowDeleteData={true}
+                            totalPage={totalPage}
+                            limit={limit}
+                            page={page}
+                            setLimit={setLimit}
+                            setPage={setPage}
+                            setSearch={setSearch}
+                            setSortBy={setSortBy}
+                            setSortMode={setSortMode}
+                            sortBy={sortBy}
+                            sortMode={sortMode}
+                        />
+                    }
                 </div>
             </ContentLayout>
 

@@ -55,7 +55,7 @@ export default function Dropdown({
                 <SelectPicker
                     container={() => containerRef.current}
                     preventOverflow={true}
-                    menuMaxHeight={100}
+                    menuMaxHeight={300}
                     placeholder={placeholder}
                     onChange={onChange}
                     className={`${className} pb-2`}
@@ -83,7 +83,7 @@ Dropdown.propTypes = {
     placement: propTypes.string,
     error: propTypes.string,
     className: propTypes.string,
-    placeholder: propTypes.string,
+    placeholder: propTypes.any,
     onChange: propTypes.func,
     value: propTypes.any,
     defaultValue: propTypes.any,
