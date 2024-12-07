@@ -36,12 +36,13 @@ export default function Index() {
     const handleActivateStaff = async (rowData) => {
         try {
             let selectedData = data.find((item) => item.nik === rowData.nik);
+            console.log("selectedData: ", selectedData);
             selectedData.is_active = !selectedData.is_active;
 
             let res = null;
             if (selectedData.role.toLowerCase() === "admin") res = await EditAdmin(selectedData);
-            else if (selectedData.role.toLowerCase() === "dokter") res = await EditDoctor(selectedData);
-            else if (selectedData.role.toLowerCase() === "farmasi") res = await EditPharmacist(selectedData);
+            else if (selectedData.role.toLowerCase() === "doctor") res = await EditDoctor(selectedData);
+            else if (selectedData.role.toLowerCase() === "pharmacist") res = await EditPharmacist(selectedData);
                 console.log("res: ", res);
             toast.success(res.message, { autoClose: 2000, position: "top-right" });
             handleFetchStaffData();
@@ -78,7 +79,7 @@ export default function Index() {
 
     return (
         <Layout active="master-staff" user={user}>
-            <ContentLayout title="Daftar Staf">
+            <ContentLayout title="List Staf">
                 <div className="flex flex-row justify-between w-full">
                     <SelectPicker
                         style={{
@@ -88,6 +89,7 @@ export default function Index() {
                             borderRadius: '0.4rem',
                         }}
                         label="Role"
+                        searchable={false}
                         data={roles.map((role) => ({ label: role, value: role }))}
                         value={filter}
                         cleanable={false}
@@ -118,43 +120,43 @@ export default function Index() {
                     // wordWrap
                     >
                         <Column width={50} fixed="left">
-                            <HeaderCell className="text-center text-dark">No</HeaderCell>
-                            <Cell className="text-center text-dark">
+                            <HeaderCell className="text-center text-dark font-bold">No</HeaderCell>
+                            <Cell className="text-center text-dark font-bold">
                                 {(rowData, index) => index + 1}
                             </Cell>
                         </Column>
 
                         <Column flexGrow={1}>
-                            <HeaderCell className="text-dark">NIK</HeaderCell>
+                            <HeaderCell className="text-dark font-bold">NIK</HeaderCell>
                             <Cell dataKey='nik' />
                         </Column>
 
                         <Column flexGrow={1}>
-                            <HeaderCell className="text-dark">Nama Lengkap</HeaderCell>
+                            <HeaderCell className="text-dark font-bold">Nama Lengkap</HeaderCell>
                             <Cell>
                                 {rowData => `${rowData?.firstName} ${rowData?.lastName}`}
                             </Cell>
                         </Column>
 
                         <Column flexGrow={1}>
-                            <HeaderCell className="text-dark">Email</HeaderCell>
+                            <HeaderCell className="text-dark font-bold">Email</HeaderCell>
                             <Cell className="text-dark" dataKey='email' />
                         </Column>
 
                         <Column flexGrow={1}>
-                            <HeaderCell className="text-dark">No Handphone</HeaderCell>
+                            <HeaderCell className="text-dark font-bold">No Handphone</HeaderCell>
                             <Cell className="text-dark" dataKey='phoneNum' />
                         </Column>
 
                         <Column flexGrow={1}>
-                            <HeaderCell className="text-dark">Tanggal Lahir</HeaderCell>
+                            <HeaderCell className="text-dark font-bold">Tanggal Lahir</HeaderCell>
                             <Cell className="text-dark">
                                 {rowData => formatDate(rowData?.dob)}
                             </Cell>
                         </Column>
 
                         <Column width={100} fixed="right">
-                            <HeaderCell className="text-center text-dark">Status Aktif</HeaderCell>
+                            <HeaderCell className="text-center text-dark font-bold">Status Aktif</HeaderCell>
                             <Cell className="text-center">
                                 {
                                     rowData => {
@@ -173,7 +175,7 @@ export default function Index() {
                         </Column>
 
                         <Column width={100} fixed="right">
-                            <HeaderCell className="text-center text-dark">Aksi</HeaderCell>
+                            <HeaderCell className="text-center text-dark font-bold">Aksi</HeaderCell>
                             <Cell className="text-center">
                                 {
                                     rowData => {

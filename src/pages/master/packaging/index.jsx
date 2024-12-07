@@ -72,9 +72,7 @@ export default function index(props) {
 
     const HandeFetchPackagingData = async () => {
         try {
-            console.log("fetching ...")
             const res = await GetAllPackaging(page, limit);
-            console.log("res: ", res);
             if (res.code !== 200) {
                 toast.error(res.message, { autoClose: 2000, position: "top-right" });
                 return;
@@ -205,7 +203,7 @@ export default function index(props) {
                         </Column>
 
                         <Column width={100} fixed="right">
-                            <HeaderCell className="text-center text-dark">Status Aktif</HeaderCell>
+                            <HeaderCell className="text-center text-dark font-bold">Status Aktif</HeaderCell>
                             <Cell className="text-center">
                                 {
                                     rowData => {

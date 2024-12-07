@@ -3,7 +3,7 @@ import ContentLayout from "@/components/Layouts/Content";
 import { useUserContext } from "@/pages/api/context/UserContext";
 import useVendorAPI from "@/pages/api/master/vendor";
 import { useEffect, useState } from "react";
-import { Pagination, Table } from "rsuite";
+import { Checkbox, Pagination, Table } from "rsuite";
 import Button from "@/components/Button";
 import { IoMdAdd } from "react-icons/io";
 import SearchBar from "@/components/SearchBar";
@@ -61,10 +61,10 @@ export default function index() {
         }
     };
 
-    const HandleDeleteVendor = async () => {
+    const HandleDeleteVendor = async (rowData) => {
         try {
-            setEditInput({ ...editInput, is_active: false });
-            const res = await DeleteVendor(editInput);
+            rowData = { ...rowData, isActive: rowData.is_active };
+            const res = await DeleteVendor(rowData);
             if (res.code !== 200) {
                 toast.error(res.message, {
                     autoClose: 2000,
@@ -155,6 +155,26 @@ export default function index() {
                             <Cell dataKey="city" />
                         </Column>
 
+                        <Column width={100} fixed="right">
+                            <HeaderCell className="text-dark text-center font-bold">Status Aktif</HeaderCell>
+                            <Cell className="text-center">
+                                {
+                                    rowData => {
+                                        return (
+                                            <div className="inline-flex items-center justify-center w-8 h-8 text-center bg-transparent border-0 rounded-lg">
+                                                <Checkbox
+                                                    checked={rowData?.is_active} 
+                                                    onChange={() => {
+                                                        HandleDeleteVendor({ ...rowData, is_active: !rowData.is_active, id: parseInt(rowData.id) });
+                                                    }}
+                                                />
+                                            </div>
+                                        )
+                                    }
+                                }
+                            </Cell>
+                        </Column>
+
                         <Column width={150} fixed="right">
                             <HeaderCell className="text-center text-dark font-bold">
                                 Aksi
@@ -170,16 +190,6 @@ export default function index() {
                                                 }
                                             >
                                                 <MdOutlineEdit size="2em" color="#FFD400" />
-                                            </button>
-
-                                            <button
-                                                className="inline-flex items-center justify-center w-8 h-8 text-center bg-transparent border-0 rounded-lg"
-                                                onClick={() => {
-                                                    setEditInput({ ...rowData, is_active: false });
-                                                    setOpen({ ...open, delete: true });
-                                                }}
-                                            >
-                                                <PiTrash size="2em" color="#DC4A43" />
                                             </button>
                                         </div>
                                     );

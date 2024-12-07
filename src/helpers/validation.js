@@ -14,8 +14,15 @@ const isRequiredOptions = () =>
         });
 const isRequiredString = () =>
     isString().min(1, { message: "Bidang isi harus diisi" });
-const isRequiredPhoneNumber = () => 
-        z.number().refine(val => /^628\d{7,}$/.test(val ?? ""), "Nomor handphone harus diawali dengan 628 dan minimal 10 digit")
+const isRequiredPhoneNumber = () =>
+    z
+        .coerce
+        .number({ message: "Bidang isi harus diisi" })
+        .min(1, { message: "Bidang isi harus diisi" })
+        .refine(
+            (val) => /^628\d{7,}$/.test(val ?? ""),
+            "Nomor handphone harus diawali dengan 628 dan minimal 10 digit",
+        );
 const isPassword = () =>
     isString().min(8, { message: "Password is minimum 8 characters" });
 const isRequiredNumber = () =>
@@ -33,9 +40,8 @@ const isRequiredEmail = () =>
         .email({ message: "Email tidak valid" });
 
 const isRequiredDate = () =>
-    z.date()
-    .refine((val) => val instanceof Date && !isNaN(val.getTime()), {
-        message: "Bidang isi harus diisi dan harus tanggal yang valid"
+    z.date().refine((val) => val instanceof Date && !isNaN(val.getTime()), {
+        message: "Bidang isi harus diisi dan harus tanggal yang valid",
     });
 
 export {
@@ -49,5 +55,6 @@ export {
     isRequiredEmail,
     isRequiredNumber,
     isRequiredOptions,
-    isRequiredDate
+    isRequiredPhoneNumber,
+    isRequiredDate,
 };

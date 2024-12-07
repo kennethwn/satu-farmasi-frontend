@@ -89,26 +89,27 @@ export default function PrescriptionDetail(props) {
                 patientId: prescriptionData.patient.id,
                 prescriptionId: prescriptionData.id
             }
-            const res = await createTransaction(data);
-            console.log(res)
-            if (res.code !== 200) {
-                toast.error(res.message, { autoClose: 2000, position: "top-center" });
-                return;
-            } else {
-                toast.success(`Status Change to Waiting for Payment`, { autoClose: 2000, position: "top-center" });
-                setStatusChanged({prescriptionId: prescriptionId, status: "WAITING_FOR_PAYMENT"})
-                setPrescriptionsData(prescriptionData => ({
-                    ...prescriptionData,
-                    status: "WAITING_FOR_PAYMENT"
-                }))
-                const updatePrescriptionStatusPayload = {
-                    transactionId: -1,
-                    prescriptionId: prescriptionData.id,
-                    status: "WAITING_FOR_PAYMENT"
-                }
-                publishNotification(updatePrescriptionStatusPayload)
-                setOpen({ ...open, proceedToPayment: false })
-            }
+            console.log("proceed data: ", JSON.stringify(data))
+            //const res = await createTransaction(data);
+            //console.log(res)
+            //if (res.code !== 200) {
+            //    toast.error(res.message, { autoClose: 2000, position: "top-center" });
+            //    return;
+            //} else {
+            //    toast.success(`Status Change to Waiting for Payment`, { autoClose: 2000, position: "top-center" });
+            //    setStatusChanged({prescriptionId: prescriptionId, status: "WAITING_FOR_PAYMENT"})
+            //    setPrescriptionsData(prescriptionData => ({
+            //        ...prescriptionData,
+            //        status: "WAITING_FOR_PAYMENT"
+            //    }))
+            //    const updatePrescriptionStatusPayload = {
+            //        transactionId: -1,
+            //        prescriptionId: prescriptionData.id,
+            //        status: "WAITING_FOR_PAYMENT"
+            //    }
+            //    publishNotification(updatePrescriptionStatusPayload)
+            //    setOpen({ ...open, proceedToPayment: false })
+            //}
         } catch (error) {
             console.error(error)
         }

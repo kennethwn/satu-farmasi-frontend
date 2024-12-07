@@ -235,7 +235,7 @@ export default function index() {
 						</Column>
 
                         <Column width={100} fixed="right">
-                            <HeaderCell className="text-center text-dark">Status Aktif</HeaderCell>
+                            <HeaderCell className="text-center text-dark font-bold">Status Aktif</HeaderCell>
                             <Cell className="text-center">
                                 {
                                     rowData => {

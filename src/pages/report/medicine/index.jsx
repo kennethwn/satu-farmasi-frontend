@@ -50,9 +50,9 @@ export default function index() {
 
     return (
         <Layout active="master-report" user={user}>
-            <ContentLayout title="List Laporan">
+            <ContentLayout title="List Laporan Obat">
                 <div className="w-full h-[500px]">
-                    <div className="flex flex-row justify-between items-center w-full pb-6">
+                    <div className="flex flex-row justify-end items-center w-full pb-6">
                         <SearchBar
                             size="md"
                             className="w-1/4"

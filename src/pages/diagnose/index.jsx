@@ -8,12 +8,10 @@ import Input from "@/components/Input";
 import useSubmitDiagnose from "../api/submitDiagnose";
 import { Toggle } from "rsuite";
 import { z, ZodError } from "zod";
-import { isRequiredNumber, isRequiredString } from "@/helpers/validation";
+import { isRequiredNumber, isRequiredPhoneNumber, isRequiredString } from "@/helpers/validation";
 import { ErrorForm } from "@/helpers/errorForm";
 import { toast } from "react-toastify";
 import Button from "@/components/Button";
-
-// FIX: if thhe token is already expired, the user is still able to access the page
 
 const medicineSchema = z.object({
     instruction: isRequiredString(),
@@ -40,7 +38,7 @@ const diagnoseSchemaNewPatient = z.object({
         patient:  z.object({
             patientName: isRequiredString(),
             credentialNum: isRequiredString(),
-            phoneNum: isRequiredString(),
+            phoneNum: isRequiredPhoneNumber(),
         }),
     }),
 })

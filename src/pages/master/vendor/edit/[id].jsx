@@ -8,14 +8,14 @@ import { toast, ToastContainer } from "react-toastify";
 import { Loader } from "rsuite";
 import useVendorAPI from "@/pages/api/master/vendor";
 import { z } from "zod";
-import { isRequiredNumber, isRequiredString } from "@/helpers/validation";
+import { isRequiredNumber, isRequiredPhoneNumber, isRequiredString } from "@/helpers/validation";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useUserContext } from "@/pages/api/context/UserContext";
 
 const vendorSchema = z.object({
     name: isRequiredString(),
-    phoneNum: isRequiredString(),
+    phoneNum: isRequiredPhoneNumber(),
     address: isRequiredString(),
     city: isRequiredString(),
 });

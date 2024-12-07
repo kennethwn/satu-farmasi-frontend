@@ -7,7 +7,7 @@ import { useForm } from "react-hook-form";
 import { zodResolver } from '@hookform/resolvers/zod';
 import { z } from "zod";
 import Link from 'next/link'
-import { isOptionalString, isPassword, isRequiredOptions, isRequiredEmail, isRequiredString } from "@/helpers/validation";
+import { isOptionalString, isPassword, isRequiredOptions, isRequiredEmail, isRequiredString, isRequiredPhoneNumber } from "@/helpers/validation";
 import Text from "@/components/Text";
 import { ErrorForm } from "@/helpers/errorForm";
 import Button from "@/components/Button";
@@ -22,7 +22,7 @@ const registerSchema = z.object({
     nik: isRequiredString().min(16, { message: "NIK must be 16 characters" }),
     firstName: isRequiredString(),
     lastName: isRequiredString(),
-    phoneNum: isRequiredString().min(10, { message: "Phone number must be minimum 10 characters" }),
+    phoneNum: isRequiredPhoneNumber(),
     role: isRequiredOptions(),
     specialist: isOptionalString(),
     dob: isRequiredString(),

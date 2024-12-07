@@ -10,7 +10,7 @@ import { useRouter } from "next/router";
 import Button from "@/components/Button";
 import { toast } from "react-toastify";
 import { z, ZodError } from "zod";
-import { isRequiredNumber, isRequiredString } from "@/helpers/validation";
+import { isRequiredNumber, isRequiredPhoneNumber, isRequiredString } from "@/helpers/validation";
 import { ErrorForm } from "@/helpers/errorForm";
 
 const medicineSchema = z.object({
@@ -34,7 +34,7 @@ const prescriptionSchemaWithNewPatient = z.object({
         patient: z.object({
             patientName: isRequiredString(),
             credentialNum: isRequiredString(),
-            phoneNum: isRequiredString(),
+            phoneNum: isRequiredPhoneNumber(),
         }),
     }),
 });
@@ -98,8 +98,6 @@ export default function create() {
                 prescriptionSchemaWithExistingPatient.parse(dataToValidate);
             }
             else prescriptionSchemaWithNewPatient.parse(dataToValidate);
-
-            console.log(data)
 
             const res = await addNewPrescription(data);
             toast.success(res.message, {

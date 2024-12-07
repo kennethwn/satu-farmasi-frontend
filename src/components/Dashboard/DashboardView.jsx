@@ -105,7 +105,7 @@ export default function DashboardView(props) {
                 })}
             </div>
             <div className="flex flex-col max-lg:gap-y-4 lg:flex-row gap-x-4 w-full">
-                <TableLayout title="List Obat Expire Tahun Ini">
+                <TableLayout title={`List Obat Expire ${new Date().getFullYear()}`}>
                     <TableExpired data={dataExpired} link="/master/medicine" />
                 </TableLayout>
                 <TableLayout title="Sisa Transaksi" link="/transaction/dashboard">

@@ -3,10 +3,9 @@ import ContentLayout from "@/components/Layouts/Content";
 import { useUserContext } from "../api/context/UserContext";
 import usePrescription from "../api/prescription";
 import { useEffect, useState } from "react";
-import { Checkbox, Pagination, SelectPicker, Table } from "rsuite";
+import {  Pagination, SelectPicker, Table } from "rsuite";
 import SearchBar from "@/components/SearchBar";
-import { formatDateWithTime, convertToTimestampString } from "@/helpers/dayHelper";
-import { MdOutlineEdit } from "react-icons/md";
+import { formatDateWithTime } from "@/helpers/dayHelper";
 import Button from "@/components/Button";
 import { IoMdAdd } from "react-icons/io";
 import { useRouter } from "next/router";
@@ -17,7 +16,7 @@ import { PiListMagnifyingGlass } from "react-icons/pi";
 export default function index() {
     const { user } = useUserContext();
     const [prescriptionsData, setPrescriptionsData] = useState([])
-    const { isLoading: loading, getAllPrescription, getSearchedPrescription } = usePrescription()
+    const { isLoading: loading, getAllPrescription } = usePrescription()
     const [statusChanged, setStatusChanged] = useState({})
     const prescriptionStatusMap = prescriptionStatusMapped
     const [search, setSearch] = useState("");
@@ -25,9 +24,6 @@ export default function index() {
     const [totalPage, setTotalPage] = useState(0);
     const [limit, setLimit] = useState(10);
     const [filterStatus, setFilterStatus] = useState("")
-    const [sortColumn, setSortColumn] = useState();
-    const [sortType, setSortType] = useState();
-    const status = ["UNPROCESSED", "ON_PROGRESS", "WAITING_FOR_PAYMENT", "DONE", "CANCELED"];
     const { HeaderCell, Cell, Column } = Table;
     const router = useRouter()
     const [selectedPrescriptionId, setSelectedPrescriptionId] = useState(-1)
@@ -87,7 +83,7 @@ export default function index() {
 
     return (
         <Layout active="prescription" user={user}>
-            <ContentLayout title="Resep">
+            <ContentLayout title="List Resep">
             <div className="flex flex-col gap-2 md:flex-row justify-between w-full">
                 <div>
                     <Button
@@ -131,37 +127,36 @@ export default function index() {
                         bordered
                         cellBordered
                         shouldUpdateScroll={false}
-                        // height={600}
                         fillHeight
                         affixHorizontalScrollbar
                         loading={loading}
                     >
                         <Column width={50} fixed="left">
-                            <HeaderCell className="text-center text-dark">No</HeaderCell>
+                            <HeaderCell className="text-center text-dark font-bold">No</HeaderCell>
                             <Cell className="text-center text-dark">
                                 {(rowData, index) => index + 1}
                             </Cell>
                         </Column>
 
                         <Column flexGrow={1} resizable>
-                            <HeaderCell className="text-dark">Resep ID</HeaderCell>
+                            <HeaderCell className="text-dark font-bold">Resep ID</HeaderCell>
                             <Cell dataKey='id'/>
                         </Column>
 
                         <Column flexGrow={1} resizable>
-                            <HeaderCell className="text-dark">Timestamp</HeaderCell>
-                            <Cell className="text-dark">
+                            <HeaderCell className="text-dark font-bold">Timestamp</HeaderCell>
+                            <Cell className="text-dark font-bold">
                                 {rowData => formatDateWithTime(rowData?.created_at)}
                             </Cell>
                         </Column>
 
                         <Column flexGrow={1} resizable>
-                            <HeaderCell className="text-dark">Nama Pasien</HeaderCell>
+                            <HeaderCell className="text-dark font-bold">Nama Pasien</HeaderCell>
                             <Cell dataKey='patient.name'/>
                         </Column>
 
                         <Column flexGrow={1} resizable>
-                            <HeaderCell className="text-center text-dark">Status</HeaderCell>
+                            <HeaderCell className="text-center text-dark font-bold">Status</HeaderCell>
                             <Cell className="text-center">
                                 {(rowData) => {
                                     return (
@@ -178,7 +173,7 @@ export default function index() {
                         </Column>
 
                         <Column width={100} fixed="right">
-                            <HeaderCell className="text-center text-dark">Detail</HeaderCell>
+                            <HeaderCell className="text-center text-dark font-bold">Detail</HeaderCell>
                             <Cell className="text-center"  style={{padding: '6px'}}>
                                 {
                                     rowData => {

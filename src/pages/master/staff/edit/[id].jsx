@@ -3,7 +3,7 @@ import Input from "@/components/Input";
 import Layout from "@/components/Layouts";
 import ContentLayout from "@/components/Layouts/Content";
 import { convertToTimestampString } from "@/helpers/dayHelper";
-import { isOptionalBoolean, isOptionalString, isRequiredEmail, isRequiredString } from "@/helpers/validation";
+import { isOptionalBoolean, isOptionalString, isRequiredEmail, isRequiredPhoneNumber, isRequiredString } from "@/helpers/validation";
 import useStaffAPI from "@/pages/api/master/staff";
 import { useRouter } from "next/router";
 import { useEffect, useRef, useState } from "react";
@@ -21,7 +21,7 @@ const staffSchema = z.object({
     email: isRequiredEmail(),
     dob: isRequiredString(),
     nik: isRequiredString(),
-    phoneNum: isRequiredString(),
+    phoneNum: isRequiredPhoneNumber(),
     specialist: isOptionalString(),
     is_active: isOptionalBoolean(),
 });
