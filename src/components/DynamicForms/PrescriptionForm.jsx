@@ -163,7 +163,7 @@ function PrescriptionForm(props) {
                                         handleMedicineChange(index, value);
                                         setErrors({
                                             ...errors,
-                                            [`prescription.medicineList.${index}.medicineId`]:
+                                            [`prescription.medicineList.${index}.code`]:
                                                 "",
                                         });
                                     }}
