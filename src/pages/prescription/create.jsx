@@ -93,8 +93,10 @@ export default function create() {
             }))
             setErrors({});
             const dataToValidate = { prescription: data };
-            if (existingPatient)
+            if (existingPatient){
+                console.log("to be validate", dataToValidate)
                 prescriptionSchemaWithExistingPatient.parse(dataToValidate);
+            }
             else prescriptionSchemaWithNewPatient.parse(dataToValidate);
 
             console.log(data)

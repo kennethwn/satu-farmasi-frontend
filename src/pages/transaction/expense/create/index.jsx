@@ -44,7 +44,7 @@ export default function Index() {
     const router = useRouter();
     const { user } = useUserContext();
     const { isLoading, CreateMedicine, GetMedicineById } = useExpenseMedicineAPI();
-    const { getMedicineDropdownOptions } = useMedicineDropdownOption();
+    const { getMedicineDropdownOptionsById } = useMedicineDropdownOption();
     const [medicineDropdownOptions, setMedicineDropdownOptions] = useState([])
     const [currStockMedicine, setCurrStockMedicine] = useState(0);
     const [data, setData] = useState([]);
@@ -75,6 +75,11 @@ export default function Index() {
                 router.push("/transaction/expense");
             }, 2000)
         } catch (error) {
+            toast.error(error.response.data.message, {
+                autoClose: 2000,
+                position: "top-right",
+            });
+            error = error.response.data.errors
             if (error instanceof ZodError) {
                 const newErrors = { ...errors };
                 error.issues.forEach((issue) => {
@@ -100,7 +105,7 @@ export default function Index() {
     useEffect(() => {
         async function fetchMedicineDropdownOptionsData() {
             try {
-                const response = await getMedicineDropdownOptions()
+                const response = await getMedicineDropdownOptionsById()
                 setMedicineDropdownOptions(response.data)
             } catch (error) {
                 console.log("error #getMedicineOptions")

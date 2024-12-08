@@ -307,3 +307,86 @@ export const generateOrderPsychotropicMedicine = (input, formField) => {
 
     pdfMake.createPdf(dd).open();
 }
+
+export const generateInvoiceTransaction = (pharmacy, input, formField) => {
+  let dd = {
+    content: [
+      {
+        text: "INVOICE TRANSAKSI",
+        style: "header",
+        alignment: "center",
+      },
+      {
+        text: `\n${pharmacy.name}`,
+        style: "subheader",
+      },
+      {
+        text: `Alamat: ${pharmacy.address}\nEmail: ${pharmacy.email}\nNo. Telp: ${pharmacy.phone}\n\n`,
+        style: "smallText",
+      },
+      {
+        table: {
+          headerRows: 1,
+          widths: ["*", "auto", "auto", "auto"],
+          body: [
+            [
+              { text: "Nama Obat", style: "tableHeader" },
+              { text: "Jumlah", style: "tableHeader", alignment: "right" },
+              { text: "Harga Satuan (Rp)", style: "tableHeader", alignment: "right" },
+              { text: "Subtotal (Rp)", style: "tableHeader", alignment: "right" },
+            ],
+            ...medicines.map((med) => [
+              med.name,
+              { text: med.quantity, alignment: "right" },
+              { text: med.price.toLocaleString(), alignment: "right" },
+              { text: (med.quantity * med.price).toLocaleString(), alignment: "right" },
+            ]),
+            [
+              { text: "Total", colSpan: 3, alignment: "right", style: "tableHeader" },
+              {},
+              {},
+              { text: total.toLocaleString(), alignment: "right", style: "tableHeader" },
+            ],
+          ],
+        },
+        layout: "lightHorizontalLines",
+      },
+      {
+        text: `\n\nTanggal: ${currentDate}\nTempat: Jakarta`,
+        style: "smallText",
+      },
+      {
+        columns: [
+          { text: "", width: "75%" },
+          {
+            text: "Tanda Tangan\n\n\n___________________",
+            alignment: "center",
+          },
+        ],
+      },
+    ],
+    styles: {
+      header: {
+        fontSize: 16,
+        bold: true,
+      },
+      subheader: {
+        fontSize: 12,
+        bold: true,
+      },
+      smallText: {
+        fontSize: 10,
+      },
+      tableHeader: {
+        bold: true,
+        fontSize: 10,
+        color: "black",
+      },
+    },
+    defaultStyle: {
+      fontSize: 10,
+    },
+  };
+
+  pdfMake.createPdf(dd).open();
+}

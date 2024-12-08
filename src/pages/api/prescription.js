@@ -95,6 +95,17 @@ export default function usePrescription() {
         }
     }
 
+    const cancelPrescription = async (data) => {
+        setIsLoading(true)
+        try {
+            return await api.put('/api/v1/prescriptions/cancel/' + data)
+        } catch (error) {
+            throw error.response.data.errors
+        } finally {
+            setIsLoading(false)
+        }
+    }
+
     return {
         isLoading,
         getAllPrescription,
@@ -102,6 +113,7 @@ export default function usePrescription() {
         addNewPrescription,
         getPrescriptionDetail,
         getMostSalesMedicineByPrescription,
+        cancelPrescription,
         updatePrescription
     }
 }

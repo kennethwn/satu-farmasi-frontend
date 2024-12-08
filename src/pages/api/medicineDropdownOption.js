@@ -23,8 +23,28 @@ export default function useMedicineDropdownOption() {
         }
     }
 
+    const getMedicineDropdownOptionsById = async() => {
+        setIsLoading(true)
+        try {
+            console.log("getting medicine dropdown")
+            const response = await api.get('/api/v1/medicines/dropdownOptionsById')
+            .then((response) => {
+                setIsLoading(false);
+                return response;
+            })
+            .catch((error) => {
+                setIsLoading(false);
+                return error;
+            })
+            return response
+        } catch (error) {
+            console.error(error);
+        }
+    }
+
     return {
         isLoading,
-        getMedicineDropdownOptions
+        getMedicineDropdownOptions,
+        getMedicineDropdownOptionsById
     }
 }

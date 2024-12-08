@@ -27,7 +27,7 @@ export default function index() {
     const [filterStatus, setFilterStatus] = useState("")
     const [sortColumn, setSortColumn] = useState();
     const [sortType, setSortType] = useState();
-    const status = ["UNPROCESSED", "ON_PROGRESS", "WAITING_FOR_PAYMENT", "DONE"];
+    const status = ["UNPROCESSED", "ON_PROGRESS", "WAITING_FOR_PAYMENT", "DONE", "CANCELED"];
     const { HeaderCell, Cell, Column } = Table;
     const router = useRouter()
     const [selectedPrescriptionId, setSelectedPrescriptionId] = useState(-1)
