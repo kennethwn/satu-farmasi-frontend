@@ -101,7 +101,7 @@ export default function Index() {
         async function fetchMedicineDropdownOptionsData() {
             try {
                 const response = await getMedicineDropdownOptions()
-                setMedicineDropdownOptions(response)
+                setMedicineDropdownOptions(response.data)
             } catch (error) {
                 console.log("error #getMedicineOptions")
             }

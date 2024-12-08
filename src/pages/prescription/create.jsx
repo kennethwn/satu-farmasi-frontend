@@ -15,7 +15,7 @@ import { ErrorForm } from "@/helpers/errorForm";
 
 const medicineSchema = z.object({
     instruction: isRequiredString(),
-    medicineId: isRequiredNumber(),
+    code: isRequiredString(),
     quantity: isRequiredNumber(),
 });
 
