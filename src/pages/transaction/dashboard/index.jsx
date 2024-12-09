@@ -5,6 +5,7 @@ import SearchBar from "@/components/SearchBar";
 import { formatDateWithTime } from "@/helpers/dayHelper";
 import prescriptionStatusMapped from "@/helpers/prescriptionStatusMap";
 import { useUserContext } from "@/pages/api/context/UserContext";
+import usePharmacy from "@/pages/api/pharmacy";
 import useTransaction from "@/pages/api/transaction/transaction";
 import { useEffect, useState } from "react";
 import { PiListMagnifyingGlass } from "react-icons/pi";
@@ -15,6 +16,7 @@ export default function index() {
   const { user } = useUserContext();
   const { HeaderCell, Cell, Column } = Table;
   const { isLoading, getAllTransaction } = useTransaction();
+  const { getPharmacyInfo } = usePharmacy();
   const prescriptionStatusMap = prescriptionStatusMapped;
   const [statusUpdated, setStatusUpdated] = useState({})
   const [data, setData] = useState([]);
@@ -25,6 +27,7 @@ export default function index() {
   const [isListening, setIsListening] = useState(false)
   const [openModal, setOpenModal] = useState(false)
   const [selectedTransactionId, setSelectedTransactionId] = useState(-1);
+  const [pharmacy, setPharmacy] = useState({});
 
   const handleFetchTransactionData = async () => {
     try {
@@ -40,6 +43,19 @@ export default function index() {
       console.error(error);
     }
   };
+
+  const handleFetchPharmacyInfo = async () => {
+    try {
+      const res = await getPharmacyInfo();
+      if (res.code !== 200) {
+        setPharmacy({});
+        return;
+      }
+      setPharmacy(res.data);
+    } catch (error) {
+      console.error(error);
+    }
+  }
 
   useEffect( () => {
     let newEvent
@@ -100,6 +116,13 @@ export default function index() {
     }
     fetchData();
   }, [page, limit, search]);
+
+  useEffect(() => {
+    async function fetchData() {
+      await handleFetchPharmacyInfo();
+    }
+    fetchData();
+  }, [])
 
   useEffect(() => {
     setPage(1)
@@ -229,6 +252,8 @@ export default function index() {
       </ContentLayout>
 
         <TransactionDetail
+            user={user}
+            pharmacy={pharmacy}
             statusUpdated={statusUpdated}
             transactionId={selectedTransactionId}
             openModal={openModal}

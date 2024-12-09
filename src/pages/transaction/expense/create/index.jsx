@@ -6,17 +6,32 @@ import { useRouter } from "next/router";
 import { useEffect, useState } from "react";
 import { toast } from "react-toastify";
 import { z, ZodError } from "zod";
-import useExpenseMedicineAPI from "@/pages/api/transaction/expenseMedicine";
+import useOutputMedicineAPI from "@/pages/api/transaction/outputMedicine";
 import Dropdown from "@/components/SelectPicker/Dropdown";
 import { isRequiredNumber, isRequiredString } from "@/helpers/validation";
 import useMedicineDropdownOption from "@/pages/api/medicineDropdownOption";
 import { useUserContext } from "@/pages/api/context/UserContext";
 import { ErrorForm } from "@/helpers/errorForm";
+import OutputMedicineWitnessForm from "@/components/DynamicForms/OuputMedicineWitnessForm";
+import usePharmacy from "@/pages/api/pharmacy";
+
+const witnessesSchema = z.object({
+    name: isRequiredString(),
+    nip: isRequiredString(),
+    role: isRequiredString()
+})
+
+const physicalReportSchema = z.object({
+    physicalReport: z.object({
+        data: z.array(witnessesSchema),
+    }),
+});
 
 const medicineSchema = z.object({
     medicineId: isRequiredNumber(),
     quantity: isRequiredNumber(),
     reasonOfDispose: isRequiredString(),
+    physicalReport: z.object(physicalReportSchema)
 });
 
 const createExpenseMedicineField = [
@@ -43,8 +58,9 @@ const createExpenseMedicineField = [
 export default function Index() {
     const router = useRouter();
     const { user } = useUserContext();
-    const { isLoading, CreateMedicine, GetMedicineById } = useExpenseMedicineAPI();
+    const { isLoading, CreateMedicine, GetMedicineById } = useOutputMedicineAPI();
     const { getMedicineDropdownOptionsById } = useMedicineDropdownOption();
+    const { getPharmacyInfo } = usePharmacy();
     const [medicineDropdownOptions, setMedicineDropdownOptions] = useState([])
     const [currStockMedicine, setCurrStockMedicine] = useState(0);
     const [data, setData] = useState([]);
@@ -55,15 +71,34 @@ export default function Index() {
         oldQuantity: 0,
         medicine: {
             currstock: null,
+        },
+        physicalReport: {
+            data: {
+                pharmacist: "",
+                sipaNumber: "",
+                pharmacy: "",
+                addressPharmacy: "",
+                witnesses: [{ name: "", nip: "", role: "" }],
+            }
         }
     });
+    const [formField, setFormField] = useState([{ name: "", nip: "", role: "" }]);
     const [errors, setErrors] = useState({});
 
     const createHandler = async (e) => {
         e.preventDefault();
         try {
-            setErrors({});
-            medicineSchema.parse(formData);
+            // setErrors({});
+            // medicineSchema.parse(formData);
+
+            // binding payload
+            formData.physicalReport.data.pharmacist = user.name;
+            formData.physicalReport.data.sipaNumber = user.sipaNumber || "0001";
+            formData.physicalReport.data.witnesses = formField;
+            // console.log(formData);
+            // console.log(formField);
+            // return;
+
             const res = await CreateMedicine(formData);
             if (res.code !== 200)
                 return toast.error(res.message, {
@@ -75,23 +110,24 @@ export default function Index() {
                 router.push("/transaction/expense");
             }, 2000)
         } catch (error) {
-            toast.error(error.response.data.message, {
-                autoClose: 2000,
-                position: "top-right",
-            });
-            error = error.response.data.errors
-            if (error instanceof ZodError) {
-                const newErrors = { ...errors };
-                error.issues.forEach((issue) => {
-                    if (issue.path.length > 0) {
-                        const fieldName = issue.path[0];
-                        newErrors[fieldName] = issue.message;
-                    }
-                });
-                setErrors(newErrors);
-            } else {
-                ErrorForm(error, setErrors, false);
-            }
+            // toast.error(error.response?.data.message, {
+            //     autoClose: 2000,
+            //     position: "top-right",
+            // });
+            // error = error.response?.data.errors
+            // if (error instanceof ZodError) {
+            //     const newErrors = { ...errors };
+            //     error.issues.forEach((issue) => {
+            //         if (issue.path.length > 0) {
+            //             const fieldName = issue.path[0];
+            //             newErrors[fieldName] = issue.message;
+            //         }
+            //     });
+            //     setErrors(newErrors);
+            // } else {
+            //     ErrorForm(error, setErrors, false);
+            // }
+            console.log(error);
         }
     };
 
@@ -154,6 +190,35 @@ export default function Index() {
             handleFetchCurrentMedicineStock();
         }
     }, [formData.medicineId])
+
+    const handleFetchPharmacyInfo = async () => {
+        try {
+            const res = await getPharmacyInfo();
+            if (res.code !== 200)
+                return toast.error(res.message, {
+                    autoClose: 2000,
+                    position: "top-right",
+            });
+            setFormData({
+                ...formData,
+                physicalReport: {
+                    data: {
+                        pharmacy: res.data.name,
+                        addressPharmacy: res.data.address
+                    }
+                }
+            })
+        } catch (error) {
+            console.error(error);
+        }
+    }
+
+    useEffect(() => {
+        async function fetchData() {
+            await handleFetchPharmacyInfo();
+        }
+        fetchData();
+    }, [router]);
 
     return (
         <Layout active="master-expense-medicine" user={user}>
@@ -221,7 +286,20 @@ export default function Index() {
                         })}
                     </div>
 
-                    <div className="flex justify-center gap-2 my-6 lg:justify-end">
+                    <div className="w-full my-6">
+                        {
+                            (formData.reasonOfDispose == "BROKEN" || formData.reasonOfDispose == "EXPIRED") &&
+                                <OutputMedicineWitnessForm 
+                                    isLoading={isLoading}
+                                    formFields={formField}
+                                    setFormFields={setFormField}
+                                    setError={setErrors}
+                                    error={errors["physicalReport"]}
+                                />
+                        }
+                    </div>
+
+                    <div className="flex justify-center gap-2 mb-6 mt-12 py-4 lg:justify-end">
                         <Button
                             appearance="primary"
                             type="submit"

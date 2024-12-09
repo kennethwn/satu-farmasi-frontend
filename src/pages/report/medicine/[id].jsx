@@ -14,12 +14,15 @@ import { PiListMagnifyingGlass } from "react-icons/pi";
 import Toaster from "@/components/Modal/Toaster";
 import formatDate from "@/helpers/dayHelper";
 import Label from "@/components/Input/Label";
+import useOutputMedicineAPI from "@/pages/api/transaction/outputMedicine";
+import { generateOutputMedicine } from "@/data/document";
 
 export default function index() {
     const router = useRouter();
     const id = router.query.id;
     const { Header, Body, Footer } = Modal;
     const { isLoading, GetReportById, finalizeReport } = useReportAPI();
+    const { GetOutputMedicineById } = useOutputMedicineAPI();
     const [currState, setCurrState] = useState(0);
 
     const [modalState, setModalState] = useState([{
@@ -199,6 +202,26 @@ export default function index() {
             ]
         });
         setModalState(updatedModalState);
+    }
+
+    const HandleFetchOutputMedicinePhysicalReport = async (id) => {
+        try {
+            const res = await GetOutputMedicineById(id);
+            if (res.code != 200) return;
+
+            const input = res.data.physicalReport.data;
+            input.created_at = res.data.physicalReport.created_at;
+
+            let medicines = [];
+            const medicine = res.data.medicine;
+            medicines = [...medicines, medicine];
+            
+            let reasonOfDispose = res.data.reasonOfDispose;
+
+            generateOutputMedicine(input, medicines, reasonOfDispose);
+        } catch (error) {
+            console.error(error);
+        }
     }
 
     useEffect(() => {
@@ -416,7 +439,7 @@ export default function index() {
                                             return (
                                                 <div className="flex justify-center flex-row gap-6">
                                                     <button className="inline-flex items-center justify-center w-8 h-8 text-center bg-transparent border-0 rounded-lg"
-                                                        onClick={() => router.push(`/master/medicine/edit/${rowData.medicine.id}`)}>
+                                                        onClick={() => HandleFetchOutputMedicinePhysicalReport(rowData?.id)}>
                                                         <PiListMagnifyingGlass />
                                                     </button>
                                                 </div>

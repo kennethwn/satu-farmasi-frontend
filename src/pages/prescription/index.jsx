@@ -228,6 +228,7 @@ export default function index() {
                 prescriptionId={selectedPrescriptionId}
                 openModal={openModal}
                 setOpenModal={setOpenModal}
+                user={user}
             />
         </Layout>
     )

@@ -6,7 +6,7 @@ import { useRouter } from "next/router";
 import { useEffect, useState } from "react";
 import { toast } from "react-toastify";
 import { z, ZodError } from "zod";
-import useExpenseMedicineAPI from "@/pages/api/transaction/expenseMedicine";
+import useOutputMedicineAPI from "@/pages/api/transaction/outputMedicine";
 import Dropdown from "@/components/SelectPicker/Dropdown";
 import { isRequiredNumber, isRequiredString } from "@/helpers/validation";
 import useMedicineDropdownOption from "@/pages/api/medicineDropdownOption";
@@ -44,7 +44,7 @@ export default function Index() {
     const router = useRouter();
     const { user } = useUserContext();
     const id = router.query.id;
-    const { isLoading, GetMedicineById, EditMedicine, GetOuputMedicineById } = useExpenseMedicineAPI();
+    const { isLoading, GetMedicineById, EditMedicine, GetOuputMedicineById } = useOutputMedicineAPI();
     const [ medicineData, setMedicineData ] = useState({})
     const [formData, setFormData] = useState({
         medicineId: 0,

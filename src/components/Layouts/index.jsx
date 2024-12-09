@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import { Container, Sidebar, Sidenav, Content, Nav } from 'rsuite';
 import { MdDashboard as DashboardIcon } from "react-icons/md";
 import { LuHistory as TransactionIcon } from "react-icons/lu";
@@ -77,6 +77,10 @@ export default function Layout(props) {
         }
         return <span style={{ color: color, paddingLeft: `${type === 'child' && '12px'}` }}>{title}</span>;
     }
+
+    useEffect(() => {
+        console.log("logged user: ", user);
+    }, [])
 
     return (
         <Container className='fixed top-0 left-0 w-screen h-screen'>
