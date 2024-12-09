@@ -391,7 +391,7 @@ export const generateInvoiceTransaction = (pharmacy, pharmacist, patient, input,
         layout: "lightHorizontalLines",
       },
       {
-        text: `\n\nTanggal: ${formatDate(input.created_at)}\nTempat: Jakarta`,
+        text: `\n\nTanggal: ${formatDate(input.created_at)}\n`,
         style: "smallText",
       },
       {
