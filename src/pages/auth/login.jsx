@@ -63,8 +63,7 @@ export default function Login() {
                 isLoading === false ?
                     <form
                         onSubmit={handleSubmit(LoginHandler)}
-                        className="flex justify-center items-center flex-col gap-3 p-8 rounded 
-            bg-background-light border border-border-auth"
+                        className="flex justify-center items-center flex-col gap-3 p-8 rounded bg-background-light border border-border-auth"
                         ref={formRef}
                     >
                         <div className="text-center mb-4">

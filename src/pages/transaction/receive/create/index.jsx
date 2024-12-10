@@ -132,6 +132,7 @@ export default function Index() {
                 label: item.name,
                 value: parseInt(item.id),
             })));
+            console.log("medicineDropdown: ", res.data)
             setMedicines(Object.entries(res.data).map(([key, item]) => ({
                 ...item,
                 label: item.name,

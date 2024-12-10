@@ -13,7 +13,7 @@ const isRequiredOptions = () =>
             message: "Silahkan pilih opsi",
         });
 const isRequiredString = () =>
-    isString().min(1, { message: "Bidang isi harus diisi" });
+    isString().min(1, { message: "Bidang ini harus diisi" });
 const isRequiredPhoneNumber = () =>
     z
         .coerce
@@ -24,7 +24,7 @@ const isRequiredPhoneNumber = () =>
             "Nomor handphone harus diawali dengan 628 dan minimal 10 digit",
         );
 const isPassword = () =>
-    isString().min(8, { message: "Password is minimum 8 characters" });
+    isString().min(8, { message: "Password minimal 8 karakter" });
 const isRequiredNumber = () =>
     z
         .number({ message: "Bidang isi harus diisi" })

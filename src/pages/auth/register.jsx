@@ -26,6 +26,7 @@ const registerSchema = z.object({
     role: isRequiredOptions(),
     specialist: isOptionalString(),
     dob: isRequiredString(),
+    sipa: isOptionalString(),
 }).superRefine(({ confirmPassword, password }, ctx) => {
     if (confirmPassword !== password) {
         ctx.addIssue({
@@ -61,9 +62,10 @@ export default function Login() {
 
     const RegisterHandler = async (data) => {
         try {
-            if (data.role === "pharmacist") await addPharmacist(data);
-            else await addDoctor(data);
-            toast.success("Register Successfull", { autoClose: 2000, position: 'top-right' });
+            const submitedData = {...data, phoneNum: data.phoneNum.toString()}
+            if (data.role === "pharmacist") await addPharmacist(submitedData);
+            else await addDoctor(submitedData);
+            toast.success("Pengguna Berhasil Ditambahkan", { autoClose: 2000, position: 'top-right' });
             setTimeout(() => {
                 router.push("/auth/login");
             }, 2000);

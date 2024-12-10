@@ -33,7 +33,7 @@ export default function index() {
         try {
             const res = await getAllPrescription(search, limit, page, filterStatus);
             if (res.code !== 200) {
-                toast.error(res.message, { autoClose: 2000, position: "top-center" });
+                toast.error(res.message, { autoClose: 2000, position: "top-right" });
                 return;
             }
             console.log(res)
@@ -96,10 +96,8 @@ export default function index() {
                 <div className="flex md:flex-row flex-col gap-4">
                     <SelectPicker
                         style={{
-                            // borderWidth: '0.5px',     
                             color: '#DDDDDD',       
                             borderColor: '#DDDDDD', 
-                            // borderRadius: '0.4rem',
                         }}
                         label="Status"
                         data={Array.from(prescriptionStatusMap.values()).map((status) => ({ label: status.label, value: status.value }))}
@@ -145,7 +143,7 @@ export default function index() {
 
                         <Column flexGrow={1} resizable>
                             <HeaderCell className="text-dark font-bold">Timestamp</HeaderCell>
-                            <Cell className="text-dark font-bold">
+                            <Cell className="text-dark">
                                 {rowData => formatDateWithTime(rowData?.created_at)}
                             </Cell>
                         </Column>
@@ -160,10 +158,10 @@ export default function index() {
                             <Cell className="text-center">
                                 {(rowData) => {
                                     return (
-                                        <div className="flex justify-center flex-row gap-6">
+                                        <div className="flex justify-center flex-row gap-6 text-white">
                                             <p 
                                                 style={{ backgroundColor: prescriptionStatusMap.get(rowData.status)?.color }}
-                                                className="text-white rounded-lg w-3/4">
+                                                className="font-extrabold text-center rounded-lg w-full">
                                                 {prescriptionStatusMap.get(rowData.status)?.label}
                                             </p>
                                         </div>
@@ -181,7 +179,7 @@ export default function index() {
                                         <button
                                             className="inline-flex items-center justify-center w-8 h-8 text-center bg-transparent border-0 rounded-lg"
                                             onClick={() => {
-                                                console.log(rowData.id);
+                                                console.log("id: ", rowData.id);
                                                 setSelectedPrescriptionId(rowData.id);
                                                 setOpenModal(true);
                                             }}

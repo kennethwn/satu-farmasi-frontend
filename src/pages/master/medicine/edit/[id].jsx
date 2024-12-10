@@ -17,6 +17,9 @@ import Text from "@/components/Text";
 import useClassificationsAPI from "@/pages/api/master/classification";
 import Dropdown from "@/components/SelectPicker/Dropdown";
 
+
+// TODO: Fix eidt genericName, packaging, classification (inactive to active)
+
 const classificationSchema = z.object({
     classificationId: isRequiredNumber(),
 });
@@ -93,7 +96,7 @@ export default function Index() {
 
     const handleFetchPackagingDropdown = async () => {
         try {
-            const res = await GetPackagingDropdown();
+            const res = await GetPackagingDropdown(id);
             if (res.code !== 200) {
                 toast.error(res.message, { autoClose: 2000, position: "top-right" });
                 setPackagings([]);
@@ -107,7 +110,7 @@ export default function Index() {
 
     const handleFetchGenericDropdown = async () => {
         try {
-            const res = await GetGenericDropdown();
+            const res = await GetGenericDropdown(id);
             if (res.code !== 200) {
                 toast.error(res.message, { autoClose: 2000, position: "top-right" });
                 setGenerics([]);
@@ -121,7 +124,7 @@ export default function Index() {
 
     const handleFetchClassifications = async () => {
         try {
-            const res = await GetAllClassificationsDropdown();
+            const res = await GetAllClassificationsDropdown(id);
             if (res.code !== 200) {
                 toast.error(res.message, { autoClose: 2000, position: "top-right" });
                 setGenerics([]);

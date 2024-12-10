@@ -131,7 +131,7 @@ export default function index(props) {
 		}
 	}
 
-	const handledeletegeneric = async (rowData) => {
+	const handledeletegeneric = async (rowData, index) => {
 		try {
             rowData = { ...rowData, isActive: rowData.is_active };
 			const res = await DeleteGeneric(rowData);
@@ -141,8 +141,8 @@ export default function index(props) {
 			}
 			toast.success(res.message, { autoClose: 2000, position: "top-right" });
 			setOpen({ ...open, delete: false });
-			         reset();
-			HandeFetchGenericData();
+            setData(prevData => prevData.map((item, idx) => idx === index ? { ...item, is_active: !item.is_active } : item))
+			reset();
 		} catch (error) {
 			console.error(error);
 		}
@@ -210,13 +210,13 @@ export default function index(props) {
                             <HeaderCell className="text-center text-dark font-bold">Status Aktif</HeaderCell>
                             <Cell className="text-center">
                                 {
-                                    rowData => {
+                                    (rowData, index) => {
                                         return (
                                             <div className="inline-flex items-center justify-center w-8 h-8 text-center bg-transparent border-0 rounded-lg">
                                                 <Checkbox
                                                     checked={rowData?.is_active} 
                                                     onChange={() => {
-                                                        handledeletegeneric({ ...rowData, is_active: !rowData.is_active, id: parseInt(rowData.id) });
+                                                        handledeletegeneric({ ...rowData, is_active: !rowData.is_active, id: parseInt(rowData.id) }, index);
                                                     }}
                                                 />
                                             </div>

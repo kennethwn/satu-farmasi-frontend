@@ -36,16 +36,15 @@ export default function Index() {
     const handleActivateStaff = async (rowData) => {
         try {
             let selectedData = data.find((item) => item.nik === rowData.nik);
-            console.log("selectedData: ", selectedData);
             selectedData.is_active = !selectedData.is_active;
 
             let res = null;
             if (selectedData.role.toLowerCase() === "admin") res = await EditAdmin(selectedData);
             else if (selectedData.role.toLowerCase() === "doctor") res = await EditDoctor(selectedData);
             else if (selectedData.role.toLowerCase() === "pharmacist") res = await EditPharmacist(selectedData);
-                console.log("res: ", res);
             toast.success(res.message, { autoClose: 2000, position: "top-right" });
-            handleFetchStaffData();
+            data.map(item => item.nik === rowData.nik ? console.log(item.nik, item.is_active) : item);
+            setData(prevData => prevData.map((item) => item.nik === rowData.nik ? { ...item, is_active: selectedData.is_active } : item))
         } catch (error) {
             console.error(error);
         }
@@ -77,6 +76,10 @@ export default function Index() {
         fetchData();
     }, [page, limit, search, filter]);
 
+    useEffect(() => {
+        console.log("Updated data: ", data);
+    }, [data])
+
     return (
         <Layout active="master-staff" user={user}>
             <ContentLayout title="List Staf">
@@ -100,7 +103,7 @@ export default function Index() {
                     <SearchBar
                         size="md"
                         className="w-1/4"
-                        placeholder="Search..."
+                        placeholder="Cari nama pengguna ..."
                         onChange={value => setSearch(value)}
                         value={search}
                     />

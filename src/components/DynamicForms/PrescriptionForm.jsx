@@ -14,7 +14,7 @@ function PrescriptionForm(props) {
   const [medicineDropdownOptions, setMedicineDropdownOptions] = useState([]);
 
   const data = Object.entries(medicineDropdownOptions).map(([key, item]) => ({
-    label: key + " - " + item.name,
+    label: item.name + " - " + key,
     value: key,
   }));
 

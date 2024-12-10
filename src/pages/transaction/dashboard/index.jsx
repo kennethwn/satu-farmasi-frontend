@@ -10,7 +10,7 @@ import useTransaction from "@/pages/api/transaction/transaction";
 import { useEffect, useState } from "react";
 import { PiListMagnifyingGlass } from "react-icons/pi";
 import { toast } from "react-toastify";
-import { Pagination, Table } from "rsuite";
+import { Pagination, SelectPicker, Table } from "rsuite";
 
 export default function index() {
   const { user } = useUserContext();
@@ -28,10 +28,11 @@ export default function index() {
   const [openModal, setOpenModal] = useState(false)
   const [selectedTransactionId, setSelectedTransactionId] = useState(-1);
   const [pharmacy, setPharmacy] = useState({});
+const [filterStatus, setFilterStatus] = useState("")
 
   const handleFetchTransactionData = async () => {
     try {
-      const res = await getAllTransaction(search, limit, page);
+      const res = await getAllTransaction(search, limit, page, filterStatus);
       if (res.code !== 200) {
         toast.error(res.message, { autoClose: 2000, position: "top-center" });
         return;
@@ -103,19 +104,22 @@ export default function index() {
 
   useEffect(() => {
     const temp = [...data]
+        console.log("statusUpdated: ", statusUpdated)
     temp.map(transaction => {
-      if (transaction.prescription.id === setStatusUpdated.prescriptionId) {
-        transaction.prescription.status = setStatusUpdated.status
+      if (transaction.prescription.id === statusUpdated.prescriptionId) {
+        transaction.prescription.status = statusUpdated.status
       }
+            console.log("transaction: ", transaction)
     })
-  }, [setStatusUpdated])
+    setData(temp)
+  }, [statusUpdated])
 
   useEffect(() => {
     async function fetchData() {
         handleFetchTransactionData();
     }
     fetchData();
-  }, [page, limit, search]);
+  }, [page, limit, search, filterStatus]);
 
   useEffect(() => {
     async function fetchData() {
@@ -132,10 +136,23 @@ export default function index() {
     <Layout active="transaction-dashboard" user={user}>
       <ContentLayout title="Riwayat Transaksi">
         <div className="flex flex-row justify-end items-center w-full pb-6">
+        <SelectPicker
+            style={{
+                color: '#DDDDDD',       
+                borderColor: '#DDDDDD', 
+            }}
+            label="Status"
+            data={Array.from(prescriptionStatusMap.values()).map((status) => ({ label: status.label, value: status.value }))}
+            value={filterStatus}
+            onChange={(value) => {
+                setFilterStatus(value);
+                console.log(value);
+            }}
+        />   
           <SearchBar
             size="md"
             className="w-1/4"
-            placeholder="Search by patient name..."
+            placeholder="Cari Nama Pasien ..."
             onChange={(value) => setSearch(value)}
           />
         </div>
@@ -160,7 +177,7 @@ export default function index() {
 
             <Column flexGrow={1}>
               <HeaderCell className="text-dark font-bold">
-                Id Transaction
+                ID Transaction
               </HeaderCell>
               <Cell dataKey="id" />
             </Column>
@@ -174,19 +191,19 @@ export default function index() {
 
             <Column flexGrow={1}>
               <HeaderCell className="text-dark font-bold">
-                Patient
+                Pasien
               </HeaderCell>
               <Cell dataKey="patient.name" />
             </Column>
 
             <Column flexGrow={1}>
               <HeaderCell className="text-dark font-bold">
-                Pharmacist
+                Farmasi
               </HeaderCell>
               <Cell dataKey="pharmacist.firstName" />
             </Column>
 
-            <Column flexGrow={1}>
+            <Column width={300}>
               <HeaderCell className="text-center text-dark font-bold">
                 Status
               </HeaderCell>
@@ -196,7 +213,7 @@ export default function index() {
                     <div className="flex justify-center flex-row gap-6">
                       <p 
                         style={{ backgroundColor: prescriptionStatusMap.get(rowData.prescription.status)?.color }}
-                        className="text-white rounded-lg w-3/4">
+                        className="text-white font-bold rounded-lg w-3/4">
                           {prescriptionStatusMap.get(rowData.prescription.status)?.label}
                       </p>
                     </div>
@@ -207,7 +224,7 @@ export default function index() {
 
             <Column width={150} fixed="right">
               <HeaderCell className="text-center text-dark font-bold">
-                Action
+                Aksi
               </HeaderCell>
               <Cell className="text-center" style={{padding: '6px'}}>
                 {(rowData) => {

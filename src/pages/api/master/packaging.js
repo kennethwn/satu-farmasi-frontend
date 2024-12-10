@@ -43,7 +43,7 @@ export default function usePackagingAPI() {
     const GetPackagingDropdown = async (data) => {
         setIsLoading(true);
         try {
-            const response = await axios.get('/api/v1/packagings/dropdown')
+            const response = await axios.get('/api/v1/packagings/dropdown?medicineCode=' + data)
             .then((response) => {
                 setIsLoading(false);
                 return response;

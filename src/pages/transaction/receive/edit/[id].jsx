@@ -255,6 +255,7 @@ export default function Index() {
     const handleFetchReceiveMedicineById = async () => {
         try {
             const res = await GetReceiveMedicinesById(id);
+            console.log("medicine by id response: ", res)
             if (res.code !== 200) {
                 toast.error(res.message, { autoClose: 2000, position: "top-right" });
                 setInput([]);

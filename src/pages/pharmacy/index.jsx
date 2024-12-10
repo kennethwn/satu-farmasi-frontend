@@ -148,7 +148,7 @@ export default function index() {
                                 })
                                 setErrors({
                                     ...errors,
-                                    "pharmacyNumber": "",
+                                    "pharmacyNum": "",
                                 });
                             }}
 						/>
@@ -263,6 +263,7 @@ export default function index() {
 						Apakah anda yakin untuk membatalkan perubahan?
 					</>
 				}
+                title={"Konfirmasi"}
 				btnText="Konfirmasi"
 				isLoading={isLoading}
 				onClick={() => handleCloseEditMode()}
@@ -277,7 +278,8 @@ export default function index() {
 						Apakah anda yakin untuk finalisasi perubahan?
 					</>
 				}
-				btnText="Confirm"
+                title={"Konfirmasi"}
+				btnText="Konfirmasi"
 				isLoading={isLoading}
 				onClick={() => handleUpdatePharmacyInfo()}
 			/>
