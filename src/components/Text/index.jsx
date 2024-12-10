@@ -10,11 +10,7 @@ export default function Text(props) {
         case "body":
             return <p className={`text-body text-dark font-normal ${className}`}>{children}</p>
         case "danger":
-            return (
-                <ul className={`list-none ${className}`}>
-                    <li className='text-sm text-danger font-normal'>{children}</li>
-                </ul>
-            )
+            return <p className='text-sm text-danger font-normal'>{children}</p>
     }
 }
 

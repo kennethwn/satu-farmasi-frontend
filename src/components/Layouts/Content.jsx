@@ -10,7 +10,7 @@ export default function ContentLayout(props) {
     const router = useRouter();
 
     return (
-        <div className='flex flex-col'>
+        <div className='flex flex-col h-full'>
             <Panel 
                 bordered
                 style={{ borderColor: '#DDDDDD' }}
@@ -27,7 +27,7 @@ export default function ContentLayout(props) {
             </Panel>
             <Panel 
                 bordered 
-                className='gap-2 overflow-auto'
+                className='gap-2 overflow-auto h-full'
                 header={header}
                 bodyFill={table}
             >

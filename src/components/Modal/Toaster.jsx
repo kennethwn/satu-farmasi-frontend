@@ -18,7 +18,7 @@ export default function Toaster({
             case 'success':
                 return <span className="text-center w-full text-success">Berhasil</span>
             case 'warning':
-                return <span className="text-center w-full text-danger">Peringatan!</span>
+                return <p className="text-center w-full text-danger">Peringatan!</p>
             default:
                 return <span className="text-center w-full text-dark">{title}</span>
         }
@@ -36,7 +36,7 @@ export default function Toaster({
                     </div>
                 )
             default:
-                return <Button className="w-full">Lanjutkan</Button>
+                return <Button className="w-full" onClick={() => onClick()}>Lanjutkan</Button>
         }
     }
 
@@ -49,7 +49,7 @@ export default function Toaster({
                 <Modal.Title className="w-full h-fit">{renderTitle()}</Modal.Title>
             </Modal.Header>
             <Modal.Body>
-                <p className="font-medium text-dark">{body}</p>
+                <p className="font-medium text-dark text-center">{body}</p>
             </Modal.Body>
             <Modal.Footer className="w-full items-center justify-center">
                 {renderButton()}
@@ -60,7 +60,7 @@ export default function Toaster({
 
 Toaster.propTypes = {
     title: propTypes.string,
-    body: propTypes.string,
+    body: propTypes.object,
     type: propTypes.string,
     btnText: propTypes.string,
     isLoading: propTypes.bool,

@@ -7,21 +7,23 @@ import { useForm } from "react-hook-form";
 import { zodResolver } from '@hookform/resolvers/zod';
 import { z } from "zod";
 import Link from 'next/link'
-import { isOptionalString, isPassword, isRequiredBoolean, isRequiredEmail, isRequiredString } from "@/helpers/validation";
+import { isOptionalString, isPassword, isRequiredOptions, isRequiredEmail, isRequiredString } from "@/helpers/validation";
 import Text from "@/components/Text";
+import { ErrorForm } from "@/helpers/errorForm";
 import Button from "@/components/Button";
 import ArrowLeftIcon from '@rsuite/icons/ArrowLeft';
 import { RadioGroup } from 'rsuite';
+import { toast } from "react-toastify";
 
 const registerSchema = z.object({
     email: isRequiredEmail(),
     password: isPassword(),
     confirmPassword: isPassword(),
-    nik: isRequiredString(),
+    nik: isRequiredString().min(16, { message: "NIK must be 16 characters" }),
     firstName: isRequiredString(),
     lastName: isRequiredString(),
-    phoneNum: isRequiredString(),
-    role: isRequiredString(),
+    phoneNum: isRequiredString().min(10, { message: "Phone number must be minimum 10 characters" }),
+    role: isRequiredOptions(),
     specialist: isOptionalString(),
     dob: isRequiredString(),
 }).superRefine(({ confirmPassword, password }, ctx) => {
@@ -34,38 +36,18 @@ const registerSchema = z.object({
 });
 
 export default function Login() {
-    const { router, isLoading:doctorLoading, addDoctor } = useDoctor();
-    const { isLoading:pharmacistLoading, addPharmacist } = usePharmacist();
+    const { router, isLoading: doctorLoading, addDoctor } = useDoctor();
+    const { isLoading: pharmacistLoading, addPharmacist } = usePharmacist();
     const [isLoading, setIsLoading] = useState(false);
 
-    const [error, setError] = useState(null);
     const credentialsRef = useRef(null);
     const formRef = useRef(null);
     const biodataRef = useRef(null);
     const [selectedOption, setSelectedOption] = useState(null);
+    const [triggerErr, setTriggerErr] = useState(false);
+    const roleRef = useRef(null);
 
-    useEffect(() => {
-        setIsLoading(doctorLoading || pharmacistLoading)
-    }, [doctorLoading, pharmacistLoading])
-
-    const { register, handleSubmit, formState: { errors } } = useForm({ resolver: zodResolver(registerSchema) })
-
-    useEffect(() => {
-        credentialsRef.current.style.display = "block";
-        biodataRef.current.style.display = "none";
-    }, [])
-
-    useEffect(() => {
-        if (Object.keys(errors).length !== 0 && errors.constructor === Object) {
-            if (errors.email || errors.password || errors.confirmPassword) {
-                credentialsRef.current.style.display = "block";
-                biodataRef.current.style.display = "none";
-                return;
-            }
-            credentialsRef.current.style.display = "none";
-            biodataRef.current.style.display = "block";
-        }
-    }, [errors])
+    const { register, handleSubmit, formState: { errors }, setError } = useForm({ resolver: zodResolver(registerSchema) })
 
     const nextDataHandler = () => {
         biodataRef.current.style.display = "block";
@@ -79,12 +61,15 @@ export default function Login() {
 
     const RegisterHandler = async (data) => {
         try {
-            let status = 0, message = "";
-            if (data.role === "pharmacist") ({ status, message } = await addPharmacist(data));
-            else ({ status, message } = await addDoctor(data));
-            status === 200 ? router.push("/auth/login") : setError(message);
+            if (data.role === "pharmacist") await addPharmacist(data);
+            else await addDoctor(data);
+            toast.success("Register Successfull", { autoClose: 2000, position: 'top-right' });
+            setTimeout(() => {
+                router.push("/auth/login");
+            }, 2000);
         } catch (error) {
-            console.log("error: ", error);
+            ErrorForm(error, setError);
+            setTriggerErr(!triggerErr);
         }
     }
 
@@ -95,18 +80,43 @@ export default function Login() {
     ]
 
     const biodataInputField = [
-        { label: "NIK", type: "text", name: "nik", placeholder: "12345678" },
+        { label: "NIK", type: "number", name: "nik", placeholder: "12345678" },
         { name: "fullName" },
         { label: "Phone Number", type: "number", name: "phoneNum", placeholder: "+628xxxxxx" },
         { label: "Date of Birth", type: "date", name: "dob", placeholder: "01/01/2000" },
         { name: "role" },
     ]
 
+    const selectHandler = (e) => {
+        setSelectedOption(e);
+        roleRef.current.style.display = "none";
+    }
 
     const submitForm = () => formRef.current.requestSubmit();
 
+    useEffect(() => {
+        if (Object.keys(errors).length > 0) {
+            if (errors.email || errors.password || errors.confirmPassword) {
+                credentialsRef.current.style.display = "block";
+                biodataRef.current.style.display = "none";
+            } else {
+                credentialsRef.current.style.display = "none";
+                biodataRef.current.style.display = "block";
+            }
+        }
+    }, [errors, triggerErr])
+
+    useEffect(() => {
+        setIsLoading(doctorLoading || pharmacistLoading)
+    }, [doctorLoading, pharmacistLoading])
+
+    useEffect(() => {
+        credentialsRef.current.style.display = "block";
+        biodataRef.current.style.display = "none";
+    }, [])
+
     return (
-        <form onSubmit={handleSubmit(RegisterHandler)} className="flex justify-center items-center flex-col py-16" ref={formRef}>
+        <form onSubmit={handleSubmit(RegisterHandler)} className="h-screen flex justify-center items-center flex-col py-16" ref={formRef}>
             <section ref={credentialsRef}>
                 <div className="flex justify-center items-center flex-col gap-3 p-8 rounded bg-background-light border border-border-auth">
                     <div className="text-center mb-4">
@@ -120,7 +130,7 @@ export default function Login() {
                             )
                         })
                     }
-                    <Button type='primary' onClick={nextDataHandler} className='w-full'>Next</Button>
+                    <Button type="button" onClick={nextDataHandler} className='w-full'>Next</Button>
                     <Text type="body">Don't have an account? <Link href="/auth/login">Sign in</Link> here</Text>
                 </div>
             </section>
@@ -144,10 +154,15 @@ export default function Login() {
                                 <>
                                     <Text type="body" className="w-full text-start">Role</Text>
                                     <RadioGroup name="role-group" inline className="flex flex-row jusitfy-start items-start gap-x-3 w-full">
-                                        <InputField type="radio" name="role" register={register} value="doctor" onChange={setSelectedOption} label="Doctor" id="doctor" />
-                                        <InputField type="radio" name="role" register={register} value="pharmacist" onChange={setSelectedOption} label="Pharmacist" id="pharmacist" />
+                                        <InputField type="radio" name="role" register={register} value="doctor" onChange={selectHandler} label="Doctor" id="doctor" />
+                                        <InputField type="radio" name="role" register={register} value="pharmacist" onChange={selectHandler} label="Pharmacist" id="pharmacist" />
                                     </RadioGroup>
-                                    <Text type="danger" className="w-full text-start">{errors.role?.message}</Text>
+                                    <div className='px-4 w-full' ref={roleRef}>
+                                        {
+                                            errors.role &&
+                                            <Text type="danger">{errors.role?.message}</Text>
+                                        }
+                                    </div>
                                 </>
                             )
                         }
@@ -156,12 +171,11 @@ export default function Login() {
                         )
                     })}
                     {selectedOption === 'doctor' && <RenderSpecialistInput register={register} errors={errors} />}
-                    { error ? <Text type="danger">{error}</Text> : null }
                     <div className="flex gap-x-5 w-full">
-                        <Button type='primary' onClick={prevDataHandler} className='w-5 flex-none'>
-                            <ArrowLeftIcon className="text-2xl"/>
+                        <Button type='button' onClick={prevDataHandler} className='w-5 flex-none'>
+                            <ArrowLeftIcon className="text-2xl" />
                         </Button>
-                        <Button type='primary' isLoading={isLoading} onClick={submitForm} className='w-full shrink'>{isLoading ? '' : 'Register'}</Button>
+                        <Button type='button' isLoading={isLoading} onClick={submitForm} className='w-full shrink'>{isLoading ? '' : 'Register'}</Button>
                     </div>
                 </div>
             </section>

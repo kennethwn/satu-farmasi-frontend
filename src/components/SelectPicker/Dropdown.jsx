@@ -2,6 +2,7 @@ import { SelectPicker } from "rsuite";
 import propTypes from 'prop-types';
 import Label from "../Input/Label";
 import Text from "../Text";
+import { useEffect, useRef } from "react";
 
 export default function Dropdown({
     name,
@@ -13,38 +14,58 @@ export default function Dropdown({
     onChange,
     label,
     id,
+    placement = "auto",
     ...props
 }) {
-    className = [className];
+    const classNames = [className];
+    const containerRef = useRef(null);
 
     const styles = {
         display: 'flex',
         width: '100%',
-        borderRadius: '1rem', // 6px
-        borderWidth: '1px',
         color: '#111827', // Tailwind's gray-900
         boxShadow: '0 1px 2px 0 rgba(0, 0, 0, 0.05)', // Small shadow
-        borderColor: '#333333', // Tailwind's gray-300
         fontSize: '0.875rem', // 14px
         lineHeight: '1.5rem', // 24px
     };
 
-    if (label) className.push('my-2');
-    console.log("eror: ", error)
+    const addNewClass = (newClass) => {
+        const selectPicker = containerRef.current?.querySelectorAll('.rs-picker-toggle');
+        console.log('selectPicker', selectPicker);
+        selectPicker.forEach((element) => {
+            element.classList.add(newClass);
+        });
+    }
+
+    const removeClass = (className) => {
+        const selectPicker = containerRef.current?.querySelectorAll('.rs-picker-toggle');
+        selectPicker.forEach((element) => {
+            element.classList.remove(className);
+        });
+    }
+
+    useEffect(() => {
+        if (error) addNewClass('error-field');
+        else removeClass('error-field');
+    }, [error])
+
+    if (label) className.push('my-2 container-select');
 
     return (
         <>
             {label && <Label id={id} label={label} />}
-            <SelectPicker
-                style={styles}
-                placeholder={placeholder}
-                onChange={onChange}
-                className={className}
-                defaultValue={defaultValue}
-                value={value}
-                {...props}
-            />
-            <div style={{ minHeight: '22px' }}>
+            <div ref={containerRef} style={{ position: 'relative' }}>
+                <SelectPicker
+                    container={() => containerRef.current}
+                    preventOverflow={false}
+                    placeholder={placeholder}
+                    onChange={onChange}
+                    className={className}
+                    defaultValue={defaultValue}
+                    value={value}
+                    placement={placement}
+                    {...props}
+                />
                 {
                     error &&
                     <Text type="danger">{error}</Text>
@@ -57,7 +78,14 @@ export default function Dropdown({
 }
 
 Dropdown.propTypes = {
+    name: propTypes.string,
+    label: propTypes.string,
+    id: propTypes.string,
+    placement: propTypes.string,
+    error: propTypes.string,
     className: propTypes.string,
     placeholder: propTypes.string,
     onChange: propTypes.func,
+    value: propTypes.any,
+    defaultValue: propTypes.any,
 }

@@ -5,22 +5,26 @@ import usePrescription from "../api/prescription";
 import { useEffect, useState } from "react";
 import { Checkbox, Pagination, SelectPicker, Table } from "rsuite";
 import SearchBar from "@/components/SearchBar";
-import formatDate from "@/helpers/dayHelper";
+import { formatDateWithTime, convertToTimestampString } from "@/helpers/dayHelper";
 import { MdOutlineEdit } from "react-icons/md";
 import Button from "@/components/Button";
 import { IoMdAdd } from "react-icons/io";
 import { useRouter } from "next/router";
 import PrescriptionDetail from "@/components/Modal/PrescriptionDetail";
+import prescriptionStatusMapped from "@/helpers/prescriptionStatusMap";
+import { PiListMagnifyingGlass } from "react-icons/pi";
 
 export default function index() {
     const { user } = useUserContext();
     const [prescriptionsData, setPrescriptionsData] = useState([])
     const { isLoading: loading, getAllPrescription, getSearchedPrescription } = usePrescription()
-    const [filter, setFilter] = useState('');
-    const [search, setSearch] = useState('');
-    const [searchResult, setSearchResult] = useState([])
-    const [limit, setLimit] = useState(10);
+    const [statusChanged, setStatusChanged] = useState({})
+    const prescriptionStatusMap = prescriptionStatusMapped
+    const [search, setSearch] = useState("");
     const [page, setPage] = useState(1);
+    const [totalPage, setTotalPage] = useState(0);
+    const [limit, setLimit] = useState(10);
+    const [filterStatus, setFilterStatus] = useState("")
     const [sortColumn, setSortColumn] = useState();
     const [sortType, setSortType] = useState();
     const status = ["UNPROCESSED", "ON PROGRESS", "WAITING FOR PAYMENT", "DONE"];
@@ -29,85 +33,57 @@ export default function index() {
     const [selectedPrescriptionId, setSelectedPrescriptionId] = useState(-1)
     const [openModal, setOpenModal] = useState(false)
 
-    const handleSortColumn = (sortColumn, sortType) => {
-        setTimeout(() => {
-            setSortColumn(sortColumn);
-            setSortType(sortType);
-        }, 500);
-    };
-
-    const handleChangeLimit = (dataKey) => {
-        setPage(1);
-        setLimit(dataKey);
-    };
-
     const handleFetchPrescriptionData = async () => {
         try {
-            const res = await getAllPrescription();
+            const res = await getAllPrescription(search, limit, page, filterStatus);
             if (res.code !== 200) {
                 toast.error(res.message, { autoClose: 2000, position: "top-center" });
                 return;
             }
-            setPrescriptionsData(res.data)
+            console.log(res)
+            setPrescriptionsData(res.data.results)
+            setTotalPage(res.data.total)
         } catch (error) {
             console.error(error);
         }
     }
 
-    // const handleFetchSearchedPrescriptionData = async () => {
-    //     try {
-    //         const res = await getSearchedPrescription(search)
-    //         if (res.code !== 200) {
-    //             toast.error(res.message, { autoClose: 2000, position: "top-center" });
-    //             return;
-    //         }
-    //         setPrescriptionsData(res.data)
-    //     } catch (error) {
-    //         console.error(error);
-    //     }
-    // }
-
-    const getData = () => {
+    const getData = (data) => {
         console.log("getData:", prescriptionsData)
-        let data = prescriptionsData.filter((value, index) => {
-            const start = limit * (page - 1);
-            const end = start + limit;
-            return index >= start && index < end
-        })
-        .sort((a, b) => {
-            if (sortColumn && sortType) {
-                let x = a[sortColumn]?.toString();
-                let y = b[sortColumn]?.toString();
-                return sortType === 'asc' ? x.localeCompare(y) : y.localeCompare(x);
-            }
-        })
 
-        if (filter) {
-            data = data.filter((value) => value.status === filter);
+        if (filterStatus) {
+            data = data.filter((value) => value.status === filterStatus);
         }
         
         return data;
     }
 
     useEffect(() => {
+        const temp = [...prescriptionsData]
+        temp.map(prescription => {
+            if (prescription.id === statusChanged.prescriptionId) {
+                prescription.status = statusChanged.status
+            }
+        })
+
+        setPrescriptionsData(temp)
+    }, [statusChanged])
+    
+    useEffect(() => {
         async function fetchData() {
-            await handleFetchPrescriptionData();
+            handleFetchPrescriptionData();
         }
         fetchData();
-    }, []); 
+    }, [page, limit, search, filterStatus]);
 
     useEffect(() => {
         console.log(openModal)
         console.log("selectedID:", selectedPrescriptionId)
     }, [openModal])
 
-
-    // useEffect(() => {
-    //     async function fetchSearchData(){
-    //         await handleFetchSearchedPrescriptionData();
-    //     }
-    //     fetchSearchData();
-    // }, [search])
+    useEffect(() => {
+        setPage(1)
+    }, [search, limit])
 
     return (
         <Layout active="prescription" user={user}>
@@ -130,37 +106,35 @@ export default function index() {
                             // borderRadius: '0.4rem',
                         }}
                         label="Status"
-                        data={status.map((status) => ({ label: status, value: status }))}
-                        value={filter}
+                        data={Array.from(prescriptionStatusMap.values()).map((status) => ({ label: status.label, value: status.value }))}
+                        value={filterStatus}
                         onChange={(value) => {
-                            setFilter(value);
+                            setFilterStatus(value);
                             console.log(value);
                         }}
                     />   
                     <SearchBar 
                         size="md"
                         // className="w-1/4"
-                        placeholder="Search..."
+                        placeholder="Search by patient name..."
                         onChange={(value) => {
+                            setSearch(value)
                             console.log(value);
                         }}
                         value={search}
                     />
                 </div>
             </div>
-                <div className="w-full pt-6">
+                <div className="w-full h-full pt-6">
                     <Table
-                        data={getData()}
+                        data={getData(prescriptionsData)}
                         bordered
                         cellBordered
                         shouldUpdateScroll={false}
-                        height={400}
+                        // height={600}
+                        fillHeight
                         affixHorizontalScrollbar
-                        sortColumn={sortColumn}
-                        sortType={sortType}
-                        onSortColumn={handleSortColumn}
                         loading={loading}
-                        // wordWrap
                     >
                         <Column width={50} fixed="left">
                             <HeaderCell className="text-center text-dark">No</HeaderCell>
@@ -169,43 +143,57 @@ export default function index() {
                             </Cell>
                         </Column>
 
-                        <Column flexGrow={1} resizable sortable>
+                        <Column flexGrow={1} resizable>
                             <HeaderCell className="text-dark">Prescription ID</HeaderCell>
-                            <Cell dataKey='prescriptionId'/>
+                            <Cell dataKey='id'/>
                         </Column>
 
-                        <Column flexGrow={1} resizable sortable>
+                        <Column flexGrow={1} resizable>
                             <HeaderCell className="text-dark">Timestamp</HeaderCell>
                             <Cell className="text-dark">
-                                {rowData => formatDate(rowData?.timestamps)}
+                                {rowData => formatDateWithTime(rowData?.created_at)}
                             </Cell>
                         </Column>
 
-                        <Column flexGrow={1} resizable sortable>
+                        <Column flexGrow={1} resizable>
                             <HeaderCell className="text-dark">Patient Name</HeaderCell>
-                            <Cell dataKey='patientName'/>
+                            <Cell dataKey='patient.name'/>
                         </Column>
 
-                        <Column flexGrow={1} resizable sortable>
-                            <HeaderCell className="text-dark">Status</HeaderCell>
-                            <Cell dataKey='status'/>
+                        <Column flexGrow={1} resizable>
+                            <HeaderCell className="text-center text-dark">Status</HeaderCell>
+                            <Cell className="text-center">
+                                {(rowData) => {
+                                    return (
+                                        <div className="flex justify-center flex-row gap-6">
+                                            <p 
+                                                style={{ backgroundColor: prescriptionStatusMap.get(rowData.status)?.color }}
+                                                className="text-white rounded-lg w-3/4">
+                                                {prescriptionStatusMap.get(rowData.status)?.label}
+                                            </p>
+                                        </div>
+                                    );
+                                }}
+                            </Cell>
                         </Column>
 
                         <Column width={100} fixed="right">
                             <HeaderCell className="text-center text-dark">Detail</HeaderCell>
-                            <Cell className="text-center">
+                            <Cell className="text-center"  style={{padding: '6px'}}>
                                 {
                                     rowData => {
                                         return (
                                         <button
                                             className="inline-flex items-center justify-center w-8 h-8 text-center bg-transparent border-0 rounded-lg"
                                             onClick={() => {
-                                                console.log(rowData.prescriptionId);
-                                                setSelectedPrescriptionId(rowData.prescriptionId);
+                                                console.log(rowData.id);
+                                                setSelectedPrescriptionId(rowData.id);
                                                 setOpenModal(true);
                                             }}
                                         >
-                                            <MdOutlineEdit size="2em" color="#FFD400" />
+                                        <PiListMagnifyingGlass 
+                                            size='1.5em'
+                                        />
                                         </button>
                                         )
                                     }
@@ -223,19 +211,20 @@ export default function index() {
                             boundaryLinks
                             maxButtons={5}
                             size="xs"
-                            layout={["total", "-", "limit", "|", "pager", "skip"]}
-                            total={getData().length || 0}
-                            limitOptions={[10, 30, 50]}
+                            layout={["total", "-", "limit", "|", "pager"]}
+                            total={totalPage || 0}
+                            limitOptions={[3, 5, 10, 15]}
                             limit={limit}
                             activePage={page}
-                            onChangePage={setPage}
-                            onChangeLimit={handleChangeLimit}
+                            onChangePage={(page) => setPage(page)}
+                            onChangeLimit={(limit) => setLimit(limit)}
                         />
                     </div>
                 </div>
             </ContentLayout>
 
             <PrescriptionDetail 
+                setStatusChanged={setStatusChanged}
                 prescriptionId={selectedPrescriptionId}
                 openModal={openModal}
                 setOpenModal={setOpenModal}

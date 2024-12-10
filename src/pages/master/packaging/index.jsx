@@ -3,7 +3,7 @@ import Layout from "@/components/Layouts";
 import ContentLayout from "@/components/Layouts/Content";
 import SearchBar from "@/components/SearchBar";
 import { useUserContext } from "@/pages/api/context/UserContext";
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { IoMdAdd } from "react-icons/io";
 import { Pagination, SelectPicker, Table, Modal } from "rsuite";
 import { MdOutlineEdit } from "react-icons/md";
@@ -14,10 +14,11 @@ import { isRequiredString } from "@/helpers/validation";
 import Input from "@/components/Input";
 import usePackagingAPI from "@/pages/api/master/packaging";
 import Toaster from "@/components/Modal/Toaster";
+import { useForm } from "react-hook-form";
+import { zodResolver } from "@hookform/resolvers/zod";
 
 const packagingSchema = z.object({
     label: isRequiredString(),
-    value: isRequiredString(),
 })
 
 export default function index(props) {
@@ -39,6 +40,16 @@ export default function index(props) {
     const [page, setPage] = useState(1);
     const [totalPage, setTotalPage] = useState(0);
     const [limit, setLimit] = useState(10);
+    const createFormRef = useRef();
+    const editFormRef = useRef();
+
+    const { register, handleSubmit, formState: { errors }, setValue, reset } = useForm({
+        resolver: zodResolver(packagingSchema), defaultValues: {
+            id: "",
+            label: "",
+            value: ""
+        }
+    });
 
     const HandleOnChange = (e, action) => {
         switch (action) {
@@ -59,28 +70,13 @@ export default function index(props) {
         }
     }
 
-    const HandleClear = () => {
-        setData([]);
-        setEditInput({});
-        setPage(1);
-        setTotalPage(0);
-        setLimit(10);
-        setInput({ label: "", value: "" });
-        setOpen({
-            create: false,
-            edit: false,
-            delete: false,
-        });
-    }
-
     const HandeFetchPackagingData = async () => {
         try {
             const res = await GetAllPackaging(page, limit);
-            console.log(res);
             if (res.code !== 200) {
-                toast.error(res.message, { autoClose: 2000, position: "top-center" });
+                toast.error(res.message, { autoClose: 2000, position: "top-right" });
                 return;
-            } 
+            }
             setData(res.data.results);
             setTotalPage(res.data.total);
         } catch (error) {
@@ -91,9 +87,8 @@ export default function index(props) {
     const HandleFetchPackagingByLabel = async () => {
         try {
             const res = await GetPackagingByLabel(search);
-            console.log(res);
             if (res.code !== 200) {
-                toast.error(res.message, { autoClose: 2000, position: "top-center" });
+                toast.error(res.message, { autoClose: 2000, position: "top-right" });
                 return;
             }
             setData(res?.data.results);
@@ -103,31 +98,34 @@ export default function index(props) {
         }
     }
 
-    const HandleCreatePackaging = async () => {
+    const HandleCreatePackaging = async (data) => {
         try {
-            const validatedData = packagingSchema.parse(input);
-            const res = await CreatePackaging(validatedData);
+            data = { ...data, value: data.label };
+            const res = await CreatePackaging(data);
             if (res.code !== 200) {
-                toast.error("Failed to create packaging", { autoClose: 2000, position: "top-center" });
+                toast.error(res.message, { autoClose: 2000, position: "top-right" });
                 return;
-            } 
-            toast.success("Successfully created packaging", { autoClose: 2000, position: "top-center" });
-            setOpen({...open, create: false, edit: false, delete: false});
+            }
+            toast.success(res.message, { autoClose: 2000, position: "top-right" });
+            setOpen({ ...open, create: false, edit: false, delete: false });
+            reset();
             HandeFetchPackagingData();
         } catch (error) {
             console.error(error);
         }
     }
 
-    const HandleEditPackaging = async () => {
+    const HandleEditPackaging = async (data) => {
         try {
-            const res = await EditPackaging(editInput);
+            data = { ...data, id: editInput.id, value: data.label };
+            const res = await EditPackaging(data);
             if (res.code !== 200) {
-                toast.error("Failed to edit packaging", { autoClose: 2000, position: "top-center" });
+                toast.error(res.message, { autoClose: 2000, position: "top-right" });
                 return;
             }
-            toast.success(`${action === "delete" ? "Successfully deleted packaging" : "Successfully edited packaging"}`, { autoClose: 2000, position: "top-center" });
-            setOpen({...open, create: false, edit: false, delete: false});
+            toast.success("Successfully edited packaging", { autoClose: 2000, position: "top-right" });
+            setOpen({ ...open, create: false, edit: false, delete: false });
+            reset();
             HandeFetchPackagingData();
         } catch (error) {
             console.error(error);
@@ -136,14 +134,14 @@ export default function index(props) {
 
     const HandleDeletePackaging = async () => {
         try {
-            setEditInput({...editInput, isActive: false});
             const res = await DeletePackaging(editInput);
             if (res.code !== 200) {
-                toast.error("Failed to delete packaging", { autoClose: 2000, position: "top-center" });
+                toast.error(res.message, { autoClose: 2000, position: "top-right" });
                 return;
             }
-            toast.success("Successfully deleted packaging", { autoClose: 2000, position: "top-center" });
-            setOpen({...open, create: false, edit: false, delete: false});
+            toast.success(res.message, { autoClose: 2000, position: "top-right" });
+            setOpen({ ...open, create: false, edit: false, delete: false });
+            reset();
             HandeFetchPackagingData();
         } catch (error) {
             console.error(error);
@@ -161,18 +159,21 @@ export default function index(props) {
         fetchData();
     }, [page, limit, search]);
 
+    const submitcreateform = () => createFormRef.current.requestSubmit();
+    const submitEditForm = () => editFormRef.current.requestSubmit();
+
     return (
         <Layout active="master-packaging" user={user}>
             <ContentLayout title="List Kemasan">
                 <div className="w-full h-[500px]">
                     <div className="flex flex-row justify-between items-center w-full pb-6">
-                        <Button 
-                            prependIcon={<IoMdAdd size={24}/>} 
-                            onClick={() => setOpen({...open, create: true})}>
-                                Tambah
+                        <Button
+                            prependIcon={<IoMdAdd size={24} />}
+                            onClick={() => setOpen({ ...open, create: true })}>
+                            Tambah
                         </Button>
 
-                        <SearchBar 
+                        <SearchBar
                             size="md"
                             className="w-1/4"
                             placeholder="Search..."
@@ -197,12 +198,12 @@ export default function index(props) {
 
                         <Column width={400}>
                             <HeaderCell className="text-dark font-bold">ID Kemasan</HeaderCell>
-                            <Cell dataKey='label'/>
+                            <Cell dataKey='label' />
                         </Column>
 
                         <Column flexGrow={1}>
                             <HeaderCell className="text-dark font-bold">Nama Kemasan</HeaderCell>
-                            <Cell dataKey='value'/>
+                            <Cell dataKey='value' />
                         </Column>
 
                         <Column width={150} fixed="right">
@@ -215,28 +216,29 @@ export default function index(props) {
                                                 <button
                                                     className="inline-flex items-center justify-center w-8 h-8 text-center bg-transparent border-0 rounded-lg"
                                                     onClick={() => {
-                                                        console.log(rowData);
                                                         setEditInput(rowData);
-                                                        setOpen({...open, edit: true});
+                                                        setValue("id", rowData.id);
+                                                        setValue("label", rowData.label);
+                                                        setValue("value", rowData.value);
+                                                        setOpen({ ...open, edit: true });
                                                     }}
                                                 >
-                                                    <MdOutlineEdit 
-                                                        size="2em" 
-                                                        color="#FFD400" 
+                                                    <MdOutlineEdit
+                                                        size="2em"
+                                                        color="#FFD400"
                                                     />
                                                 </button>
 
                                                 <button
                                                     className="inline-flex items-center justify-center w-8 h-8 text-center bg-transparent border-0 rounded-lg"
                                                     onClick={() => {
-                                                        console.log(rowData);
-                                                        setEditInput({...rowData, isActive: false});
-                                                        setOpen({...open, delete: true});
+                                                        setEditInput({ ...rowData, isActive: false, id: parseInt(rowData.id) });
+                                                        setOpen({ ...open, delete: true });
                                                     }}
                                                 >
-                                                    <PiTrash 
-                                                        size="2em" 
-                                                        color="#DC4A43" 
+                                                    <PiTrash
+                                                        size="2em"
+                                                        color="#DC4A43"
                                                     />
                                                 </button>
                                             </div>
@@ -268,71 +270,85 @@ export default function index(props) {
                 </div>
             </ContentLayout>
 
-            <Modal 
+            <Modal
                 backdrop="static"
-                open={open.create} 
-                onClose={() => setOpen({...open, create: false})}
+                open={open.create}
+                onClose={() => {
+                    reset();
+                    setOpen({ ...open, create: false })
+                }}
                 size="lg"
             >
                 <Header className="text-2xl font-bold">Tambah Kemasan</Header>
-                <Body className="pt-2">
-                    <Input
-                        type="text"
-                        label="Nama Kemasan"
-                        name="name"
-                        placeholder="nama kemasan"
-                        onChange={e => HandleOnChange(e, "create")}
-                    />
-                </Body>
-                <Footer className="pt-4">
-                    <Button
-                        appearance="primary"
-                        isLoading={isLoading}
-                        onClick={() => HandleCreatePackaging()}
-                    >
-                        Simpan
-                    </Button>
-                </Footer>
+                <form onSubmit={handleSubmit(HandleCreatePackaging)} ref={createFormRef}>
+                    <Body className="pt-2">
+                        <Input
+                            type="text"
+                            label="Nama Kemasan"
+                            name="label"
+                            placeholder="Nama kemasan"
+                            autofocus={true}
+                            register={register}
+                            error={errors["label"]?.message}
+                            onChange={e => HandleOnChange(e, "create")}
+                        />
+                    </Body>
+                    <Footer className="pt-4">
+                        <Button
+                            type="button"
+                            appearance="primary"
+                            isLoading={isLoading}
+                            onClick={submitcreateform}
+                        >
+                            Simpan
+                        </Button>
+                    </Footer>
+                </form>
             </Modal>
 
-            <Modal 
+            <Modal
                 backdrop="static"
-                open={open.edit} 
+                open={open.edit}
                 onClose={() => {
-                    setOpen({...open, edit: false})
+                    reset();
+                    setOpen({ ...open, edit: false })
                 }}
                 size="lg"
             >
                 <Header className="text-2xl font-bold">Edit Kemasan</Header>
-                <Body className="pt-2">
-                    <Input
-                        type="text"
-                        label="Nama Kemasan"
-                        name="name"
-                        placeholder="nama kemasan"
-                        value={editInput.value}
-                        onChange={e => HandleOnChange(e, "edit")}
-                    />
-                </Body>
-                <Footer className="pt-4">
-                    <Button
-                        isLoading={isLoading}
-                        appearance="primary"
-                        onClick={() => HandleEditPackaging()}
-                    >
-                        Simpan
-                    </Button>
-                </Footer>
+                <form onSubmit={handleSubmit(HandleEditPackaging)} ref={editFormRef}>
+                    <Body className="pt-2">
+                        <Input
+                            type="text"
+                            label="Nama Kemasan"
+                            name="label"
+                            placeholder="Nama kemasan"
+                            autofocus={true}
+                            register={register}
+                            error={errors["label"]?.message}
+                            onChange={e => HandleOnChange(e, "edit")}
+                        />
+                    </Body>
+                    <Footer className="pt-4">
+                        <Button
+                            type="button"
+                            isLoading={isLoading}
+                            appearance="primary"
+                            onClick={submitEditForm}
+                        >
+                            Simpan
+                        </Button>
+                    </Footer>
+                </form>
             </Modal>
 
-            {/* TODO: Bold editInput.label */}
             <Toaster
                 type="warning"
-                open={open.delete} 
-                onClose={() => setOpen({...open, delete: false})}
+                open={open.delete}
+                onClose={() => setOpen({ ...open, delete: false })}
                 body={<>Apakah anda yakin untuk menghapus data <span className="text-danger">{editInput.label}</span>?</>}
                 btnText="Hapus"
-                onClick={() => HandleDeletePackaging()}
+                onClick={HandleDeletePackaging}
             />
         </Layout>
     )

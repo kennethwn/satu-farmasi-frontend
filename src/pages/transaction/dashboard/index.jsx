@@ -1,14 +1,12 @@
-import Button from "@/components/Button";
 import Layout from "@/components/Layouts";
 import ContentLayout from "@/components/Layouts/Content";
 import TransactionDetail from "@/components/Modal/TransactionDetail";
 import SearchBar from "@/components/SearchBar";
+import { formatDateWithTime } from "@/helpers/dayHelper";
+import prescriptionStatusMapped from "@/helpers/prescriptionStatusMap";
 import { useUserContext } from "@/pages/api/context/UserContext";
-import useClassifiVendorAPI from "@/pages/api/master/vendor";
 import useTransaction from "@/pages/api/transaction/transaction";
-import { useRouter } from "next/router";
 import { useEffect, useState } from "react";
-import { IoMdAdd } from "react-icons/io";
 import { PiListMagnifyingGlass } from "react-icons/pi";
 import { toast } from "react-toastify";
 import { Pagination, Table } from "rsuite";
@@ -17,6 +15,8 @@ export default function index() {
   const { user } = useUserContext();
   const { HeaderCell, Cell, Column } = Table;
   const { isLoading, getAllTransaction } = useTransaction();
+  const prescriptionStatusMap = prescriptionStatusMapped;
+  const [statusUpdated, setStatusUpdated] = useState({})
   const [data, setData] = useState([]);
   const [search, setSearch] = useState("");
   const [page, setPage] = useState(1);
@@ -34,6 +34,7 @@ export default function index() {
         return;
       }
       setData(res.data.results);
+      console.log(res.data.results);
       setTotalPage(res.data.total);
     } catch (error) {
       console.error(error);
@@ -51,7 +52,12 @@ export default function index() {
             try {
                 const parsedData = JSON.parse(event?.data);
                 console.log(parsedData)// Append new data to the state
-                toast.info(`New Transaction Created, Refresh to See New Transaction`, { autoClose: 2000, position: "top-right" });
+                setStatusUpdated(parsedData)
+                if (parsedData.status === "WAITING_FOR_PAYMENT") {
+                  toast.info(`New Transaction Created, Refresh to See New Transaction`, { autoClose: 2000, position: "top-right" });
+                } else if (parsedData.status === "DONE") {
+                  toast.info(`A Transaction Has Been Mark as Done, Refresh to See the Update`, { autoClose: 2000, position: "top-right" });
+                }
             } catch (err) {
                 console.error("Failed to parse data from SSE:", err);
             }
@@ -74,11 +80,19 @@ export default function index() {
     };
   }, []);
 
-    useEffect(() => {
-        console.log(openModal)
-        console.log("selectedID:", selectedTransactionId)
-    }, [openModal])
+  useEffect(() => {
+      console.log(openModal)
+      console.log("selectedID:", selectedTransactionId)
+  }, [openModal])
 
+  useEffect(() => {
+    const temp = [...data]
+    temp.map(transaction => {
+      if (transaction.prescription.id === setStatusUpdated.prescriptionId) {
+        transaction.prescription.status = setStatusUpdated.status
+      }
+    })
+  }, [setStatusUpdated])
 
   useEffect(() => {
     async function fetchData() {
@@ -89,7 +103,7 @@ export default function index() {
 
   useEffect(() => {
     setPage(1)
-  }, [search])
+  }, [search, limit])
 
   return (
     <Layout active="transaction-dashboard" user={user}>
@@ -98,7 +112,7 @@ export default function index() {
           <SearchBar
             size="md"
             className="w-1/4"
-            placeholder="Search..."
+            placeholder="Search by patient name..."
             onChange={(value) => setSearch(value)}
           />
         </div>
@@ -128,6 +142,13 @@ export default function index() {
               <Cell dataKey="id" />
             </Column>
 
+            <Column flexGrow={1} resizable>
+                <HeaderCell className="text-dark font-bold">Timestamp</HeaderCell>
+                <Cell className="text-dark">
+                    {rowData => formatDateWithTime(rowData?.updated_at)}
+                </Cell>
+            </Column>
+
             <Column flexGrow={1}>
               <HeaderCell className="text-dark font-bold">
                 Patient
@@ -143,27 +164,41 @@ export default function index() {
             </Column>
 
             <Column flexGrow={1}>
-              <HeaderCell className="text-dark font-bold">
+              <HeaderCell className="text-center text-dark font-bold">
                 Status
               </HeaderCell>
-              <Cell dataKey="prescription.status" />
+              <Cell className="text-center">
+                {(rowData) => {
+                  return (
+                    <div className="flex justify-center flex-row gap-6">
+                      <p 
+                        style={{ backgroundColor: prescriptionStatusMap.get(rowData.prescription.status)?.color }}
+                        className="text-white rounded-lg w-3/4">
+                          {prescriptionStatusMap.get(rowData.prescription.status)?.label}
+                      </p>
+                    </div>
+                  );
+                }}
+              </Cell>
             </Column>
 
             <Column width={150} fixed="right">
               <HeaderCell className="text-center text-dark font-bold">
                 Action
               </HeaderCell>
-              <Cell className="text-center">
+              <Cell className="text-center" style={{padding: '6px'}}>
                 {(rowData) => {
                   return (
-                    <div className="flex justify-center flex-row gap-6">
+                    <div className="flex justify-center flex-row gap-6 items-center">
                       <button className="inline-flex items-center justify-center w-8 h-8 text-center bg-transparent border-0 rounded-lg"
                         onClick={() => {
                             console.log(rowData.id);
                             setSelectedTransactionId(rowData.id);
                             setOpenModal(true);
                         }}>
-                        <PiListMagnifyingGlass />
+                        <PiListMagnifyingGlass 
+                          size='1.5em'
+                        />
                       </button>
                     </div>
                   );
@@ -194,6 +229,7 @@ export default function index() {
       </ContentLayout>
 
         <TransactionDetail
+            statusUpdated={statusUpdated}
             transactionId={selectedTransactionId}
             openModal={openModal}
             setOpenModal={setOpenModal}

@@ -29,6 +29,7 @@ export const middleware = async (req) => {
 export const config = {
     matcher: [
         "/",
+        "/diagnose/:path*",
         "/prescribe/:path*",
         "/transaction/:path*",
         "/report/:path*",

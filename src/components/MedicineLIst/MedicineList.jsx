@@ -1,6 +1,7 @@
 import { Grid, Row, Table } from "rsuite";
 import { Cell, Column, HeaderCell } from "rsuite-table";
 import { useState } from "react";
+import { formatRupiah } from "@/helpers/currency";
 
 export default function MedicineList(props) {
     const {medicineList} = props;
@@ -44,8 +45,6 @@ export default function MedicineList(props) {
             wordWrap="break-word"
             // height={400}
             affixHorizontalScrollbar
-            sortColumn={sortColumn}
-            sortType={sortType}
         >
             <Column width={50} fixed="left">
                 <HeaderCell className="text-center text-dark">No</HeaderCell>
@@ -54,35 +53,42 @@ export default function MedicineList(props) {
                 </Cell>
             </Column>
 
-            <Column width={200} resizable sortable>
+            <Column flexGrow={4} fullText>
                 <HeaderCell className="text-dark">Nama Obat</HeaderCell>
                 <Cell>
-                    {(rowData) => 
-                        <Grid>
-                            <Row>
-                                {rowData.medicine.name}
-                            </Row>
-                            <Row>
-                                {rowData.instruction}
-                            </Row>
-                        </Grid>
-                    }
+                    {(rowData) => {
+                        return (<div className="flex flex-col h-full">
+                            <p>{rowData.medicine.name} <br /> <span className="text-gray-500">{rowData.instruction}</span></p>
+                        </div>)
+                        // <Grid>
+                        //     <Row>
+                        //         {rowData.medicine.name}
+                        //     </Row>
+                        //     <Row className="text-gray-500">
+                        //         {rowData.instruction}
+                        //     </Row>
+                        // </Grid>
+                    }}
                 </Cell>
             </Column>
 
-            <Column width={75} resizable sortable>
+            <Column flexGrow={1}>
                 <HeaderCell className="text-dark">Jumlah</HeaderCell>
                 <Cell dataKey='quantity'/>
             </Column>
 
-            <Column width={175} resizable sortable>
+            <Column flexGrow={2}>
                 <HeaderCell className="text-dark">Harga Per Obat (Rp.)</HeaderCell>
-                <Cell dataKey='medicine.price'/>
+                <Cell dataKey='medicine.price'>
+                    {rowData => formatRupiah(rowData?.medicine?.price)}
+                </Cell>
             </Column>
 
-            <Column width={175} resizable sortable>
+            <Column flexGrow={2} fixed="right">
                 <HeaderCell className="text-dark">Total Sub Harga (Rp.)</HeaderCell>
-                <Cell dataKey='totalPrice'/>
+                <Cell dataKey='totalPrice'>
+                    {rowData => formatRupiah(rowData?.totalPrice)}
+                </Cell>
             </Column>
 
             {/* <Column width={225} fixed="right">
