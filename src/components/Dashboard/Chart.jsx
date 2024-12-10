@@ -86,7 +86,7 @@ export default function Chart({
                 <div className="w-full justify-center items-center h-full">
                     {series.length > 0 ? 
                         <ApexChart type={options?.chart?.type} options={options} series={series} height={300} width="100%" />
-                        : <div className="text-center">no data</div>
+                        : <div className="text-center">No data found</div>
                     }
                 </div>
             </div>

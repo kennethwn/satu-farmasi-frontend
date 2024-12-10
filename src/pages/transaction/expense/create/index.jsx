@@ -27,6 +27,9 @@ const physicalReportSchema = z.object({
     }),
 });
 
+// FIX: Zod isn't working currently
+// HACK: how do I choice the specific medicine ID?
+// TODO: Add reserveStock column or  addjust the currStock
 const medicineSchema = z.object({
     medicineId: isRequiredNumber(),
     quantity: isRequiredNumber(),
@@ -89,7 +92,7 @@ export default function Index() {
         e.preventDefault();
         try {
             setErrors({});
-            medicineSchema.parse(formData);
+            //medicineSchema.parse(formData);
 
             // binding payload
             formData.physicalReport.data.pharmacist = user.name;
@@ -110,11 +113,7 @@ export default function Index() {
                 router.push("/transaction/expense");
             }, 2000)
         } catch (error) {
-            toast.error(error.response?.data.message, {
-                autoClose: 2000,
-                position: "top-right",
-            });
-            error = error.response?.data.errors
+            console.log(error);
             if (error instanceof ZodError) {
                 const newErrors = { ...errors };
                 error.issues.forEach((issue) => {
@@ -125,9 +124,12 @@ export default function Index() {
                 });
                 setErrors(newErrors);
             } else {
-                ErrorForm(error, setErrors, false);
+                toast.error(error.response?.data.message, {
+                    autoClose: 2000,
+                    position: "top-right",
+                });
+                // ErrorForm(error, setErrors, false);
             }
-            console.log(error);
         }
     };
 

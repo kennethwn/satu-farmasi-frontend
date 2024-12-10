@@ -55,7 +55,7 @@ export default function useVendorAPI() {
         try {
             return await axios.post("/api/v1/vendors/", data);
         } catch (error) {
-            console.error(error);
+            throw error.response.data.errors
         } finally {
             setIsLoading(false);
         }

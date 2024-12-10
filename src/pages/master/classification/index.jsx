@@ -5,7 +5,7 @@ import { useState, useEffect, useRef } from "react";
 import useClassificationsAPI from "@/pages/api/master/classification";
 import { z } from "zod";
 import { isRequiredString } from "@/helpers/validation";
-import { Modal, Pagination, Table } from "rsuite";
+import { Checkbox, Modal, Pagination, Table } from "rsuite";
 import Button from "@/components/Button";
 import { IoMdAdd } from "react-icons/io";
 import SearchBar from "@/components/SearchBar";
@@ -149,9 +149,10 @@ export default function index() {
 		}
 	};
 
-	const HandleDeleteClassification = async () => {
+	const HandleDeleteClassification = async (rowData, index) => {
 		try {
-			const res = await DeleteClassification(editInput);
+            rowData = { ...rowData, isActive: rowData.is_active };
+			const res = await DeleteClassification(rowData);
 			if (res.code !== 200) {
 				toast.error(res.message, {
 					autoClose: 2000,
@@ -164,7 +165,7 @@ export default function index() {
 				position: "top-right",
 			});
 			setOpen({ ...open, create: false, edit: false, delete: false });
-			HandleFetchClassificationData();
+            setData(prevData => prevData.map((item, idx) => idx === index ? { ...item, is_active: !item.is_active } : item))
 		} catch (error) {
 			console.error(error);
 		}
@@ -204,7 +205,7 @@ export default function index() {
 						<SearchBar
 							size="md"
 							className="w-1/4"
-							placeholder="Search..."
+							placeholder="Cari Klasifikasi ..."
 							onChange={(value) => setSearch(value)}
 						/>
 					</div>
@@ -226,13 +227,6 @@ export default function index() {
 							</Cell>
 						</Column>
 
-						<Column width={400}>
-							<HeaderCell className="text-dark font-bold">
-								ID Klasifikasi
-							</HeaderCell>
-							<Cell dataKey="label" />
-						</Column>
-
 						<Column flexGrow={1}>
 							<HeaderCell className="text-dark font-bold">
 								Nama Klasifikasi
@@ -240,9 +234,29 @@ export default function index() {
 							<Cell dataKey="value" />
 						</Column>
 
+                        <Column width={100} fixed="right">
+                            <HeaderCell className="text-center text-dark font-bold">Status Aktif</HeaderCell>
+                            <Cell className="text-center">
+                                {
+                                    (rowData, index) => {
+                                        return (
+                                            <div className="inline-flex items-center justify-center w-8 h-8 text-center bg-transparent border-0 rounded-lg">
+                                                <Checkbox
+                                                    checked={rowData?.is_active} 
+                                                    onChange={() => {
+                                                        HandleDeleteClassification({ ...rowData, is_active: !rowData.is_active, id: parseInt(rowData.id) }, index);
+                                                    }}
+                                                />
+                                            </div>
+                                        )
+                                    }
+                                }
+                            </Cell>
+                        </Column>
+
 						<Column width={150} fixed="right">
 							<HeaderCell className="text-center text-dark font-bold">
-								Action
+								Aksi
 							</HeaderCell>
 							<Cell className="text-center">
 								{(rowData) => {
@@ -259,16 +273,6 @@ export default function index() {
 												}}
 											>
 												<MdOutlineEdit size="2em" color="#FFD400" />
-											</button>
-
-											<button
-												className="inline-flex items-center justify-center w-8 h-8 text-center bg-transparent border-0 rounded-lg"
-												onClick={() => {
-													setEditInput({ ...rowData, is_active: false, id: parseInt(rowData.id) });
-													setOpen({ ...open, delete: true });
-												}}
-											>
-												<PiTrash size="2em" color="#DC4A43" />
 											</button>
 										</div>
 									);
@@ -339,7 +343,7 @@ export default function index() {
 				}}
 				size="lg"
 			>
-				<Header className="text-2xl font-bold">Edit Klasifikasi</Header>
+				<Header className="text-2xl font-bold">Ubah Klasifikasi</Header>
 				<form onSubmit={handleSubmit(HandleEditClassification)} ref={editFormRef}>
 					<Body className="pt-2">
 						<Input
@@ -360,21 +364,6 @@ export default function index() {
 					</Footer>
 				</form>
 			</Modal>
-
-			<Toaster
-				type="warning"
-				open={open.delete}
-				onClose={() => setOpen({ ...open, delete: false })}
-				body={
-					<>
-						Apakah anda yakin untuk menghapus data{" "}
-						<span className="text-danger">{editInput.label}</span>?
-					</>
-				}
-				btnText="Hapus"
-				isLoading={isLoading}
-				onClick={HandleDeleteClassification}
-			/>
 		</Layout>
 	);
 }

@@ -10,7 +10,7 @@ import { useRouter } from "next/router";
 import Button from "@/components/Button";
 import { toast } from "react-toastify";
 import { z, ZodError } from "zod";
-import { isRequiredNumber, isRequiredString } from "@/helpers/validation";
+import { isRequiredNumber, isRequiredPhoneNumber, isRequiredString } from "@/helpers/validation";
 import { ErrorForm } from "@/helpers/errorForm";
 
 const medicineSchema = z.object({
@@ -34,7 +34,7 @@ const prescriptionSchemaWithNewPatient = z.object({
         patient: z.object({
             patientName: isRequiredString(),
             credentialNum: isRequiredString(),
-            phoneNum: isRequiredString(),
+            phoneNum: isRequiredPhoneNumber(),
         }),
     }),
 });
@@ -99,8 +99,6 @@ export default function create() {
             }
             else prescriptionSchemaWithNewPatient.parse(dataToValidate);
 
-            console.log(data)
-
             const res = await addNewPrescription(data);
             toast.success(res.message, {
                 autoClose: 2000,
@@ -129,7 +127,7 @@ export default function create() {
     return (
         <Layout active="prescription" user={user}>
             <ContentLayout
-                title="Create Prescription"
+                title="Tambah Resep"
                 type="child"
                 backpageUrl="/prescription"
             >
@@ -140,8 +138,8 @@ export default function create() {
                     <div className="flex flex-col gap-2">
                         <Toggle
                             size="lg"
-                            checkedChildren="Existing Patient"
-                            unCheckedChildren="New Patient"
+                            checkedChildren="Pasien Lama"
+                            unCheckedChildren="Pasien Baru"
                             defaultChecked
                             onChange={(e) => setExistingPatient(e)}
                         />

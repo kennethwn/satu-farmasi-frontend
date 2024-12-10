@@ -5,7 +5,7 @@ import SearchBar from "@/components/SearchBar";
 import { useUserContext } from "@/pages/api/context/UserContext";
 import { useEffect, useRef, useState } from "react";
 import { IoMdAdd } from "react-icons/io";
-import { Pagination, SelectPicker, Table, Modal } from "rsuite";
+import { Pagination, SelectPicker, Table, Modal, Checkbox } from "rsuite";
 import { MdOutlineEdit } from "react-icons/md";
 import { PiTrash } from "react-icons/pi";
 import { toast } from "react-toastify";
@@ -132,17 +132,18 @@ export default function index(props) {
         }
     }
 
-    const HandleDeletePackaging = async () => {
+    const HandleDeletePackaging = async (rowData, index) => {
         try {
-            const res = await DeletePackaging(editInput);
+            rowData = { ...rowData, isActive: rowData.is_active };
+            const res = await DeletePackaging(rowData);
             if (res.code !== 200) {
                 toast.error(res.message, { autoClose: 2000, position: "top-right" });
                 return;
             }
             toast.success(res.message, { autoClose: 2000, position: "top-right" });
             setOpen({ ...open, create: false, edit: false, delete: false });
+            setData(prevData => prevData.map((item, idx) => idx === index ? { ...item, is_active: !item.is_active } : item))
             reset();
-            HandeFetchPackagingData();
         } catch (error) {
             console.error(error);
         }
@@ -176,7 +177,7 @@ export default function index(props) {
                         <SearchBar
                             size="md"
                             className="w-1/4"
-                            placeholder="Search..."
+                            placeholder="Cari Kemasan ..."
                             onChange={(value) => setSearch(value)}
                         />
                     </div>
@@ -196,18 +197,33 @@ export default function index(props) {
                             </Cell>
                         </Column>
 
-                        <Column width={400}>
-                            <HeaderCell className="text-dark font-bold">ID Kemasan</HeaderCell>
-                            <Cell dataKey='label' />
-                        </Column>
-
                         <Column flexGrow={1}>
                             <HeaderCell className="text-dark font-bold">Nama Kemasan</HeaderCell>
                             <Cell dataKey='value' />
                         </Column>
 
+                        <Column width={100} fixed="right">
+                            <HeaderCell className="text-center text-dark font-bold">Status Aktif</HeaderCell>
+                            <Cell className="text-center">
+                                {
+                                    (rowData, index) => {
+                                        return (
+                                            <div className="inline-flex items-center justify-center w-8 h-8 text-center bg-transparent border-0 rounded-lg">
+                                                <Checkbox
+                                                    checked={rowData?.is_active} 
+                                                    onChange={() => {
+                                                        HandleDeletePackaging({ ...rowData, is_active: !rowData.is_active, id: parseInt(rowData.id) }, index);
+                                                    }}
+                                                />
+                                            </div>
+                                        )
+                                    }
+                                }
+                            </Cell>
+                        </Column>
+
                         <Column width={150} fixed="right">
-                            <HeaderCell className="text-center text-dark font-bold">Action</HeaderCell>
+                            <HeaderCell className="text-center text-dark font-bold">Aksi</HeaderCell>
                             <Cell className="text-center">
                                 {
                                     rowData => {
@@ -226,19 +242,6 @@ export default function index(props) {
                                                     <MdOutlineEdit
                                                         size="2em"
                                                         color="#FFD400"
-                                                    />
-                                                </button>
-
-                                                <button
-                                                    className="inline-flex items-center justify-center w-8 h-8 text-center bg-transparent border-0 rounded-lg"
-                                                    onClick={() => {
-                                                        setEditInput({ ...rowData, isActive: false, id: parseInt(rowData.id) });
-                                                        setOpen({ ...open, delete: true });
-                                                    }}
-                                                >
-                                                    <PiTrash
-                                                        size="2em"
-                                                        color="#DC4A43"
                                                     />
                                                 </button>
                                             </div>
@@ -315,7 +318,7 @@ export default function index(props) {
                 }}
                 size="lg"
             >
-                <Header className="text-2xl font-bold">Edit Kemasan</Header>
+                <Header className="text-2xl font-bold">Ubah Kemasan</Header>
                 <form onSubmit={handleSubmit(HandleEditPackaging)} ref={editFormRef}>
                     <Body className="pt-2">
                         <Input
@@ -341,15 +344,6 @@ export default function index(props) {
                     </Footer>
                 </form>
             </Modal>
-
-            <Toaster
-                type="warning"
-                open={open.delete}
-                onClose={() => setOpen({ ...open, delete: false })}
-                body={<>Apakah anda yakin untuk menghapus data <span className="text-danger">{editInput.label}</span>?</>}
-                btnText="Hapus"
-                onClick={HandleDeletePackaging}
-            />
         </Layout>
     )
 }

@@ -3,10 +3,9 @@ import ContentLayout from "@/components/Layouts/Content";
 import { useUserContext } from "../api/context/UserContext";
 import usePrescription from "../api/prescription";
 import { useEffect, useState } from "react";
-import { Checkbox, Pagination, SelectPicker, Table } from "rsuite";
+import {  Pagination, SelectPicker, Table } from "rsuite";
 import SearchBar from "@/components/SearchBar";
-import { formatDateWithTime, convertToTimestampString } from "@/helpers/dayHelper";
-import { MdOutlineEdit } from "react-icons/md";
+import { formatDateWithTime } from "@/helpers/dayHelper";
 import Button from "@/components/Button";
 import { IoMdAdd } from "react-icons/io";
 import { useRouter } from "next/router";
@@ -17,7 +16,7 @@ import { PiListMagnifyingGlass } from "react-icons/pi";
 export default function index() {
     const { user } = useUserContext();
     const [prescriptionsData, setPrescriptionsData] = useState([])
-    const { isLoading: loading, getAllPrescription, getSearchedPrescription } = usePrescription()
+    const { isLoading: loading, getAllPrescription } = usePrescription()
     const [statusChanged, setStatusChanged] = useState({})
     const prescriptionStatusMap = prescriptionStatusMapped
     const [search, setSearch] = useState("");
@@ -25,9 +24,6 @@ export default function index() {
     const [totalPage, setTotalPage] = useState(0);
     const [limit, setLimit] = useState(10);
     const [filterStatus, setFilterStatus] = useState("")
-    const [sortColumn, setSortColumn] = useState();
-    const [sortType, setSortType] = useState();
-    const status = ["UNPROCESSED", "ON_PROGRESS", "WAITING_FOR_PAYMENT", "DONE", "CANCELED"];
     const { HeaderCell, Cell, Column } = Table;
     const router = useRouter()
     const [selectedPrescriptionId, setSelectedPrescriptionId] = useState(-1)
@@ -37,7 +33,7 @@ export default function index() {
         try {
             const res = await getAllPrescription(search, limit, page, filterStatus);
             if (res.code !== 200) {
-                toast.error(res.message, { autoClose: 2000, position: "top-center" });
+                toast.error(res.message, { autoClose: 2000, position: "top-right" });
                 return;
             }
             console.log(res)
@@ -87,12 +83,12 @@ export default function index() {
 
     return (
         <Layout active="prescription" user={user}>
-            <ContentLayout title="Resep">
+            <ContentLayout title="List Resep">
             <div className="flex flex-col gap-2 md:flex-row justify-between w-full">
                 <div>
                     <Button
                         prependIcon={<IoMdAdd size={24} />}
-                        onClick={() => router.push(`/prescription/create`)}
+                         onClick={() => router.push(`/prescription/create`)}
                     >
                         Tambah
                     </Button>
@@ -100,10 +96,8 @@ export default function index() {
                 <div className="flex md:flex-row flex-col gap-4">
                     <SelectPicker
                         style={{
-                            // borderWidth: '0.5px',     
                             color: '#DDDDDD',       
                             borderColor: '#DDDDDD', 
-                            // borderRadius: '0.4rem',
                         }}
                         label="Status"
                         data={Array.from(prescriptionStatusMap.values()).map((status) => ({ label: status.label, value: status.value }))}
@@ -131,44 +125,43 @@ export default function index() {
                         bordered
                         cellBordered
                         shouldUpdateScroll={false}
-                        // height={600}
                         fillHeight
                         affixHorizontalScrollbar
                         loading={loading}
                     >
                         <Column width={50} fixed="left">
-                            <HeaderCell className="text-center text-dark">No</HeaderCell>
+                            <HeaderCell className="text-center text-dark font-bold">No</HeaderCell>
                             <Cell className="text-center text-dark">
                                 {(rowData, index) => index + 1}
                             </Cell>
                         </Column>
 
                         <Column flexGrow={1} resizable>
-                            <HeaderCell className="text-dark">Prescription ID</HeaderCell>
+                            <HeaderCell className="text-dark font-bold">Resep ID</HeaderCell>
                             <Cell dataKey='id'/>
                         </Column>
 
                         <Column flexGrow={1} resizable>
-                            <HeaderCell className="text-dark">Timestamp</HeaderCell>
+                            <HeaderCell className="text-dark font-bold">Timestamp</HeaderCell>
                             <Cell className="text-dark">
                                 {rowData => formatDateWithTime(rowData?.created_at)}
                             </Cell>
                         </Column>
 
                         <Column flexGrow={1} resizable>
-                            <HeaderCell className="text-dark">Patient Name</HeaderCell>
+                            <HeaderCell className="text-dark font-bold">Nama Pasien</HeaderCell>
                             <Cell dataKey='patient.name'/>
                         </Column>
 
                         <Column flexGrow={1} resizable>
-                            <HeaderCell className="text-center text-dark">Status</HeaderCell>
+                            <HeaderCell className="text-center text-dark font-bold">Status</HeaderCell>
                             <Cell className="text-center">
                                 {(rowData) => {
                                     return (
-                                        <div className="flex justify-center flex-row gap-6">
+                                        <div className="flex justify-center flex-row gap-6 text-white">
                                             <p 
                                                 style={{ backgroundColor: prescriptionStatusMap.get(rowData.status)?.color }}
-                                                className="text-white rounded-lg w-3/4">
+                                                className="font-extrabold text-center rounded-lg w-full">
                                                 {prescriptionStatusMap.get(rowData.status)?.label}
                                             </p>
                                         </div>
@@ -178,7 +171,7 @@ export default function index() {
                         </Column>
 
                         <Column width={100} fixed="right">
-                            <HeaderCell className="text-center text-dark">Detail</HeaderCell>
+                            <HeaderCell className="text-center text-dark font-bold">Detail</HeaderCell>
                             <Cell className="text-center"  style={{padding: '6px'}}>
                                 {
                                     rowData => {
@@ -186,7 +179,7 @@ export default function index() {
                                         <button
                                             className="inline-flex items-center justify-center w-8 h-8 text-center bg-transparent border-0 rounded-lg"
                                             onClick={() => {
-                                                console.log(rowData.id);
+                                                console.log("id: ", rowData.id);
                                                 setSelectedPrescriptionId(rowData.id);
                                                 setOpenModal(true);
                                             }}

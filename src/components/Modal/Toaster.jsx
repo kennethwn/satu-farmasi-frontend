@@ -17,11 +17,11 @@ export default function Toaster({
     const renderTitle = () => {
         switch (type) {
             case 'success':
-                return <span className="text-center w-full text-success">Berhasil</span>
+                return <span className="text-center w-full text-success font-bold">Berhasil</span>
             case 'warning':
-                return <p className="text-center w-full text-danger">Peringatan!</p>
+                return <p className="text-center w-full text-danger font-bold">Peringatan!</p>
             default:
-                return <span className="text-center w-full text-dark">{title}</span>
+                return <span className="text-center w-full text-dark font-bold">{title}</span>
         }
     }
 
