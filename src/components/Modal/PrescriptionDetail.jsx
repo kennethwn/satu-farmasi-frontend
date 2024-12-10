@@ -8,6 +8,7 @@ import { useRouter } from "next/router";
 import useTransaction from "@/pages/api/transaction/transaction";
 import { toast } from "react-toastify";
 import Toaster from "./Toaster";
+import usePharmacy from "@/pages/api/pharmacy";
 
 export default function PrescriptionDetail(props) {
     const { setStatusChanged, prescriptionId, openModal, setOpenModal, user } = props
@@ -15,6 +16,8 @@ export default function PrescriptionDetail(props) {
     const router = useRouter();
     const { createTransaction, finishTransaction, publishNotification } = useTransaction();
     const [isListening, setIsListening] = useState(false)
+
+    const { getPharmacyInfo } = usePharmacy();
 
     const { getPrescriptionDetail, cancelPrescription } = usePrescription();
     const [open, setOpen] = useState({

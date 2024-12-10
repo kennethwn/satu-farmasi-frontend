@@ -12,6 +12,7 @@ import { isRequiredNumber, isRequiredString } from "@/helpers/validation";
 import useMedicineDropdownOption from "@/pages/api/medicineDropdownOption";
 import { useUserContext } from "@/pages/api/context/UserContext";
 import { ErrorForm } from "@/helpers/errorForm";
+import OutputMedicineWitnessForm from "@/components/DynamicForms/OuputMedicineWitnessForm";
 
 export const medicineSchema = z.object({
     medicineId: isRequiredNumber(),
@@ -44,7 +45,7 @@ export default function Index() {
     const router = useRouter();
     const { user } = useUserContext();
     const id = router.query.id;
-    const { isLoading, GetMedicineById, EditMedicine, GetOuputMedicineById } = useOutputMedicineAPI();
+    const { isLoading, GetMedicineById, EditMedicine, GetOutputMedicineById } = useOutputMedicineAPI();
     const [ medicineData, setMedicineData ] = useState({})
     const [formData, setFormData] = useState({
         medicineId: 0,
@@ -56,11 +57,12 @@ export default function Index() {
             currStock: null
         }
     });
+    const [formField, setFormField] = useState([{ name: "", nip: "", role: "" }]);
     const [errors, setErrors] = useState({});
 
     const handleFetchMedicineById = async () => {
         try {
-            const res = await GetOuputMedicineById(id);
+            const res = await GetOutputMedicineById(id);
             if (res.code !== 200)
                 return toast.error(res.message, {
                     autoClose: 2000,
@@ -75,6 +77,7 @@ export default function Index() {
                     currstock: res.data.medicine.currStock,
                 },
             })
+            setFormField(res.data.physicalReport.data.witnesses);
         } catch (error) {
             console.error(error);
         }
@@ -233,6 +236,19 @@ export default function Index() {
                                 </div>
                             );
                         })}
+                    </div>
+
+                    <div className="w-full my-6">
+                        {
+                            (formData.reasonOfDispose == "BROKEN" || formData.reasonOfDispose == "EXPIRED") &&
+                                <OutputMedicineWitnessForm 
+                                    isLoading={isLoading}
+                                    formFields={formField}
+                                    setFormFields={setFormField}
+                                    setError={setErrors}
+                                    error={errors["physicalReport"]}
+                                />
+                        }
                     </div>
 
                     <div className="flex justify-center gap-2 my-6 lg:justify-end">

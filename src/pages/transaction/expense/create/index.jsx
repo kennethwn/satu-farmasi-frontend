@@ -88,8 +88,8 @@ export default function Index() {
     const createHandler = async (e) => {
         e.preventDefault();
         try {
-            // setErrors({});
-            // medicineSchema.parse(formData);
+            setErrors({});
+            medicineSchema.parse(formData);
 
             // binding payload
             formData.physicalReport.data.pharmacist = user.name;
@@ -110,23 +110,23 @@ export default function Index() {
                 router.push("/transaction/expense");
             }, 2000)
         } catch (error) {
-            // toast.error(error.response?.data.message, {
-            //     autoClose: 2000,
-            //     position: "top-right",
-            // });
-            // error = error.response?.data.errors
-            // if (error instanceof ZodError) {
-            //     const newErrors = { ...errors };
-            //     error.issues.forEach((issue) => {
-            //         if (issue.path.length > 0) {
-            //             const fieldName = issue.path[0];
-            //             newErrors[fieldName] = issue.message;
-            //         }
-            //     });
-            //     setErrors(newErrors);
-            // } else {
-            //     ErrorForm(error, setErrors, false);
-            // }
+            toast.error(error.response?.data.message, {
+                autoClose: 2000,
+                position: "top-right",
+            });
+            error = error.response?.data.errors
+            if (error instanceof ZodError) {
+                const newErrors = { ...errors };
+                error.issues.forEach((issue) => {
+                    if (issue.path.length > 0) {
+                        const fieldName = issue.path[0];
+                        newErrors[fieldName] = issue.message;
+                    }
+                });
+                setErrors(newErrors);
+            } else {
+                ErrorForm(error, setErrors, false);
+            }
             console.log(error);
         }
     };
