@@ -22,8 +22,8 @@ export default function Chart({
     ...props
 }) {
 
-    const [curMonth, setCurMonth] = useState(0);
-    const [curYear, setCurYear] = useState(0);
+    const [curMonth, setCurMonth] = useState(new Date().getMonth()+1);
+    const [curYear, setCurYear] = useState(new Date().getFullYear());
     const [yearList, setYearList] = useState([]);
 
     const getCurrentDate = () => {
@@ -36,12 +36,13 @@ export default function Chart({
 
     const getYearList = () => {
         const list = generateYearList(2000, new Date().getFullYear());
+        console.log(list);
         setYearList(list);
     }
 
     useEffect(() => {
         getCurrentDate();
-    }, [month]);
+    }, []);
     
     useEffect(() => {
         getYearList();
@@ -65,6 +66,7 @@ export default function Chart({
                                 setCurYear(value);
                                 setCurrentYear(value);
                             }}
+                            cleanable={false}
                         />
                     }
                     {monthPicker && 
@@ -75,9 +77,9 @@ export default function Chart({
                             data={month?.map(item => ({label: item.label, value: item.id}))}
                             onChange={value => {
                                 setCurMonth(value);
-                                console.log("monthid: ", value)
                                 setCurrentMonth(value);
                             }}
+                            cleanable={false}
                         />
                     }
                 </div>

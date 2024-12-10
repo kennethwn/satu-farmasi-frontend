@@ -1,7 +1,7 @@
 import { useState } from "react";
 import axios from "@/configs/axios/satufarmasi-service-axios";
 
-export default function useExpenseMedicineAPI() {
+export default function useOutputMedicineAPI() {
     const [isLoading, setIsLoading] = useState(false);
 
     const GetAllMedicine = async (page, limit) => {
@@ -33,7 +33,7 @@ export default function useExpenseMedicineAPI() {
         }
     };
 
-    const GetOuputMedicineById = async (id) => {
+    const GetOutputMedicineById = async (id) => {
         try {
             return await axios.get(`/api/v1/outputMedicines/${id}`);
         } catch (error) {
@@ -96,6 +96,6 @@ export default function useExpenseMedicineAPI() {
         EditMedicine,
         DeleteMedicine,
         GetMedicineByParams,
-        GetOuputMedicineById,
+        GetOutputMedicineById,
     };
 }

@@ -23,8 +23,8 @@ export default function Home() {
 
   const [dataExp, setDataExp] = useState([]);
   const [dataTransaction, setDataTransaction] = useState([]);
-  const [currentMonth, setCurrentMonth] = useState(0);
-  const [currentYear, setCurrentYear] = useState(0);
+  const [currentMonth, setCurrentMonth] = useState(new Date().getMonth()+1);
+  const [currentYear, setCurrentYear] = useState(new Date().getFullYear());
 
   const [totalPatient, setTotalPatient] = useState(0);
   const [totalMedicine, setTotalMedicine] = useState(0);
@@ -146,6 +146,10 @@ export default function Home() {
   useEffect(() => {
     handleFetchMostSalesMedicinesByPrescription();
   }, [currentMonth]);
+
+  useEffect(() => {
+    handleFetchAnnualReport();
+  }, [currentYear]);
 
   return (
     <Layouts user={user}>

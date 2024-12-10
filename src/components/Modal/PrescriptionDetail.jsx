@@ -8,13 +8,16 @@ import { useRouter } from "next/router";
 import useTransaction from "@/pages/api/transaction/transaction";
 import { toast } from "react-toastify";
 import Toaster from "./Toaster";
+import usePharmacy from "@/pages/api/pharmacy";
 
 export default function PrescriptionDetail(props) {
-    const { setStatusChanged, prescriptionId, openModal, setOpenModal } = props
+    const { setStatusChanged, prescriptionId, openModal, setOpenModal, user } = props
     const { Header, Body, Footer } = Modal;
     const router = useRouter();
     const { createTransaction, finishTransaction, publishNotification } = useTransaction();
     const [isListening, setIsListening] = useState(false)
+
+    const { getPharmacyInfo } = usePharmacy();
 
     const { getPrescriptionDetail, cancelPrescription } = usePrescription();
     const [open, setOpen] = useState({
@@ -87,7 +90,8 @@ export default function PrescriptionDetail(props) {
         try {
             const data = {
                 patientId: prescriptionData.patient.id,
-                prescriptionId: prescriptionData.id
+                prescriptionId: prescriptionData.id,
+                pharmacistId: user?.id
             }
             console.log("proceed data: ", JSON.stringify(data))
             //const res = await createTransaction(data);
@@ -219,7 +223,7 @@ export default function PrescriptionDetail(props) {
             size="lg"
         >
             <Header className="text-2xl font-bold">Detail Prescription</Header>
-            <Body className="flex flex-col pt-2 gap-2">
+            <Body className="flex flex-col py-2 gap-2">
                 <div>
                     <Input
                         type="text"

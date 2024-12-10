@@ -4,7 +4,7 @@ import ContentLayout from "@/components/Layouts/Content";
 import Toaster from "@/components/Modal/Toaster";
 import SearchBar from "@/components/SearchBar";
 import { useUserContext } from "@/pages/api/context/UserContext";
-import useExpenseMedicineAPI from "@/pages/api/transaction/expenseMedicine";
+import useOutputMedicineAPI from "@/pages/api/transaction/outputMedicine";
 import { useRouter } from "next/router";
 import { useEffect, useState } from "react";
 import { IoMdAdd } from "react-icons/io";
@@ -17,7 +17,7 @@ import formatCalendar from "@/helpers/dayHelper";
 export default function Index() {
     const { user } = useUserContext();
     const { HeaderCell, Cell, Column } = Table;
-    const { isLoading, GetAllMedicine, GetMedicineByParams, DeleteMedicine } = useExpenseMedicineAPI();
+    const { isLoading, GetAllMedicine, GetMedicineByParams, DeleteMedicine } = useOutputMedicineAPI();
     const status = ["LOST", "EXPIRED", "BROKEN"];
     const [filter, setFilter] = useState('');
 
