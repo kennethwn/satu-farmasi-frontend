@@ -1,4 +1,4 @@
-import api from "../../components/configs/axios/satufarmasi-service-axios"
+import api from "../../configs/axios/satufarmasi-service-axios"
 import { useState } from 'react'
 
 export default function usePatientDropdownOption() {

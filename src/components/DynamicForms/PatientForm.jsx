@@ -1,42 +1,46 @@
-import React, { useEffect } from 'react'
+import React, { useEffect, useState } from 'react'
 import { SelectPicker } from 'rsuite'
-import Input from '../Input';
+import InputField from '../Input';
+import usePatientDropdownOption from '@/pages/api/patientDropdownOption';
 
 function PatientForm(props) {
     const {
         selectedPatient,
         setSelectedPatient,
-        patientDropdownOptions,
         existingPatient
     } = props
 
-    const styles = {
-        display: 'block',
-        width: '100%',
-        borderRadius: '9999px',
-        paddingLeft: '1rem',
-        paddingRight: '1rem',
-        borderWidth: '1px',
-        paddingTop: '0.375rem',
-        paddingBottom: '0.375rem',
-        color: 'var(--color-dark)',
-        borderColor: 'var(--color-dark)',
-        '::placeholder': {
-            color: 'var(--color-gray-400)',
-        },
-        fontSize: '1rem',
-        lineHeight: '1.5rem',
-    };
+    const { getPatientDropdownOptions } = usePatientDropdownOption();
+    const [patientDropdownOptions, setPatientDropdownOptions] = useState([])
 
-    const data = patientDropdownOptions.map(item => ({label: item.credentialNumber + " - " + item.name, value: item.id}))
+    const data = Object.entries(patientDropdownOptions).map(([key, patient]) => ({
+        label: patient.credentialNumber + " - " + patient.name, 
+        value: parseInt(key)
+    }))
+
+    useEffect(() => {
+        async function fetchPatientDropdownOptionsData(){
+            try {
+                const response = await getPatientDropdownOptions()
+                setPatientDropdownOptions(response)
+            } catch (error) {
+                console.log("error #getPatientOptions")
+            }
+        }
+        fetchPatientDropdownOptionsData()
+    }, [])
+
+    useEffect(() => {
+        console.log(selectedPatient)
+    }, [selectedPatient])
 
     const handlePatientChange = (patientId) => {
         setSelectedPatient({
             ...selectedPatient,
             patientId: patientId,
-            patientName: patientDropdownOptions[patientId-1].name,
-            credentialNum: patientDropdownOptions[patientId-1].credentialNumber,
-            phoneNum: patientDropdownOptions[patientId-1].phoneNum
+            patientName: patientDropdownOptions[patientId].name,
+            credentialNum: patientDropdownOptions[patientId].credentialNumber,
+            phoneNum: patientDropdownOptions[patientId].phoneNum
         })
     }
 
@@ -50,14 +54,14 @@ function PatientForm(props) {
     const handleCredentialNumChange = (credentialNum) => {
         setSelectedPatient({
             ...selectedPatient,
-            credentialNum: credentialNum,
+            credentialNum: credentialNum?.replace(/[^0-9]/g, ''),
         })
     }
     
     const handlePhoneNumChange = (phoneNum) => {
         setSelectedPatient({
             ...selectedPatient,
-            phoneNum: phoneNum,
+            phoneNum: phoneNum?.replace(/[^0-9]/g, ''),
         })
     }
 
@@ -78,31 +82,29 @@ function PatientForm(props) {
                 <div className='col-span-2'>
                     {existingPatient ? 
                     <SelectPicker
-                        style={styles}
-                        id='name' 
-                        appearance='subtle'
-                        size='small'
+                        id='name'
+                        size='lg'
                         name='name'
                         data={data} 
                         onChange={(value) => handlePatientChange(value)}
                         value={selectedPatient.patientId}
                         block
-                        cleanable={false}
+                        // cleanable={false}
                     />
                     : 
-                    <Input type="text" id="name" name="name" onChange={(e) => handleNameChange(e.target.value)} placeholder="name" value={selectedPatient.PatientName} />
+                    <InputField type="text" id="name" name="name" onChange={(e) => handleNameChange(e.target.value)} placeholder="name" value={selectedPatient.PatientName} />
                     }
                 </div>
             </div>
             <div className='flex flex-col gap-2'>
                 <p> Credential Number </p>
-                <Input type="text" id="name" name="name" onChange={(e) => handleCredentialNumChange(e.target.value)} placeholder="name" value={selectedPatient.credentialNum} 
+                <InputField type="text" id="name" name="name" onChange={(e) => handleCredentialNumChange(e.target.value)} placeholder="credential number" value={selectedPatient.credentialNum} 
                     disabled={existingPatient}
                 />
             </div>
             <div className='flex flex-col gap-2'>
                 <p> No Handphone </p>
-                <Input type="text" id="name" name="name" onChange={(e) => handlePhoneNumChange(e.target.value)} placeholder="name" value={selectedPatient.phoneNum}
+                <InputField type="text" id="name" name="name" onChange={(e) => handlePhoneNumChange(e.target.value)} placeholder="no handphone" value={selectedPatient.phoneNum}
                     disabled={existingPatient}
                 />
             </div>

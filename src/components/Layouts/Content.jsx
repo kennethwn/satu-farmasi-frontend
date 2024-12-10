@@ -6,7 +6,7 @@ import { IoMdArrowDropleft as ArrowLeftIcon } from "react-icons/io";
 import { useRouter } from 'next/router';
 
 export default function ContentLayout(props) {
-    const { children, title, type, backpageUrl } = props;
+    const { children, header, title, table, type, backpageUrl } = props;
     const router = useRouter();
 
     return (
@@ -25,7 +25,12 @@ export default function ContentLayout(props) {
                     <span className='text-[32px] leading-9 text-dark font-bold py-[52px]'>{title}</span>
                 </div>
             </Panel>
-            <Panel bordered className='min-h-screen gap-2 overflow-auto'>
+            <Panel 
+                bordered 
+                className='gap-2 overflow-auto'
+                header={header}
+                bodyFill={table}
+            >
                 {children}
             </Panel>
         </div>
@@ -33,8 +38,10 @@ export default function ContentLayout(props) {
 }
 
 ContentLayout.propTypes = {
+    header: propTypes.node,
     children: propTypes.node,
     title: propTypes.string,
+    table: propTypes.bool,
     type: propTypes.string,
     backpageUrl: propTypes.string
 }

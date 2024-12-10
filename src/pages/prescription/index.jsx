@@ -7,6 +7,10 @@ import { Checkbox, Pagination, SelectPicker, Table } from "rsuite";
 import SearchBar from "@/components/SearchBar";
 import formatDate from "@/helpers/dayHelper";
 import { MdOutlineEdit } from "react-icons/md";
+import Button from "@/components/Button";
+import { IoMdAdd } from "react-icons/io";
+import { useRouter } from "next/router";
+import PrescriptionDetail from "@/components/Modal/PrescriptionDetail";
 
 export default function index() {
     const { user } = useUserContext();
@@ -19,8 +23,11 @@ export default function index() {
     const [page, setPage] = useState(1);
     const [sortColumn, setSortColumn] = useState();
     const [sortType, setSortType] = useState();
-    const status = ["UNPROCESSED", "ON_PROGRESS", "WAITING_FOR_PAYMENT", "DONE"];
+    const status = ["UNPROCESSED", "ON PROGRESS", "WAITING FOR PAYMENT", "DONE"];
     const { HeaderCell, Cell, Column } = Table;
+    const router = useRouter()
+    const [selectedPrescriptionId, setSelectedPrescriptionId] = useState(-1)
+    const [openModal, setOpenModal] = useState(false)
 
     const handleSortColumn = (sortColumn, sortType) => {
         setTimeout(() => {
@@ -89,6 +96,11 @@ export default function index() {
         fetchData();
     }, []); 
 
+    useEffect(() => {
+        console.log(openModal)
+        console.log("selectedID:", selectedPrescriptionId)
+    }, [openModal])
+
 
     // useEffect(() => {
     //     async function fetchSearchData(){
@@ -98,15 +110,24 @@ export default function index() {
     // }, [search])
 
     return (
-        <Layout active="prescribe" user={user}>
+        <Layout active="prescription" user={user}>
             <ContentLayout title="Resep">
-            <div className="flex flex-row justify-between w-full">
+            <div className="flex flex-col gap-2 md:flex-row justify-between w-full">
+                <div>
+                    <Button
+                        prependIcon={<IoMdAdd size={24} />}
+                        onClick={() => router.push(`/prescription/create`)}
+                    >
+                        Tambah
+                    </Button>
+                </div>
+                <div className="flex md:flex-row flex-col gap-4">
                     <SelectPicker
                         style={{
-                            borderWidth: '0.5px',     
+                            // borderWidth: '0.5px',     
                             color: '#DDDDDD',       
                             borderColor: '#DDDDDD', 
-                            borderRadius: '0.4rem',
+                            // borderRadius: '0.4rem',
                         }}
                         label="Status"
                         data={status.map((status) => ({ label: status, value: status }))}
@@ -115,11 +136,10 @@ export default function index() {
                             setFilter(value);
                             console.log(value);
                         }}
-                    />
-                    
+                    />   
                     <SearchBar 
                         size="md"
-                        className="w-1/4"
+                        // className="w-1/4"
                         placeholder="Search..."
                         onChange={(value) => {
                             console.log(value);
@@ -127,6 +147,7 @@ export default function index() {
                         value={search}
                     />
                 </div>
+            </div>
                 <div className="w-full pt-6">
                     <Table
                         data={getData()}
@@ -148,46 +169,44 @@ export default function index() {
                             </Cell>
                         </Column>
 
-                        <Column width={150} resizable sortable>
+                        <Column flexGrow={1} resizable sortable>
                             <HeaderCell className="text-dark">Prescription ID</HeaderCell>
                             <Cell dataKey='prescriptionId'/>
                         </Column>
 
-                        <Column width={150} resizable sortable>
+                        <Column flexGrow={1} resizable sortable>
                             <HeaderCell className="text-dark">Timestamp</HeaderCell>
                             <Cell className="text-dark">
                                 {rowData => formatDate(rowData?.timestamps)}
                             </Cell>
                         </Column>
 
-                        <Column width={200} resizable sortable>
+                        <Column flexGrow={1} resizable sortable>
                             <HeaderCell className="text-dark">Patient Name</HeaderCell>
                             <Cell dataKey='patientName'/>
                         </Column>
 
-                        <Column width={200} resizable sortable>
+                        <Column flexGrow={1} resizable sortable>
                             <HeaderCell className="text-dark">Status</HeaderCell>
                             <Cell dataKey='status'/>
                         </Column>
 
                         <Column width={100} fixed="right">
-                            <HeaderCell className="text-center text-dark">Action</HeaderCell>
+                            <HeaderCell className="text-center text-dark">Detail</HeaderCell>
                             <Cell className="text-center">
                                 {
                                     rowData => {
                                         return (
-                                            <button
-                                                className="inline-flex items-center justify-center w-8 h-8 text-center bg-transparent border-0 rounded-lg"
-                                                onClick={() => {
-                                                    console.log(rowData)
-                                                    router.push(`/master/staff/edit/${rowData?.nik}`);
-                                                }}
-                                            >
-                                                <MdOutlineEdit 
-                                                    size="2em" 
-                                                    color="#FFD400" 
-                                                />
-                                            </button>
+                                        <button
+                                            className="inline-flex items-center justify-center w-8 h-8 text-center bg-transparent border-0 rounded-lg"
+                                            onClick={() => {
+                                                console.log(rowData.prescriptionId);
+                                                setSelectedPrescriptionId(rowData.prescriptionId);
+                                                setOpenModal(true);
+                                            }}
+                                        >
+                                            <MdOutlineEdit size="2em" color="#FFD400" />
+                                        </button>
                                         )
                                     }
                                 }
@@ -215,6 +234,12 @@ export default function index() {
                     </div>
                 </div>
             </ContentLayout>
+
+            <PrescriptionDetail 
+                prescriptionId={selectedPrescriptionId}
+                openModal={openModal}
+                setOpenModal={setOpenModal}
+            />
         </Layout>
     )
 }

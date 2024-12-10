@@ -41,3 +41,12 @@ input[type=number] {
     -moz-appearance:textfield;
     appearance: textfield;
 }
+
+/*
+  NOTE: Modal styles for rsuite
+*/
+.rs-modal-wrapper{
+  display: flex;
+  align-items: center;
+  background-color: rgba(0, 0, 0, 0.5);
+}

@@ -9,47 +9,51 @@ import { useUserContext } from "./api/context/UserContext";
 import Button from "@/components/Button";
 import { toast } from "react-toastify";
 import Toaster from "@/components/Modal/Toaster";
+import pdfMake from "pdfmake/build/pdfmake"
+import pdfFonts from "pdfmake/build/vfs_fonts";
 
 const inter = Inter({ subsets: ["latin"] });
+pdfMake.vfs = pdfFonts.pdfMake.vfs;
 
 export default function Home() {
-  const [input, setInput] = useState("");
-  const [open, setOpen] = useState(false);
   const { user } = useUserContext();
 
-  useEffect(() => {
-    // toaster for notification
-    toast.success("hello world", { autoClose: 2000, position: "top-center" });
+  function printPDF() {
+    var docDefinition = {
+      info: {
+        title: 'awesome Document',
+        author: 'john doe',
+        subject: 'subject of document',
+        keywords: 'keywords for document',
+      },
+      content: [
+        {
+          layout: 'lightHorizontalLines', // optional
+          table: {
+            // headers are automatically repeated if the table spans over multiple pages
+            // you can declare how many rows should be treated as headers
+            headerRows: 1,
+            widths: [ '*', 'auto', 100, '*' ],
+    
+            body: [
+              [ 'First', 'Second', 'Third', 'The last one' ],
+              [ 'Value 1', 'Value 2', 'Value 3', 'Value 4' ],
+              [ { text: 'Bold value', bold: true }, 'Val 2', 'Val 3', 'Val 4' ]
+            ]
+          }
+        }
+      ]
+    };
 
-    setTimeout(() => {
-      toast.error("hello world", { autoClose: 2000, position: "top-center" });
-    }, 2000);
-  }, []);
+    pdfMake.createPdf(docDefinition).open();
+  }
 
   return (
     <Layouts user={user}>
       <ContentLayout type="child" title="Home">
         <p>hello world</p>
-        <div className="mt-2">
-          <Input type="text" id="name" name="name" onChange={(e) => setInput(e.target.value)} placeholder="name" />
-        </div>
-        <div className="w-1/4 mt-2">
-          <Button appearance='primary' className='w-1 mr-9'>{<ArrowLeftIcon size={'24px'} />}</Button>
-          <Button appearance="primary" onClick={() => alert(input)} appendIcon={<PrescribeIcon stroke="white" />}>Dimas</Button>
-          
-          {/* Button for open toaster component */}
-          <Button appearance="danger" onClick={() => setOpen(true)}>Delete</Button> 
-        </div>
+        <Button onClick={printPDF}>PDF</Button>
       </ContentLayout>
-
-      <Toaster
-          type="warning"
-          open={open} 
-          onClose={() => setOpen(false)}
-          body={`Apakah anda yakin untuk menghapus data ini?`}
-          btnText="Hapus"
-          onClick={() => setOpen(false)}
-      />
     </Layouts>
   );
 }

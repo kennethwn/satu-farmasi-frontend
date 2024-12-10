@@ -10,6 +10,7 @@ import PrescribeIcon from '../Icons/PrescribeIcon';
 import propTypes from 'prop-types';
 import { useRouter } from 'next/router';
 import useUser from '@/pages/api/user';
+import Toaster from "@/components/Modal/Toaster";
 
 export default function Layout(props) {
     const {
@@ -22,8 +23,9 @@ export default function Layout(props) {
     const [activeKey, setActiveKey] = useState(active);
     const [expand, setExpand] = useState(true);
     const [error, setError] = useState(null);
-    const [loggedOut, setLoggedOut] = useState(false);
     const userRole = user?.role?.toLowerCase();
+    const [askForLogout, setAskForLogout] = useState(false);
+
 
     const logoutHandler = async () => {
         try {
@@ -52,7 +54,7 @@ export default function Layout(props) {
                 return <DashboardIcon size="1.2em" style={{ ...iconStyle, color }} />;
             case "diagnose":
                 return <PrescribeIcon stroke={color} style={{ ...iconStyle, color }} />;
-            case "prescribe":
+            case "prescription":
                 return <PrescribeIcon stroke={color} style={{ ...iconStyle, color }} />;
             case "transaction":
                 return <TransactionIcon size="1.2em" style={{ ...iconStyle, color }} />;
@@ -114,22 +116,31 @@ export default function Layout(props) {
                             }
                             {(userRole === 'pharmacist' || userRole === 'doctor') &&
                                 <Nav.Item
-                                    eventKey="prescribe"
-                                    icon={renderIcon("prescribe", activeKey === "prescribe")}
+                                    eventKey="prescription"
+                                    icon={renderIcon("prescription", activeKey === "prescription")}
                                     onClick={() => {
-                                        router.push("/prescribe", undefined, { shallow: true });
-                                        setActiveKey("prescribe");
+                                        router.push("/prescription", undefined, { shallow: true });
+                                        setActiveKey("prescription");
                                     }}
-                                >{renderTitle("Resep", activeKey === "prescribe")}</Nav.Item>
+                                >{renderTitle("Resep", activeKey === "prescription")}</Nav.Item>
                             }
                             {userRole === 'pharmacist' &&
                                 <Nav.Menu
                                     eventKey="transaction"
                                     trigger="hover"
                                     title="Transaksi"
-                                    icon={renderIcon("transaction", activeKey === "transaction-receive" || activeKey === "transaction-expense")}
+                                    icon={renderIcon("transaction", activeKey === "transaction-dashboard"
+                                        || activeKey === "transaction-receive" 
+                                        || activeKey === "transaction-expense")}
                                     placement="rightStart"
                                 >
+                                    <Nav.Item
+                                        onClick={() => {
+                                            router.push("/transaction/dashboard", undefined, { shallow: true });
+                                            setActiveKey("transaction-dashboard");
+                                        }}
+                                        eventKey="transaction-dashboard"
+                                    >{renderTitle("Riwayat Transaksi", activeKey === "transaction-dashboard")}</Nav.Item>
                                     <Nav.Item
                                         onClick={() => {
                                             router.push("/transaction/receive", undefined, { shallow: true });
@@ -187,7 +198,7 @@ export default function Layout(props) {
                                 <span className='text-sm font-semibold text-dark'>{user?.name || "Kenneth William N"}</span>
                             </div>
                             <div className='px-[18px] overflow-hidden w-full whitespace-nowrap'>
-                                <Button appearance='danger' className='w-full' onClick={logoutHandler}>Logout</Button>
+                                <Button appearance='danger' className='w-full' onClick={() => setAskForLogout(true)}>Logout</Button>
                             </div>
                         </React.Fragment>
                         :
@@ -199,6 +210,15 @@ export default function Layout(props) {
                 </div>
             </Sidebar>
             <Content className='p-4 overflow-auto'>{props.children}</Content>
+
+            <Toaster
+              type="warning"
+              open={askForLogout}
+              onClose={() => setAskForLogout(false)}
+              body={ <> Apakah Anda yakin ingin logout? </> }
+              btnText="Logout"
+              onClick={() => logoutHandler()}
+            />
         </Container>
     );
 };

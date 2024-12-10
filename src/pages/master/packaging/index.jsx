@@ -164,28 +164,28 @@ export default function index(props) {
     return (
         <Layout active="master-packaging" user={user}>
             <ContentLayout title="List Kemasan">
-                <div className="flex flex-row justify-between items-center w-full pb-6">
-                    <Button 
-                        prependIcon={<IoMdAdd size={24}/>} 
-                        onClick={() => setOpen({...open, create: true})}>
-                            Tambah
-                    </Button>
-
-                    <SearchBar 
-                        size="md"
-                        className="w-1/4"
-                        placeholder="Search..."
-                        onChange={(value) => setSearch(value)}
-                    />
-                </div>
                 <div className="w-full h-[500px]">
+                    <div className="flex flex-row justify-between items-center w-full pb-6">
+                        <Button 
+                            prependIcon={<IoMdAdd size={24}/>} 
+                            onClick={() => setOpen({...open, create: true})}>
+                                Tambah
+                        </Button>
+
+                        <SearchBar 
+                            size="md"
+                            className="w-1/4"
+                            placeholder="Search..."
+                            onChange={(value) => setSearch(value)}
+                        />
+                    </div>
                     <Table
                         data={data || []}
                         bordered
                         cellBordered
+                        height={400}
                         shouldUpdateScroll={false}
                         affixHorizontalScrollbar
-                        fillHeight={true}
                         loading={isLoading}
                     >
                         <Column width={100} fixed="left">
@@ -287,6 +287,7 @@ export default function index(props) {
                 <Footer className="pt-4">
                     <Button
                         appearance="primary"
+                        isLoading={isLoading}
                         onClick={() => HandleCreatePackaging()}
                     >
                         Simpan
@@ -315,6 +316,7 @@ export default function index(props) {
                 </Body>
                 <Footer className="pt-4">
                     <Button
+                        isLoading={isLoading}
                         appearance="primary"
                         onClick={() => HandleEditPackaging()}
                     >

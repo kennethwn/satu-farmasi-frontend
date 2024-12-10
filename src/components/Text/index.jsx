@@ -12,7 +12,7 @@ export default function Text(props) {
         case "danger":
             return (
                 <ul className={`list-none ${className}`}>
-                    <li className='text-sm text-danger font-semibold'>{children}</li>
+                    <li className='text-sm text-danger font-normal'>{children}</li>
                 </ul>
             )
     }
