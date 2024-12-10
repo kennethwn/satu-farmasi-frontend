@@ -73,6 +73,42 @@ export default function useTransaction() {
         }
     }
 
+    const getTransactionProfitByDate = async (data) => {
+        setIsLoading(true);
+        try {
+            const response = await axios.post(`/api/v1/transactions/profit/date`, data)
+            .then(response => {
+                setIsLoading(false);
+                return response;
+            })
+            .catch(error => {
+                setIsLoading(false);
+                return error;
+            })
+            return response;
+        } catch (error) {
+            console.error(error);
+        }
+    }
+
+    const getAnnualTransactionRecap = async (data) => {
+        setIsLoading(true);
+        try {
+            const response = await axios.post(`/api/v1/transactions/annual-recap`, data)
+            .then(response => {
+                setIsLoading(false);
+                return response;
+            })
+            .catch(error => {
+                setIsLoading(false);
+                return error;
+            })
+            return response;
+        } catch (error) {
+            console.error(error);
+        }
+    }
+
     const createTransaction = async (data) => {
         setIsLoading(true);
         try {
@@ -151,6 +187,8 @@ export default function useTransaction() {
         isLoading,
         getAllTransaction,
         getOnProgressAndWaitingPaymentTransaction,
+        getTransactionProfitByDate,
+        getAnnualTransactionRecap,
         createTransaction,
         getTransactionDetail,
         confirmPayment,

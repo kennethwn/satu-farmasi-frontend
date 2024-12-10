@@ -1,22 +1,20 @@
+import ReceiveMedicineForm from "@/components/DynamicForms/ReceiveMedicineForm";
 import Layout from "@/components/Layouts";
 import ContentLayout from "@/components/Layouts/Content";
-import Dropdown from "@/components/SelectPicker/Dropdown";
-import Text from "@/components/Text";
 import { useUserContext } from "@/pages/api/context/UserContext";
-import { useRouter } from "next/router";
-import { useState, useEffect } from "react";
-import Button from "@/components/Button";
+import useClassificationsAPI from "@/pages/api/master/classification";
 import useGenericAPI from "@/pages/api/master/generic";
 import useMedicineAPI from "@/pages/api/master/medicine";
 import usePackagingAPI from "@/pages/api/master/packaging";
-import { toast } from "react-toastify";
-import { DatePicker, SelectPicker, Toggle } from "rsuite";
-import { z, ZodError } from "zod";
-import { isRequiredNumber, isRequiredString, isRequiredDate } from "@/helpers/validation";
-import useClassificationsAPI from "@/pages/api/master/classification";
-import ReceiveMedicineForm from "@/components/DynamicForms/ReceiveMedicineForm";
 import useVendorAPI from "@/pages/api/master/vendor";
 import useReceiveMedicineAPI from "@/pages/api/transaction/receiveMedicine";
+import { useRouter } from "next/router";
+import { useState, useEffect } from "react";
+import { z, ZodError } from "zod";
+import { isRequiredNumber, isRequiredString, isRequiredDate } from "@/helpers/validation";
+import Button from "@/components/Button";
+import { Modal } from "rsuite";
+import { toast } from "react-toastify";
 
 const classificationSchema = z.object({
     classificationId: isRequiredNumber(),
@@ -65,15 +63,17 @@ export default function Index() {
 
     const router = useRouter();
     const id = router.query.id;
+
     const [isLoading, setIsLoading] = useState(false);
     const { GetAllClassificationsDropdown } = useClassificationsAPI();
     const { GetPackagingDropdown } = usePackagingAPI();
     const { GetGenericDropdown } = useGenericAPI();
     const { GetMedicineDropdownList } = useMedicineAPI();
     const { GetAllActiveVendor } = useVendorAPI();
-    const { CreateReceiveMedicine } = useReceiveMedicineAPI();
+    const { GetReceiveMedicinesById, ConfirmReceiveMedicine } = useReceiveMedicineAPI();
 
     const [existingMedicine, setExistingMedicine] = useState(false);
+    const [modal, setModal] = useState(false);
     const [input, setInput] = useState({});
     const [errors, setErrors] = useState({});
     const [medicines, setMedicines] = useState([]);
@@ -203,61 +203,30 @@ export default function Index() {
         }
     }
 
-    const handleSubmit = async () => {
+    const handleConfirm = async () => {
         try {
-            let classifications = [];
-            input.classifications = [];
-            formFields.forEach((item, index) => {
-                input.classifications[index] = {
-                    classification: {
-                        id: item.id,
-                    }
-                }
-            });
-            
-            input?.classifications?.forEach((item) => {
-                let temp = { classificationId: 0, medicineId: 0 };
-                temp['classificationId'] = item.classification.id;
-                temp['medicineId'] = input.id;
-                classifications.push(temp);
-            })
-            
-            const medicineRequest = {
-                code: input.code || medicines?.find(item => item.id == input.medicineId)?.code || "",
-                name: input.name || medicines?.find(item => item.id == input.medicineId)?.name,
-                genericNameId: parseInt(input.genericNameId) || parseInt(medicines?.find(item => item.id == input.medicineId)?.genericName.id),
-                merk: input.merk || medicines?.find(item => item.id == input.medicineId)?.merk,
-                description: input.description || medicines?.find(item => item.id == input.medicineId)?.description || "",
-                unitOfMeasure: input.unitOfMeasure || medicines?.find(item => item.id == input.medicineId)?.unitOfMeasure,
-                price: parseFloat(input.price) || parseFloat(medicines?.find(item => item.id == input.medicineId)?.price),
-                expiredDate: new Date(input.expiredDate || medicines?.find(item => item.id == input.medicineId)?.expiredDate),
-                currStock: parseInt(input.currStock) || medicines?.find(item => item.id == input.medicineId)?.currStock,
-                minStock: parseInt(input.minStock) || medicines?.find(item => item.id == input.medicineId)?.minStock,
-                maxStock: parseInt(input.maxStock) || medicines?.find(item => item.id == input.medicineId)?.maxStock,
-                packagingId: parseInt(input.packagingId) || medicines?.find(item => item.id == input.medicineId)?.packaging.id,
-                sideEffect: input.sideEffect || medicines?.find(item => item.id == input.medicineId)?.sideEffect,
-                classificationList: !existingMedicine ? classifications :  (medicines?.find(item => item.id == input?.medicineId)?.classifications?.map(item => ({ medicineId: input.medicineId, classificationId: item.id }))),
-            }
-
             const payload = {
+                id: input.id,
                 documentNumber: input.documentNumber,
                 batchCode: input.batchCode,
-                medicineId: parseInt(input.medicineId) || 0,
-                quantity: parseInt(input.quantity) || parseInt(input.currStock),
+                medicineId: parseInt(input.medicineId),
+                quantity: parseInt(input.quantity),
                 vendorId: parseInt(input.vendorId),
                 buyingPrice: parseFloat(input.buyingPrice),
                 paymentMethod: input.paymentMethod,
                 deadline: input.deadline,
+                is_active: true,
                 isPaid: input.isPaid,
-                medicineRequest: medicineRequest,
-                reportId: 0
+                reportId: 0,
+                expiredDate: new Date(input.expiredDate)
             }
 
-            // setErrors({});
+            setErrors({});
             // medicineSchema.parse(payload);
-            const res = await CreateReceiveMedicine(payload);
+            const res = await ConfirmReceiveMedicine(payload);
             if (res.code !== 200) {
                 toast.error(res.response.data.message, { autoClose: 2000, position: "top-right" });
+                setModal(false);
                 return;
             }
             toast.success(res.message, { autoClose: 2000, position: "top-right" });
@@ -283,6 +252,53 @@ export default function Index() {
         }
     }
 
+    const handleFetchReceiveMedicineById = async () => {
+        try {
+            const res = await GetReceiveMedicinesById(id);
+            if (res.code !== 200) {
+                toast.error(res.message, { autoClose: 2000, position: "top-right" });
+                setInput([]);
+                return;
+            }
+
+            const data = res.data;
+            setInput(
+                {
+                    id: data.id,
+                    documentNumber: data.documentNumber,
+                    batchCode: data.batchCode,
+                    medicineId: data.medicine.id,
+                    quantity: parseInt(data.quantity),
+                    vendorId: data.vendor.id,
+                    buyingPrice: parseFloat(data.buyingPrice),
+                    paymentMethod: data.paymentMethod,
+                    deadline: new Date(data.deadline),
+                    isPaid: data.isPaid,
+                    expiredDate: new Date(data.medicine.expiredDate),
+                    medicineRequest: {
+                        code: data.medicine.code,
+                        name: data.medicine.name,
+                        genericNameId: data.medicine.genericName.id,
+                        merk: data.medicine.merk,
+                        description: data.medicine.description,
+                        price: parseFloat(data.medicine.price),
+                        expiredDate: new Date(data.medicine.expiredDate),
+                        packagingId: data.medicine.packaging.id,
+                        currStock: data.medicine.currStock,
+                        minStock: data.medicine.minStock,
+                        maxStock: data.medicine.maxStock,
+                        unitOfMeasure: data.medicine.unitOfMeasure,
+                        sideEffect: data.medicine.sideEffect,
+                        classificationList: data.medicine?.classifications.map(item => item.classification)
+                    }
+                }
+            )
+            setFormFields(res.data?.medicine?.classifications.map(item => item.classification));
+        } catch (error) {
+            console.error(error);
+        }
+    }
+
     useEffect(() => {
         async function fetchData() {
             await handleFetchPackagingDropdown();
@@ -290,6 +306,7 @@ export default function Index() {
             await handleFetchClassifications();
             await handleFetchMedicineDropdown();
             await handleFetchVendors();
+            await handleFetchReceiveMedicineById();
         }
         if (router.isReady) {
             fetchData();
@@ -298,19 +315,8 @@ export default function Index() {
 
     return (
         <Layout active="transaction-receive" user={user}>
-            <ContentLayout title="Tambah Penerimaan Obat" type="child" backpageUrl="/transaction/receive">
+            <ContentLayout title="Edit Penerimaan Obat" type="child" backpageUrl="/transaction/receive">
                 <form id="form">
-                    <div className="my-2">
-                        <Toggle 
-                        size="lg" 
-                        checkedChildren="Existing Medicine" 
-                        unCheckedChildren="New Medicine" 
-                        defaultChecked={false} onChange={e => {
-                            handleClearInput();
-                            setExistingMedicine(e)
-                        }} />
-                    </div>
-                    
                     <ReceiveMedicineForm
                         isLoading={isLoading}
                         errors={errors}
@@ -324,7 +330,8 @@ export default function Index() {
                         dataVendors={vendors}
                         formFields={formFields}
                         setFormFields={handleFormFields}
-                        existingMedicine={existingMedicine}
+                        existingMedicine={true}
+                        isEdit={true}
                     />
 
                     <div className="flex justify-center gap-2 my-6 pb-4 lg:justify-end">
@@ -342,9 +349,7 @@ export default function Index() {
                                 type="button"
                                 appearance="primary"
                                 onClick={() => {
-                                    console.log("input: ", input);
-                                    console.log("formFields: ", formFields);
-                                    handleSubmit();
+                                    setModal(true)
                                 }}
                             >
                                 Simpan
@@ -353,6 +358,19 @@ export default function Index() {
                     </div>
                 </form>
             </ContentLayout>
+
+            <Modal open={modal} onClose={() => setModal(false)}>
+                <Modal.Header className="text-2xl font-semibold">Konfirmasi Penerimaan Obat</Modal.Header>
+                <Modal.Body>
+                    <div className="flex flex-col">
+                        <p>Konfirmasi hanya sekali!</p> 
+                        <p>Apabila ada kesalahan data maka sepenuhnya <span className="text-red-500">tanggung jawab</span> anda</p>
+                    </div>
+                </Modal.Body>
+                <Modal.Footer>
+                    <Button isLoading={isLoading} appearance="primary" type="button" onClick={() => handleConfirm()}>Konfirmasi</Button>
+                </Modal.Footer>
+            </Modal>
         </Layout>
     )
 }

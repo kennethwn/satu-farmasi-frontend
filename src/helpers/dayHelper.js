@@ -65,6 +65,19 @@ export const convertToTimestampString = (dateString) => {
     return rfc3339Timestamp;
 }
 
+export const convertToRFC3339 = (date) => {
+    const pad = (num) => String(num).padStart(2, '0');
+    return `${date.getFullYear()}-${pad(date.getMonth() + 1)}-${pad(date.getDate())}T${pad(date.getHours())}:${pad(date.getMinutes())}:${pad(date.getSeconds())}`;
+};
+
+export const generateYearList = (startYear, endYear) => {
+    const years = [];
+    for (let year = startYear; year <= endYear; year++) {
+        years.push({ label: year.toString(), value: year });
+    }
+    return years;
+}
+
 export const getDifferenceDays = (startDate, endDate) => {
     const differenceInTime = new Date(endDate).getTime() - new Date(startDate).getTime();
     const differenceInDays = Math.round(differenceInTime / (1000 * 3600 * 24));

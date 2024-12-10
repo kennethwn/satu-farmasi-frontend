@@ -10,9 +10,10 @@ import { toast } from "react-toastify";
 import prescriptionStatusMapped from "@/helpers/prescriptionStatusMap";
 import Toaster from "./Toaster";
 import { formatRupiah } from "@/helpers/currency";
+import { generateInvoiceTransaction } from "@/data/document";
 
 export default function TransactionDetail(props) {
-    const { statusUpdated, transactionId, openModal, setOpenModal } = props
+    const { statusUpdated, transactionId, openModal, setOpenModal, user, pharmacy } = props
     const { Header, Body, Footer } = Modal;
     const router = useRouter();
     const prescriptionStatusMap = prescriptionStatusMapped
@@ -49,14 +50,30 @@ export default function TransactionDetail(props) {
                     price: ""
                 }
             }]
+        },
+        physicalReport: {
+            id: -1,
+            data: {},
+            created_at: ""
         }
     })
 
     const handleConfirmPayment = async () => {
         try {
+            const physicalReport = {
+                id: 0,
+                data: {
+                    pharmacy: pharmacy,
+                    pharmacist: user,
+                    patient: transactionData.prescription.patient,
+                    medicine: transactionData.prescription.medicineList,
+                    totalPrice: transactionData.totalPrice,
+                }
+            }
             const data = {
                 id: parseInt(transactionData.id),
-                paymentMethod: paymentMethod
+                paymentMethod: paymentMethod,
+                physicalReport: physicalReport
             }
             const res = await confirmPayment(data);
             console.log(res)
@@ -82,6 +99,21 @@ export default function TransactionDetail(props) {
             }
         } catch (error) {
             console.error(error)
+        }
+    }
+
+    const handleGenereateInvoice = () => {
+        try {
+            const patient = transactionData.physicalReport.data.patient;
+            const pharmacist = transactionData.physicalReport.data.pharmacist;
+            const pharmacy = transactionData.physicalReport.data.pharmacy;
+            const input = transactionData.physicalReport;
+            const totalPrice = transactionData.totalPrice;
+            const formField = transactionData.physicalReport.data.medicine;
+            console.log("patient: ", patient)
+            generateInvoiceTransaction(pharmacy, pharmacist, patient, input, formField, totalPrice);
+        } catch (error) {
+            console.error(error);
         }
     }
 
@@ -187,7 +219,7 @@ export default function TransactionDetail(props) {
                 {
                     (transactionData?.prescription.status == "ON_PROGRESS" || transactionData?.prescription.status == "DONE") && 
                     <>
-                        <Button appearance="primary">
+                        <Button appearance="primary" onClick={() => handleGenereateInvoice()}>
                             Download Invoice
                         </Button>
                     </>   

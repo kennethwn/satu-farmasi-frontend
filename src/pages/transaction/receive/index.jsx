@@ -9,7 +9,6 @@ import { useUserContext } from "@/pages/api/context/UserContext";
 import useReceiveMedicineAPI from "@/pages/api/transaction/receiveMedicine";
 import { useEffect, useState } from "react";
 import { IoMdAdd } from "react-icons/io";
-import { HiOutlinePrinter } from "react-icons/hi2";
 import { PiTrash } from "react-icons/pi";
 import { IoDocumentTextOutline } from "react-icons/io5";
 import { FcAddDatabase } from "react-icons/fc";
@@ -17,12 +16,14 @@ import { toast } from "react-toastify";
 import { Modal, Pagination, Panel, Table } from "rsuite";
 import { HeaderCell, Column, Cell } from "rsuite-table";
 import { useRouter } from "next/router";
+import { MdOutlineEdit } from "react-icons/md";
 import Text from "@/components/Text";
+import Toaster from "@/components/Modal/Toaster";
 
 export default function index() {
     const router = useRouter();
     const { user } = useUserContext();
-    const { GetAllReceiveMedicines, SearchReceiveMedicine } = useReceiveMedicineAPI();
+    const { GetAllReceiveMedicines, SearchReceiveMedicine, DeleteReceiveMedicine } = useReceiveMedicineAPI();
 
     const [data, setData] = useState([]);
     const [isLoading, setIsLoading] = useState(false);
@@ -32,6 +33,8 @@ export default function index() {
     const [totalPage, setTotalPage] = useState(0);
     const [limit, setLimit] = useState(10);
     const [modal, setModal] = useState(false);
+    const [modalDelete, setModalDelete] = useState(false);
+    const [selectedMedicine, setSelectedMedicine] = useState({});
 
     const handleFetchReceiveMedicine = async () => {
         try {
@@ -56,6 +59,22 @@ export default function index() {
             }
             setData(res.data.results);
             setTotalPage(res.data.total);
+        } catch (error) {
+            console.error(error);
+        }
+    }
+
+    const handleDeleteReceiveMedicine = async () => {
+        try {
+            const payload = { id: selectedMedicine?.id }
+            const res = await DeleteReceiveMedicine(payload);
+            if (res.code !== 200) {
+                toast.error(res.message, { autoClose: 2000, position: "top-right" });
+                return;
+            }
+            toast.success(res.message, { autoClose: 2000, position: "top-right" });
+            setModalDelete(false);
+            handleFetchReceiveMedicine();
         } catch (error) {
             console.error(error);
         }
@@ -183,31 +202,34 @@ export default function index() {
                                 rowData => {
                                     return (
                                         <div className="flex justify-center flex-row gap-6">
-                                            <button
-                                                className="inline-flex items-center justify-center w-8 h-8 text-center bg-transparent border-0 rounded-lg"
-                                                onClick={() => {
-                                                    console.log(rowData);
-                                                    // router.push(`/master/medicine/edit/${rowData?.code}`)
-                                                }}
-                                            >
-                                                <HiOutlinePrinter 
-                                                    size="1.7em" 
-                                                />
-                                            </button>
-
-                                            <button
-                                                className="inline-flex items-center justify-center w-8 h-8 text-center bg-transparent border-0 rounded-lg"
-                                                onClick={() => {
-                                                    console.log(rowData);
-                                                    // setSelectedMedicine(rowData);
-                                                    // setModalDelete(!modalDelete);
-                                                }}
-                                            >
-                                                <PiTrash 
-                                                    size="1.7em" 
-                                                    color="#DC4A43" 
-                                                />
-                                            </button>
+                                            {!rowData?.is_active || !rowData?.isPaid ?
+                                                <button
+                                                    className="inline-flex items-center justify-center w-8 h-8 text-center bg-transparent border-0 rounded-lg"
+                                                    onClick={() => {
+                                                        console.log(rowData);
+                                                        router.push(`/transaction/receive/edit/${rowData?.id}`)
+                                                    }}
+                                                >
+                                                    <MdOutlineEdit size="2em" color="#FFD400" />
+                                                </button>
+                                                : null       
+                                            }
+                                            {!rowData?.is_active || !rowData?.isPaid ?
+                                                <button
+                                                    className="inline-flex items-center justify-center w-8 h-8 text-center bg-transparent border-0 rounded-lg"
+                                                    onClick={() => {
+                                                        console.log(rowData);
+                                                        setSelectedMedicine(rowData);
+                                                        setModalDelete(!modalDelete);
+                                                    }}
+                                                >
+                                                    <PiTrash 
+                                                        size="1.7em" 
+                                                        color="#DC4A43" 
+                                                    />
+                                                </button>
+                                                : null
+                                            }
                                         </div>
                                     )
                                 }
@@ -254,6 +276,20 @@ export default function index() {
                     </div>
                 </Modal.Body>
             </Modal>
+
+            <Toaster
+				type="warning"
+				open={modalDelete}
+				onClose={() => setModalDelete(false)}
+				body={
+					<>
+						Apakah anda yakin untuk menghapus data{" "}
+						<span className="text-danger">{selectedMedicine?.documentNumber}</span>?
+					</>
+				}
+				btnText="Hapus"
+				onClick={handleDeleteReceiveMedicine}
+			/>
         </Layout>
     )
 }
