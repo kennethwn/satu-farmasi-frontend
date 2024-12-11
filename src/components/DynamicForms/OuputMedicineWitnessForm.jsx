@@ -6,6 +6,7 @@ import { SelectPicker } from 'rsuite';
 import Text from "@/components/Text";
 import Dropdown from '../SelectPicker/Dropdown';
 import Input from '../Input';
+import { useEffect } from 'react';
 
 export default function OutputMedicineWitnessForm(props) {
 	const {
@@ -37,7 +38,24 @@ export default function OutputMedicineWitnessForm(props) {
 		let data = [...formFields];
 		data.splice(index, 1);
 		setFormFields(data);
+
+		// Object.keys(errors).forEach((item) => {
+		// 	if (item.includes(index.toString())) {
+
+		// 	}
+		// })
 	};
+
+	const handleCheckError = (field) => {
+		console.log("field name: ", field);
+		console.log("error from component: ", errors);
+		if (errors[field]) {
+			return errors[field];
+		}
+		return null;
+	}
+
+	console.log("error from dynamic form: ", errors);
 
 	return (
 		<div id="form-2">
@@ -92,18 +110,22 @@ export default function OutputMedicineWitnessForm(props) {
                                             block
 											onChange={(e) => {
 												handleChangeFormFields('name', e.target.value, index)
-												// setErrors({
-												// 	...errors,
-												// 	[`physicalReport.data[${index}].name`]: ""
-												// });
+												setErrors({
+													...errors,
+													[`physicalReport.data.witnesses.${index}.name`]: ""
+												});
 											}}
+											// error={() => handleCheckError(`physicalReport.data.witnesses[${index}].name`)}
+											error={
+												errors[`physicalReport.data.witnesses.${index}.name`]
+											}
                                         />
-										{
-											// errors[`physicalReport.data[${index}].name`] &&
-											// 	<div style={{ minHeight: '22px' }}>
-											// 		<Text type="danger">{errors[`physicalReport.data[${index}].name`]}</Text>
-											// 	</div>
-										}
+										{/* {
+											errors[`data[${index}].name`] &&
+												<div style={{ minHeight: '22px' }}>
+													<Text type="danger">{errors[`data[${index}].name`]}</Text>
+												</div>
+										} */}
 									</>
 								}
 							</div>
@@ -111,7 +133,7 @@ export default function OutputMedicineWitnessForm(props) {
 						<div className="col-span-3">
 							{(index === 0) && (
 								<label className="block text-body font-medium leading-6 text-gray-900">
-									NIP
+									Nomor Identitas Pegawai
 								</label>
 							)
 							}
@@ -139,18 +161,22 @@ export default function OutputMedicineWitnessForm(props) {
                                             block
 											onChange={(e) => {
 												handleChangeFormFields('nip', e.target.value, index)
-												// setErrors({
-												// 	...errors,
-												// 	"physicalReport.data.nip": ""
-												// });
+												setErrors({
+													...errors,
+													[`physicalReport.data.witnesses.${index}.nip`]: ""
+												});
 											}}
+											error={
+												errors[`physicalReport.data.witnesses.${index}.nip`]
+											}
+											// error={() => handleCheckError(`physicalReport.data.witnesses[${index}].nip`)}
                                         />
-										{
-											// errors["physicalReport.data.nip"] &&
-											// 	<div style={{ minHeight: '22px' }}>
-											// 		<Text type="danger">{errors["physicalReport.data.nip"]}</Text>
-											// 	</div>
-										}
+										{/* {
+											errors["data.nip"] &&
+												<div style={{ minHeight: '22px' }}>
+													<Text type="danger">{errors["data.nip"]}</Text>
+												</div>
+										} */}
 									</>
 								}
 							</div>
@@ -186,18 +212,22 @@ export default function OutputMedicineWitnessForm(props) {
                                             block
 											onChange={(e) => {
 												handleChangeFormFields('role', e.target.value, index)
-												// setErrors({
-												// 	...errors,
-												// 	"physicalReport.data.role": ""
-												// });
+												setErrors({
+													...errors,
+													[`physicalReport.data.witnesses.${index}.role`]: ""
+												});
 											}}
+											error={
+												errors[`physicalReport.data.witnesses.${index}.role`]
+											}
+											// error={() => handleCheckError(`physicalReport.data.witnesses[${index}].role`)}
                                         />
-										{
-											// errors["physicalReport.data.role"] &&
-											// 	<div style={{ minHeight: '22px' }}>
-											// 		<Text type="danger">{errors["physicalReport.data.role"]}</Text>
-											// 	</div>
-										}
+										{/* {
+											errors["data.role"] &&
+												<div style={{ minHeight: '22px' }}>
+													<Text type="danger">{errors["data.role"]}</Text>
+												</div>
+										} */}
 									</>
 								}
 							</div>

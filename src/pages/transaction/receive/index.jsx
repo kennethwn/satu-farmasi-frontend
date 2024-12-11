@@ -207,7 +207,7 @@ export default function index() {
                                                     className="inline-flex items-center justify-center w-8 h-8 text-center bg-transparent border-0 rounded-lg"
                                                     onClick={() => {
                                                         console.log(rowData);
-                                                        router.push(`/transaction/receive/edit/${rowData?.id}`)
+                                                        router.push(`/transaction/receive/confirm/${rowData?.id}`)
                                                     }}
                                                 >
                                                     <MdOutlineEdit size="2em" color="#FFD400" />

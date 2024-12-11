@@ -137,6 +137,7 @@ export default function RequestMedicineForm(props) {
                             phoneVendor: dataVendor?.find(item => item.id == value)?.phoneNum,
                         })
                     }
+                    cleanable={false}
                 />
 
                 {/* Vendor's City */}

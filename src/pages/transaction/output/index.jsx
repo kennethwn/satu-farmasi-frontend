@@ -103,13 +103,13 @@ export default function Index() {
     }, [page, limit, search]);
 
     return (
-        <Layout active="master-expense" user={user}>
+        <Layout active="transaction-output" user={user}>
             <ContentLayout title="List Pengeluaran Obat">
                 <div className="flex flex-col gap-2 md:flex-row justify-between w-full">
                     <div>
                         <Button
                             prependIcon={<IoMdAdd size={24} />}
-                            onClick={() => router.push(`/transaction/expense/create`)}
+                            onClick={() => router.push(`/transaction/output/create`)}
                         >
                             Tambah
                         </Button>
@@ -202,7 +202,7 @@ export default function Index() {
                                             <button
                                                 disabled={rowData?.report?.isFinalized} className={`${rowData?.report?.isFinalized ? 'hidden' : ''} inline-flex items-center justify-center w-8 h-8 text-center bg-transparent border-0 rounded-lg`}
                                                 onClick={() =>
-                                                    router.push(`/transaction/expense/edit/${rowData?.id}`)
+                                                    router.push(`/transaction/output/edit/${rowData?.id}`)
                                                 }
                                             >
                                                 <MdOutlineEdit size="2em" color="#FFD400" />

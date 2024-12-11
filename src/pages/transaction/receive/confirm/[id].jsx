@@ -315,7 +315,7 @@ export default function Index() {
 
     return (
         <Layout active="transaction-receive" user={user}>
-            <ContentLayout title="Edit Penerimaan Obat" type="child" backpageUrl="/transaction/receive">
+            <ContentLayout title="Konfirmasi Penerimaan Obat" type="child" backpageUrl="/transaction/receive">
                 <form id="form">
                     <ReceiveMedicineForm
                         isLoading={isLoading}
@@ -341,7 +341,7 @@ export default function Index() {
                                 isDisabled={true}
                                 isLoading={isLoading}
                             >
-                                Simpan
+                                Konfirmasi
                             </Button>
                             :
                             <Button
@@ -352,7 +352,7 @@ export default function Index() {
                                     setModal(true)
                                 }}
                             >
-                                Simpan
+                                Konfirmasi
                             </Button>
                         }
                     </div>
