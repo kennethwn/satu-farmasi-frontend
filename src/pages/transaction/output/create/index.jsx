@@ -27,6 +27,9 @@ const physicalReportSchema = z.object({
     }),
 });
 
+// FIX: Zod isn't working currently
+// HACK: how do I choice the specific medicine ID?
+// TODO: Add reserveStock column or  addjust the currStock
 const medicineSchema = z.object({
     medicineId: isRequiredNumber(),
     quantity: isRequiredNumber(),
@@ -150,7 +153,6 @@ export default function Index() {
                 error = error.response?.data.errors
                 ErrorForm(error, setErrors, false);
             }
-            console.log(error);
         }
     };
 

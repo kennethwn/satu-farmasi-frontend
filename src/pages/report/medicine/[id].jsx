@@ -53,10 +53,10 @@ export default function index() {
             console.log(res.data);
             setValue({
                 ...res.data,
-                receiveMedicines: res.data.receiveMedicines.map(item => ({
-                    ...item,
-                    buyingPrice: formatRupiah(item.buyingPrice),
-                })),
+                //receiveMedicines: res.data.receiveMedicines.map(item => ({
+                //    ...item,
+                //    buyingPrice: formatRupiah(item.buyingPrice),
+                //})),
                 transactions: res.data.transactions.map(item => ({
                     ...item,
                     pharmacist: {
@@ -76,8 +76,8 @@ export default function index() {
                         diagnose: {
                             ...item.prescription.diagnose,
                             doctor: {
-                                ...item.prescription.diagnose.doctor,
-                                fullName: item.prescription.diagnose.doctor.firstName + " " + item.prescription.diagnose.doctor.lastName
+                                ...item.prescription.diagnose?.doctor,
+                                fullName: item.prescription.diagnose?.doctor?.firstName + " " + item.prescription.diagnose?.doctor?.lastName
                             },
                         },
                     },
@@ -246,7 +246,7 @@ export default function index() {
                         <Label className={`my-3 p-2 font-semibold rounded-lg ${getReportStatusClass()}`} id="transactions" label={`${value.isFinalized ? 'Sudah Diselesaikan ' : 'Belum Diselesaikan'}`} />
                     </div>
                     <div className="sm:col-span-6">
-                        <Label className="my-3" id="transactions" label={`Total Transaksi ${value.transactions?.length}`} />
+                        <Label className="my-3" id="transactions" label={`Total Transaksi ${value.transactions?.length || 0}`} />
                         <Accordion header="List Transaksi">
                             <Table
                                 data={value.transactions || []}
@@ -271,7 +271,13 @@ export default function index() {
 
                                 <Column width={200} flexGrow={1}>
                                     <HeaderCell className="text-dark font-bold"> Nama Dokter </HeaderCell>
-                                    <Cell dataKey="prescription.diagnose.doctor.fullName" />
+                                    <Cell>
+                                        {(rowData, index) => { 
+                                            return rowData.prescription.diagnose.doctor.fullName !== "undefined undefined"
+                                            ? rowData.prescription.diagnose.doctor.fullName 
+                                            : "-" 
+                                        }}
+                                        </Cell>
                                 </Column>
 
                                 <Column width={200} flexGrow={1}>
@@ -305,7 +311,7 @@ export default function index() {
                         </Accordion>
                     </div>
                     <div className="sm:col-span-6">
-                        <Label className="my-3" id="receiveMedicines" label={`Total Obat Masuk ${value.receiveMedicines?.length}`} />
+                        <Label className="my-3" id="receiveMedicines" label={`Total Obat Masuk ${value.receiveMedicines?.length || 0}`} />
                         <Accordion header="List Obat Masuk">
                             <Table
                                 data={value.receiveMedicines || []}
@@ -397,7 +403,7 @@ export default function index() {
                         </Accordion>
                     </div>
                     <div className="sm:col-span-6">
-                        <Label className="my-3" id="outputMedicines" label={`Total Obat Keluar ${value.outputMedicines?.length}`} />
+                        <Label className="my-3" id="outputMedicines" label={`Total Obat Keluar ${value.outputMedicines?.length || 0}`} />
                         <Accordion header="List Obat Keluar">
                             <Table
                                 data={value.outputMedicines || []}

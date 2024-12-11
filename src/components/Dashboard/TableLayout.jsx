@@ -22,7 +22,7 @@ export default function TableLayout(props) {
                 <div className="flex flex-row w-full hover:cursor-pointer justify-between">
                     <span className="font-bold text-2xl">{title}</span>
                     <div className="flex flex-row gap-x-2 items-center justify-between" onClick={() => handleRoute(link)}>
-                        <span className="text-purple hover:underline font-bold">See All</span>
+                        <span className="text-purple hover:underline font-bold">Lihat Semua</span>
                         <FaArrowRightLong size={24} />
                     </div>
                 </div>

@@ -67,103 +67,103 @@ export default function MasterMedicineList(props) {
                 onSortColumn={handleSortColumn}
             >
                 <Column width={50} fixed="left">
-                    <HeaderCell className="text-center text-dark ">No</HeaderCell>
+                    <HeaderCell className="text-center text-dark font-bold">No</HeaderCell>
                     <Cell className="text-center text-dark">
                         {(rowData, index) => index + 1}
                     </Cell>
                 </Column>
 
                 <Column width={250} sortable fullText resizable>
-                    <HeaderCell className="text-dark ">Kode</HeaderCell>
+                    <HeaderCell className="text-dark font-bold">Kode</HeaderCell>
                     <Cell dataKey='code'/>
                 </Column>
 
                 <Column width={250} sortable fullText resizable>
-                    <HeaderCell className="text-dark ">Nama</HeaderCell>
+                    <HeaderCell className="text-dark font-bold">Nama</HeaderCell>
                     <Cell dataKey='name'/>
                 </Column>
 
                 <Column width={250} sortable fullText resizable>
-                    <HeaderCell className="text-dark ">Merk</HeaderCell>
+                    <HeaderCell className="text-dark font-bold">Merek</HeaderCell>
                     <Cell dataKey='merk'/>
                 </Column>
 
                 {/* <Column width={250} fullText resizable>
-                    <HeaderCell className="text-dark ">Generik</HeaderCell>
+                    <HeaderCell className="text-dark font-bold">Generik</HeaderCell>
                     <Cell>
                         {(rowData) => rowData?.genericName?.label}
                     </Cell>
                 </Column>
 
                 <Column width={250} fullText resizable>
-                    <HeaderCell className="text-dark ">Kemasan</HeaderCell>
+                    <HeaderCell className="text-dark font-bold">Kemasan</HeaderCell>
                     <Cell>
                         {(rowData) => rowData?.packaging?.label}
                     </Cell>
                 </Column> */}
 
                 <Column width={250} sortable fullText resizable>
-                    <HeaderCell className="text-dark ">Deskripsi</HeaderCell>
+                    <HeaderCell className="text-dark font-bold">Deskripsi</HeaderCell>
                     <Cell dataKey='description'/>
                 </Column>
 
                 <Column width={250} sortable fullText resizable>
-                    <HeaderCell className="text-dark ">Satuan</HeaderCell>
+                    <HeaderCell className="text-dark font-bold">Satuan</HeaderCell>
                     <Cell dataKey='unitOfMeasure'/>
                 </Column>
 
                 <Column width={250} fullText resizable>
-                    <HeaderCell className="text-dark ">Harga</HeaderCell>
+                    <HeaderCell className="text-dark font-bold">Harga</HeaderCell>
                     <Cell dataKey='price'>
                         {(rowData) => formatRupiah(rowData?.price)}    
                     </Cell>
                 </Column>
 
                 <Column width={250} sortable fullText resizable>
-                    <HeaderCell className="text-dark ">Current Stock</HeaderCell>
+                    <HeaderCell className="text-dark font-bold">Stok Sekarang</HeaderCell>
                     <Cell dataKey='currStock'/>
                 </Column>
 
                 <Column width={250} sortable fullText resizable>
-                    <HeaderCell className="text-dark ">Minimum Stock</HeaderCell>
+                    <HeaderCell className="text-dark font-bold">Stok Minimum</HeaderCell>
                     <Cell dataKey='minStock'/>
                 </Column>
 
                 <Column width={250} sortable fullText resizable>
-                    <HeaderCell className="text-dark ">Maximum Stock</HeaderCell>
+                    <HeaderCell className="text-dark font-bold">Stok Maksimum</HeaderCell>
                     <Cell dataKey='maxStock'/>
                 </Column>
 
                 <Column width={250} sortable fullText resizable>
-                    <HeaderCell className="text-dark ">Tanggal Masuk</HeaderCell>
+                    <HeaderCell className="text-dark font-bold">Tanggal Masuk</HeaderCell>
                     <Cell dataKey='created_at'>
                         {rowData => formatDate(rowData?.created_at)}
                     </Cell>
                 </Column>
 
                 <Column width={250} sortable fullText resizable>
-                    <HeaderCell className="text-dark ">Tanggal Expired</HeaderCell>
+                    <HeaderCell className="text-dark font-bold">Tanggal Expired</HeaderCell>
                     <Cell dataKey='expiredDate'>
                         {rowData => formatDateWithTime(rowData?.expiredDate)}
                     </Cell>
                 </Column>
 
                 <Column width={250} sortable fullText resizable>
-                    <HeaderCell className="text-dark ">Efek Samping</HeaderCell>
+                    <HeaderCell className="text-dark font-bold">Efek Samping</HeaderCell>
                     <Cell dataKey='sideEffect'/>
                 </Column>
 
                 {isMaster &&
                     <>
                         <Column width={150} sortable fixed="right" resizable>
-                            <HeaderCell className="text-dark ">Status Stok</HeaderCell>
+                            <HeaderCell className="text-dark font-bold">Status Stok</HeaderCell>
                             <Cell dataKey='status_stock'>
                                 {rowData => resolveStatusStockMedicine(rowData?.lowStock)}
                             </Cell>
                         </Column>
 
                         <Column width={180} sortable fixed="right" resizable>
-                            <HeaderCell className="text-dark ">Rekomendasi Restock</HeaderCell>
+                            <HeaderCell className="text-dark font-bold">Rekomendasi Restock</HeaderCell>
                             <Cell dataKey='recommendedRestock' className="items-center">
                                 {rowData => {
                                     return (
@@ -174,7 +174,7 @@ export default function MasterMedicineList(props) {
                         </Column>
 
                         <Column width={150} fixed="right">
-                            <HeaderCell className="text-center text-dark ">Action</HeaderCell>
+                            <HeaderCell className="text-center text-dark font-bold">Aksi</HeaderCell>
                             <Cell className="text-center" style={{ padding: '6px' }}>
                                 {
                                     rowData => {

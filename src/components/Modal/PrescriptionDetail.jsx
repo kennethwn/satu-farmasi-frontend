@@ -71,10 +71,10 @@ export default function PrescriptionDetail(props) {
             const res = await cancelPrescription(prescriptionId);
             console.log("cancel: ", res)
             if (res.code !== 200) {
-                toast.error(res.message, { autoClose: 2000, position: "top-center" });
+                toast.error(res.message, { autoClose: 2000, position: "top-right" });
                 return;
             } else {
-                toast.success(`Status Change to Canceled`, { autoClose: 2000, position: "top-center" });
+                toast.success(`Status Change to Canceled`, { autoClose: 2000, position: "top-right" });
                 setStatusChanged({prescriptionId: prescriptionId, status: "CANCELED"})
                 setPrescriptionsData(prescriptionData => ({
                     ...prescriptionData,
@@ -93,13 +93,14 @@ export default function PrescriptionDetail(props) {
                 prescriptionId: prescriptionData.id,
                 pharmacistId: user?.id
             }
+            console.log("proceed data: ", JSON.stringify(data))
             const res = await createTransaction(data);
             console.log(res)
             if (res.code !== 200) {
-                toast.error(res.message, { autoClose: 2000, position: "top-center" });
+                toast.error(res.message, { autoClose: 2000, position: "top-right" });
                 return;
             } else {
-                toast.success(`Status Change to Waiting for Payment`, { autoClose: 2000, position: "top-center" });
+                toast.success(`Status Change to Waiting for Payment`, { autoClose: 2000, position: "top-right" });
                 setStatusChanged({prescriptionId: prescriptionId, status: "WAITING_FOR_PAYMENT"})
                 setPrescriptionsData(prescriptionData => ({
                     ...prescriptionData,
@@ -128,10 +129,10 @@ export default function PrescriptionDetail(props) {
             const res = await finishTransaction(data);
             console.log(res)
             if (res.code !== 200) {
-                toast.error(res.message, { autoClose: 2000, position: "top-center" });
+                toast.error(res.message, { autoClose: 2000, position: "top-right" });
                 return;
             } else {
-                toast.success(`Status Change to Waiting for Payment`, { autoClose: 2000, position: "top-center" });
+                toast.success(`Status Change to Waiting for Payment`, { autoClose: 2000, position: "top-right" });
                 setStatusChanged({prescriptionId: prescriptionId, status: "DONE"})
                 setPrescriptionsData(prescriptionData => ({
                     ...prescriptionData,
@@ -155,6 +156,7 @@ export default function PrescriptionDetail(props) {
             try {
                 if (prescriptionId !== -1) {
                     const response = await getPrescriptionDetail(prescriptionId)
+                    console.log("prescription response: ", response)
                     setPrescriptionsData(response.data)
                 }
             } catch (error) {
@@ -259,9 +261,11 @@ export default function PrescriptionDetail(props) {
                 }
                 {
                     prescriptionData?.status === "ON_PROGRESS" &&
-                    <Button appearance="primary" onClick={() => setOpen({...open, markAsDone: true})}>
-                        Mark as Done
-                    </Button>
+                    <div className="w-full flex justify-end">
+                        <Button appearance="primary" onClick={() => setOpen({...open, markAsDone: true})}>
+                            Mark as Done
+                        </Button>
+                    </div>
                 }
             </div>
 

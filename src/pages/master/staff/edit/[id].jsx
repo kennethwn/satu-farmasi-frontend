@@ -3,7 +3,7 @@ import Input from "@/components/Input";
 import Layout from "@/components/Layouts";
 import ContentLayout from "@/components/Layouts/Content";
 import { convertToTimestampString } from "@/helpers/dayHelper";
-import { isOptionalBoolean, isOptionalString, isRequiredEmail, isRequiredString } from "@/helpers/validation";
+import { isOptionalBoolean, isOptionalString, isRequiredEmail, isRequiredPhoneNumber, isRequiredString } from "@/helpers/validation";
 import useStaffAPI from "@/pages/api/master/staff";
 import { useRouter } from "next/router";
 import { useEffect, useRef, useState } from "react";
@@ -15,13 +15,14 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import { useUserContext } from "@/pages/api/context/UserContext";
 import { ErrorForm } from "@/helpers/errorForm";
 
+// TODO: dynamic validation based on role
 const staffSchema = z.object({
     firstName: isRequiredString(),
     lastName: isRequiredString(),
     email: isRequiredEmail(),
     dob: isRequiredString(),
     nik: isRequiredString(),
-    phoneNum: isRequiredString(),
+    phoneNum: isRequiredPhoneNumber(),
     specialist: isOptionalString(),
     is_active: isOptionalBoolean(),
 });
@@ -82,16 +83,19 @@ export default function Index() {
                 ...data,
                 role: getValues("role"),
                 dob: convertToTimestampString(data.dob),
+                phoneNum: data.phoneNum.toString(),
                 is_active: isChecked,
                 oldEmail: getValues("oldEmail"),
                 oldNik: getValues("oldNik"),
             }
+            console.log("data: ", data)
             res = await handleRole(data);
             toast.success(res.message, { autoClose: 2000, position: "top-right" });
             setTimeout(() => {
                 router.push("/master/staff");
             }, 2000);
         } catch (error) {
+            console.log("erorr: ", error);
             ErrorForm(error, setError);
         }
     };
@@ -131,7 +135,7 @@ export default function Index() {
     return (
         <Layout active="master-staff" user={user}>
             <ContentLayout title="Ubah Staf" type="child" backpageUrl="/master/staff">
-                <form id="form" onSubmit={handleSubmit(handleSubmitStaff)} ref={formRef}>
+                <form id="form" onSubmit={handleSubmit(() =>  handleSubmitStaff)} ref={formRef}>
                     <div className="grid grid-cols-1 gap-x-6 gap-y-6 sm:grid-cols-6">
                         <div className="sm:col-span-3">
                             <div className="mt-2">

@@ -4,13 +4,13 @@ import axios from "@/configs/axios/satufarmasi-service-axios";
 export default function useTransaction() {
     const [isLoading, setIsLoading] = useState(false);
 
-    const getAllTransaction = async (patientName, limit, page) => {
+    const getAllTransaction = async (patientName, limit, page,filterStatus) => {
         setIsLoading(true);
         try {
             let response
         
             if (patientName !== "") {
-                response = await axios.get(`/api/v1/transactions/_summary?name=${patientName}&limit=${limit}&page=${page}`)
+                response = await axios.get(`/api/v1/transactions/_summary?name=${patientName}&limit=${limit}&page=${page}&status=${filterStatus}`)
                 .then((response) => {
                     setIsLoading(false);
                     return response;
@@ -20,7 +20,7 @@ export default function useTransaction() {
                     return error;
                 })
             } else { 
-                response = await axios.get(`/api/v1/transactions/_summary?limit=${limit}&page=${page}`)
+                response = await axios.get(`/api/v1/transactions/_summary?limit=${limit}&page=${page}&status=${filterStatus}`)
                 .then((response) => {
                     setIsLoading(false);
                     return response;

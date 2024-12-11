@@ -24,21 +24,21 @@ export default function DashboardView(props) {
     const TableExpired = (props) => (
         <Table {...props}>
             <Column flexGrow={1}>
-                <HeaderCell className="text-dark">Medicine</HeaderCell>
+                <HeaderCell className="text-dark">Obat</HeaderCell>
                 <Cell dataKey="name"/>
             </Column>
             <Column flexGrow={1}>
-                <HeaderCell className="text-dark">Batch Id</HeaderCell>
+                <HeaderCell className="text-dark">Batch ID</HeaderCell>
                 <Cell dataKey="code"/>
             </Column>
             <Column flexGrow={1}>
-                <HeaderCell className="text-dark">Expire Date</HeaderCell>
+                <HeaderCell className="text-dark">Tanggal Expired</HeaderCell>
                 <Cell dataKey="expiredDate">
                     {rowData => formatDate(rowData?.expiredDate)}
                 </Cell>
             </Column>
             <Column flexGrow={1}>
-                <HeaderCell className="text-dark">Quantity</HeaderCell>
+                <HeaderCell className="text-dark">Jumlah</HeaderCell>
                 <Cell dataKey="currStock"/>
             </Column>
         </Table>
@@ -47,15 +47,15 @@ export default function DashboardView(props) {
     const TableMedicineOrder = (props) => (
         <Table {...props}>
             <Column width={75}>
-                <HeaderCell>Id</HeaderCell>
+                <HeaderCell>ID</HeaderCell>
                 <Cell dataKey="id"/>
             </Column>
             <Column flexGrow={1}>
-                <HeaderCell>Patient</HeaderCell>
+                <HeaderCell>Pasien</HeaderCell>
                 <Cell dataKey="patient.name"/>
             </Column>
             <Column flexGrow={1}>
-                <HeaderCell>Pharmacist</HeaderCell>
+                <HeaderCell>Farmasi</HeaderCell>
                 <Cell dataKey="pharmacist.firstName"/>
             </Column>
             <Column flexGrow={1} resizable>
@@ -169,13 +169,13 @@ export default function DashboardView(props) {
                 <TableLayout title="Expiring List" link="/master/medicine">
                     <TableExpired data={dataExpired} />
                 </TableLayout>
-                <TableLayout title="Remaining Transaction" link="/transaction/dashboard">
+                <TableLayout title="Sisa Transaksi" link="/transaction/dashboard">
                     <TableMedicineOrder data={dataTransaction}/>
                 </TableLayout>
             </div>
             <div className="flex pb-6 flex-col max-lg:gap-y-4 lg:flex-row gap-x-4 w-full">
-                <Chart title="Annual Report" className="w-full lg:w-3/5" options={options} series={series} yearPicker setCurrentYear={setCurrentYear} />
-                <Chart title="Monthly Report" description="Top 3 Best-Selling Medicines" className="w-full lg:w-2/5" options={pieOptions} series={pieOptions.series} monthPicker setCurrentMonth={setCurrentMonth} />
+                <Chart title="Laporan Tahunan" className="w-full lg:w-3/5" options={options} series={series} yearPicker setCurrentYear={setCurrentYear} />
+                <Chart title="Laporan Bulanan" description="Top 3 Best-Selling Medicines" className="w-full lg:w-2/5" options={pieOptions} series={pieOptions.series} monthPicker setCurrentMonth={setCurrentMonth} />
             </div>
         </div>
     )

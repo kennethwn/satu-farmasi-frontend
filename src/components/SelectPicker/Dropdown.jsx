@@ -68,7 +68,7 @@ export default function Dropdown({
             </div>
             {
                 error &&
-                <Text className="my-2" type="danger">{error}</Text>
+                <Text className="w-fit" type="danger">{error}</Text>
             }
         </>
         // <div className="block w-full rounded-full px-4 border py-1.5 text-dark border-dark placeholder:text-gray-400 sm:text-base sm:leading-6 ">

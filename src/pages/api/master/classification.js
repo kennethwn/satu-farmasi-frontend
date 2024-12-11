@@ -15,10 +15,11 @@ export default function useClassificationsAPI() {
         }
     }
 
-    const GetAllClassificationsDropdown = async () => {
+    const GetAllClassificationsDropdown = async (data) => {
         setIsLoading(true)
         try {
-            return await axios.get(`/api/v1/classifications/dropdown`)
+            console.log("data", data)
+            return await axios.get(`/api/v1/classifications/dropdown?medicineCode=${data}`)
         } catch (error) {
             console.error(error);
         } finally {

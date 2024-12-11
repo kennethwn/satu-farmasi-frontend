@@ -8,13 +8,13 @@ import { formatRupiah } from "@/helpers/currency";
 import Dropdown from "../SelectPicker/Dropdown";
 
 function PrescriptionForm(props) {
-  const { formFields, setFormFields, errors, setErrors } = props;
+  const { formFields, setFormFields, setAvailableStock = () => {}, errors, setErrors } = props;
 
   const { getMedicineDropdownOptions } = useMedicineDropdownOption();
   const [medicineDropdownOptions, setMedicineDropdownOptions] = useState([]);
 
   const data = Object.entries(medicineDropdownOptions).map(([key, item]) => ({
-    label: key + " - " + item.name,
+    label: item.name + " - " + key,
     value: key,
   }));
 
@@ -22,6 +22,7 @@ function PrescriptionForm(props) {
     async function fetchMedicineDropdownOptionsData(){
         try {
             const response = await getMedicineDropdownOptions()
+            setAvailableStock(response.data)
             setMedicineDropdownOptions(response.data)
         } catch (error) {
             console.log("error #getMedicineOptions")
@@ -29,10 +30,6 @@ function PrescriptionForm(props) {
     } 
     fetchMedicineDropdownOptionsData();
   }, []);
-
-  useEffect(() => {
-      console.log(formFields);
-  }, [formFields]);
 
   const handleMedicineChange = (formFieldId, code) => {
     const checkIfStockIsInsufficient = (medicineDropdownOption, quantity) => {
@@ -44,6 +41,7 @@ function PrescriptionForm(props) {
       medicineName: medicineDropdownOptions[code]?.name,
       quantity: 0,
       price: medicineDropdownOptions[code]?.price,
+      currStock: medicineDropdownOptions[code]?.currStock,
       totalPrice: 0,
       insufficientStock: checkIfStockIsInsufficient(medicineDropdownOptions[code], quantity)
     };
@@ -53,6 +51,7 @@ function PrescriptionForm(props) {
       if (index === formFieldId) {
         item.code = updatedData.code;
         item.medicineName = updatedData.medicineName;
+        item.currStock = updatedData.currStock;
         item.quantity = 0;
         item.price = updatedData.price;
         item.totalPrice = 0;
@@ -129,10 +128,11 @@ function PrescriptionForm(props) {
             <div className="grid grid-cols-10 gap-4 text-center font-bold max-lg:invisible">
                 <div> </div>
                 <div className="col-span-2">Nama Obat</div>
-                <div className="col-span-2">Jumlah</div>
+                <div className="col-span-1">Jumlah</div>
+                <div className="col-span-1">Stock Obat</div>
                 <div className="col-span-2">Harga per Obat</div>
                 <div className="col-span-2">Total Sub Harga</div>
-                <div> Action </div>
+                <div> Aksi </div>
             </div>
             {formFields &&
                 formFields.map((formField, index) => (
@@ -155,7 +155,6 @@ function PrescriptionForm(props) {
                                 <label className="lg:hidden">Nama Obat</label>
                                 <Dropdown
                                     id="name"
-                                    // appearance="subtle"
                                     size="lg"
                                     name="name"
                                     data={data}
@@ -168,19 +167,6 @@ function PrescriptionForm(props) {
                                         });
                                     }}
                                     value={formField.code}
-                                    // renderValue={
-                                    //     formField.medicineId != ""
-                                    //         ? (value) => (
-                                    //             <div className="text-sm">
-                                    //                 {
-                                    //                     medicineDropdownOptions[
-                                    //                         value
-                                    //                     ]?.name
-                                    //                 }
-                                    //             </div>
-                                    //         )
-                                    //         : null
-                                    // }
                                     block
                                     style={{}}
                                     placement="bottomStart"
@@ -192,7 +178,7 @@ function PrescriptionForm(props) {
                                     }
                                 />
                             </div>
-                            <div className="col-span-2">
+                            <div className="col-span-1">
                                 <label className="lg:hidden">Jumlah</label>
                                 <InputField
                                     type="number"
@@ -200,7 +186,7 @@ function PrescriptionForm(props) {
                                     name="quantity"
                                     placeholder="Jumlah"
                                     value={formField.quantity}
-                                    disabled={formField.medicineId == -1}
+                                    disabled={formField.code == -1}
                                     onChange={(e) => {
                                         handleMedicineQuantity(
                                             index,
@@ -217,6 +203,17 @@ function PrescriptionForm(props) {
                                         `prescription.medicineList.${index}.quantity`
                                         ]
                                     }
+                                />
+                            </div>
+                            <div className="col-span-1">
+                                <label className="lg:hidden"> Stock Obat </label>
+                                <InputField
+                                    type="number"
+                                    id="currStock"
+                                    name="currStock"
+                                    placeholder="Stock Obat"
+                                    value={formField.currStock}
+                                    disabled={true}
                                 />
                             </div>
                             <div className="col-span-2">
@@ -254,7 +251,7 @@ function PrescriptionForm(props) {
                                     id="instruction"
                                     name="instruction"
                                     value={formField?.instruction} // TODO: fix handle change
-                                    placeholder="Instruction"
+                                    placeholder="Instruksi"
                                     onChange={(e) => {
                                         handleInstructionField(
                                             index,
@@ -298,7 +295,7 @@ function PrescriptionForm(props) {
                                     id="instruction"
                                     name="instruction"
                                     value={formField?.instruction} // TODO: fix handle change
-                                    placeholder="Instruction"
+                                    placeholder="Instruksi"
                                     onChange={(e) => {
                                         handleInstructionField(
                                             index,

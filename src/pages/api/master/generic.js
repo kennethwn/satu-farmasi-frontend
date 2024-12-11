@@ -43,7 +43,7 @@ export default function useGenericAPI() {
     const GetGenericDropdown = async (data) => {
         setIsLoading(true);
         try {
-            const response = await axios.get('/api/v1/genericName/dropdown')
+            const response = await axios.get('/api/v1/genericName/dropdown?medicineCode=' + data)
             .then((response) => {
                 setIsLoading(false);
                 return response;

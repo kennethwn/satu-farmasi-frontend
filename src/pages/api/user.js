@@ -17,9 +17,8 @@ export default function useUser() {
                 password,
                 isRemember,
             });
-            setUser(response);
             const fullName = response.data.firstName + " " + response.data.lastName;
-            setUser({ name: fullName, role: response.data.role });
+            setUser({ name: fullName, email: response.data.email, role: response.data.role });
             return response;
         } catch (error) {
             throw error.response.data;
