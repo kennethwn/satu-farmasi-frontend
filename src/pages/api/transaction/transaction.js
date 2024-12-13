@@ -4,13 +4,13 @@ import axios from "@/configs/axios/satufarmasi-service-axios";
 export default function useTransaction() {
     const [isLoading, setIsLoading] = useState(false);
 
-    const getAllTransaction = async (patientName, limit, page) => {
+    const getAllTransaction = async (patientName, limit, page,filterStatus) => {
         setIsLoading(true);
         try {
             let response
         
             if (patientName !== "") {
-                response = await axios.get(`/api/v1/transactions/_summary?name=${patientName}&limit=${limit}&page=${page}`)
+                response = await axios.get(`/api/v1/transactions/_summary?name=${patientName}&limit=${limit}&page=${page}&status=${filterStatus}`)
                 .then((response) => {
                     setIsLoading(false);
                     return response;
@@ -20,7 +20,7 @@ export default function useTransaction() {
                     return error;
                 })
             } else { 
-                response = await axios.get(`/api/v1/transactions/_summary?limit=${limit}&page=${page}`)
+                response = await axios.get(`/api/v1/transactions/_summary?limit=${limit}&page=${page}&status=${filterStatus}`)
                 .then((response) => {
                     setIsLoading(false);
                     return response;
@@ -59,6 +59,42 @@ export default function useTransaction() {
         setIsLoading(true);
         try {
             const response = await axios.get(`/api/v1/transactions/_status/on-progress-waiting-payment`)
+            .then(response => {
+                setIsLoading(false);
+                return response;
+            })
+            .catch(error => {
+                setIsLoading(false);
+                return error;
+            })
+            return response;
+        } catch (error) {
+            console.error(error);
+        }
+    }
+
+    const getTransactionProfitByDate = async (data) => {
+        setIsLoading(true);
+        try {
+            const response = await axios.post(`/api/v1/transactions/profit/date`, data)
+            .then(response => {
+                setIsLoading(false);
+                return response;
+            })
+            .catch(error => {
+                setIsLoading(false);
+                return error;
+            })
+            return response;
+        } catch (error) {
+            console.error(error);
+        }
+    }
+
+    const getAnnualTransactionRecap = async (data) => {
+        setIsLoading(true);
+        try {
+            const response = await axios.post(`/api/v1/transactions/annual-recap`, data)
             .then(response => {
                 setIsLoading(false);
                 return response;
@@ -151,6 +187,8 @@ export default function useTransaction() {
         isLoading,
         getAllTransaction,
         getOnProgressAndWaitingPaymentTransaction,
+        getTransactionProfitByDate,
+        getAnnualTransactionRecap,
         createTransaction,
         getTransactionDetail,
         confirmPayment,

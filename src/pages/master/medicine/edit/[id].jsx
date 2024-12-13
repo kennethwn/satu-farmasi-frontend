@@ -17,15 +17,18 @@ import Text from "@/components/Text";
 import useClassificationsAPI from "@/pages/api/master/classification";
 import Dropdown from "@/components/SelectPicker/Dropdown";
 
+
+// TODO: Fix eidt genericName, packaging, classification (inactive to active)
+
 const classificationSchema = z.object({
     classificationId: isRequiredNumber(),
 });
 
 const medicineSchema = z.object({
     name: isRequiredString(),
+    code: isRequiredString(),
     merk: isRequiredString(),
     price: isRequiredNumber(),
-    currStock: isRequiredNumber(),
     minStock: isRequiredNumber(),
     maxStock: isRequiredNumber(),
     genericNameId: isRequiredNumber(),
@@ -35,22 +38,13 @@ const medicineSchema = z.object({
     }),
     classificationList: z.array(classificationSchema),
     sideEffect: isRequiredString(),
-}).refine(data => data.minStock < data.maxStock, {
-    message: "Minimum stock must be less than maximum stock",
-    path: ["minStock"],
-}).refine(data => data.maxStock > data.minStock, {
-    message: "Maximum stock must be greater than minimum stock",
-    path: ["maxStock"],
-}).refine(data => data.currStock <= data.maxStock, {
-    message: "Current stock cannot be greater than maximum stock",
-    path: ["currStock"],
 })
 
 export default function Index() {
     const router = useRouter();
     const id = router.query.id;
     const { user } = useUserContext();
-    const { isLoading, EditMedicine, SearchMedicine } = useMedicineAPI();
+    const { isLoading, EditMedicine, GetMedicineListByCode } = useMedicineAPI();
     const { GetAllClassificationsDropdown } = useClassificationsAPI();
     const { GetPackagingDropdown } = usePackagingAPI();
     const { GetGenericDropdown } = useGenericAPI();
@@ -79,7 +73,7 @@ export default function Index() {
 
     const handleFetchMedicineByCode = async () => {
         try {
-            const res = await SearchMedicine(1, 1, id);
+            const res = await GetMedicineListByCode(1, 1, id, 'code', 'asc');
             if (res.code !== 200) {
                 toast.error(res.message, { autoClose: 2000, position: "top-right" });
                 return;
@@ -89,9 +83,9 @@ export default function Index() {
             let classificationForm = [];
             res.data.results[0].classifications.forEach((item, index) => {
                 let data = { id: 0, label: '', value: '' };
-                data['id'] = item.classification.id;
-                data['label'] = item.classification.label;
-                data['value'] = item.classification.value;
+                data['id'] = item.id;
+                data['label'] = item.label;
+                data['value'] = item.value;
                 classificationForm.push(data);
             })
             setFormFields(classificationForm);
@@ -102,7 +96,7 @@ export default function Index() {
 
     const handleFetchPackagingDropdown = async () => {
         try {
-            const res = await GetPackagingDropdown();
+            const res = await GetPackagingDropdown(id);
             if (res.code !== 200) {
                 toast.error(res.message, { autoClose: 2000, position: "top-right" });
                 setPackagings([]);
@@ -116,7 +110,7 @@ export default function Index() {
 
     const handleFetchGenericDropdown = async () => {
         try {
-            const res = await GetGenericDropdown();
+            const res = await GetGenericDropdown(id);
             if (res.code !== 200) {
                 toast.error(res.message, { autoClose: 2000, position: "top-right" });
                 setGenerics([]);
@@ -130,7 +124,7 @@ export default function Index() {
 
     const handleFetchClassifications = async () => {
         try {
-            const res = await GetAllClassificationsDropdown();
+            const res = await GetAllClassificationsDropdown(id);
             if (res.code !== 200) {
                 toast.error(res.message, { autoClose: 2000, position: "top-right" });
                 setGenerics([]);
@@ -169,8 +163,6 @@ export default function Index() {
                 description: input.description,
                 unitOfMeasure: input.unitOfMeasure,
                 price: parseInt(input.price),
-                expiredDate: input.expiredDate,
-                currStock: parseInt(input.currStock),
                 minStock: parseInt(input.minStock),
                 maxStock: parseInt(input.maxStock),
                 genericNameId: parseInt(input.genericName) || parseInt(input.genericName.id),
@@ -182,6 +174,7 @@ export default function Index() {
                 updated_at: input.updated_at
             }
 
+            console.log(payload)
             setErrors({});
             medicineSchema.parse(payload);
             const res = await EditMedicine(payload);
@@ -191,6 +184,7 @@ export default function Index() {
                 router.push("/master/medicine");
             }, 2000)
         } catch (error) {
+            console.log(error);
             if (error instanceof ZodError) {
                 const newErrors = { ...errors };
                 error.issues.forEach((issue) => {
@@ -263,6 +257,36 @@ export default function Index() {
                                 {isLoading ?
                                     <InputField
                                         type="text"
+                                        id="medicine_code"
+                                        name="medicine_code"
+                                        disabled={true}
+                                        label="Kode Obat"
+                                        placeholder="Kode obat"
+                                        value={input?.code}
+                                    />
+                                    :
+                                    <InputField
+                                        type="text"
+                                        id="medicine_code"
+                                        name="medicine_code"
+                                        // onChange={e => {
+                                        //     setInput({ ...input, code: e.target.value });
+                                        //     setErrors({ ...errors, "code": "" });
+                                        // }}
+                                        disabled
+                                        label="Kode Obat"
+                                        placeholder="Kode obat"
+                                        error={errors['code']}
+                                        value={input?.code}
+                                    />
+                                }
+                            </div>
+                        </div>
+                        <div className="sm:col-span-6">
+                            <div className="mt-2">
+                                {isLoading ?
+                                    <InputField
+                                        type="text"
                                         id="merk"
                                         name="merk"
                                         label="Merek"
@@ -320,36 +344,7 @@ export default function Index() {
                                 }
                             </div>
                         </div>
-                        <div className="sm:col-span-2">
-                            <div className="mt-2">
-                                {isLoading ?
-                                    <InputField
-                                        type="number"
-                                        id="currStock"
-                                        name="currStock"
-                                        placeholder="0"
-                                        label="Stok Sekarang"
-                                        value={input?.currStock}
-                                        disabled={true}
-                                    />
-                                    :
-                                    <InputField
-                                        type="number"
-                                        id="currStock"
-                                        name="currStock"
-                                        placeholder="0"
-                                        label="Stok Sekarang"
-                                        value={input?.currStock}
-                                        error={errors['currStock']}
-                                        onChange={e => {
-                                            setInput({ ...input, currStock: parseInt(e.target.value) })
-                                            setErrors({ ...errors, "currStock": "" });
-                                        }}
-                                    />
-                                }
-                            </div>
-                        </div>
-                        <div className="sm:col-span-2">
+                        <div className="sm:col-span-3">
                             <div className="mt-2">
                                 {isLoading ?
                                     <InputField
@@ -378,7 +373,7 @@ export default function Index() {
                                 }
                             </div>
                         </div>
-                        <div className="sm:col-span-2">
+                        <div className="sm:col-span-3">
                             <div className="mt-2">
                                 {isLoading ?
                                     <InputField
@@ -425,6 +420,7 @@ export default function Index() {
                                         labelKey="label"
                                         data={generics}
                                         block
+                                        cleanable={false}
                                     />
                                     :
                                     <>
@@ -441,6 +437,7 @@ export default function Index() {
                                                 setInput({ ...input, genericName: { id: value } })
                                                 setErrors({ ...errors, "genericNameId": "" });
                                             }}
+                                            cleanable={false}
                                             data={generics}
                                             block
                                         />
@@ -470,6 +467,7 @@ export default function Index() {
                                         value={input?.packaging?.id}
                                         labelKey="label"
                                         valueKey="id"
+                                        cleanable={false}
                                         data={packagings}
                                         block
                                     />
@@ -484,6 +482,7 @@ export default function Index() {
                                             size='lg'
                                             className="py-1.5"
                                             valueKey="id"
+                                            cleanable={false}
                                             onChange={value => {
                                                 setInput({ ...input, packaging: { id: value } })
                                                 setErrors({ ...errors, "packagingId": "" });
@@ -519,6 +518,7 @@ export default function Index() {
                                         disabled={true}
                                         size='lg'
                                         block
+                                        cleanable={false}
                                         className="py-1.5"
                                         data={unitOfMeasure}
                                         value={input?.unitOfMeasure}
@@ -527,11 +527,12 @@ export default function Index() {
                                     />
                                     :
                                     <>
-                                        <SelectPicker
+                                        <Dropdown
                                             id="unitOfMeasure"
                                             name="unitOfMeasure"
                                             placeholder="Satuan"
                                             size='lg'
+                                            cleanable={false}
                                             className="py-1.5"
                                             data={unitOfMeasure}
                                             block
@@ -584,7 +585,7 @@ export default function Index() {
                         </div>
                     </div>
 
-                    <div className="flex justify-center gap-2 my-6 lg:justify-end">
+                    <div className="flex justify-center gap-2 my-6 pb-6 lg:justify-end">
                         {isSubmitted ?
                             <Button
                                 appearance="primary"

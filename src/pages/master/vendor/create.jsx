@@ -7,14 +7,14 @@ import { useRef, useState } from "react";
 import { toast } from "react-toastify";
 import useVendorAPI from "@/pages/api/master/vendor";
 import { z } from "zod";
-import { isRequiredString } from "@/helpers/validation";
+import { isRequiredPhoneNumber, isRequiredString } from "@/helpers/validation";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useUserContext } from "@/pages/api/context/UserContext";
 
 const vendorSchema = z.object({
     name: isRequiredString(),
-    phoneNum: isRequiredString(),
+    phoneNum: isRequiredPhoneNumber(),
     address: isRequiredString(),
     city: isRequiredString(),
 });
@@ -65,18 +65,17 @@ export default function create() {
     const createHandler = async (data) => {
         try {
             const res = await CreateVendor(data);
-            if (res.code !== 200)
-                return toast.error(res.message, {
-                    autoClose: 2000,
-                    position: "top-right",
-                });
             toast.success(res.message, { autoClose: 2000, position: "top-right" });
             setSubmitted(true)
             setTimeout(() => {
                 router.push("/master/vendor");
             }, 2000);
         } catch (error) {
-            console.error(error);
+            console.log(error);
+            toast.error(error.message, {
+                autoClose: 2000,
+                position: "top-right",
+            })
         }
     };
 

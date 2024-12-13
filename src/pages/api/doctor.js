@@ -13,6 +13,7 @@ export default function useDoctor() {
 		try {
 			return await api.post("/api/v1/doctors/", { email, password, nik, firstName, lastName, phoneNum, dob, role, specialist });
 		} catch (error) {
+            console.log("err in doctor: ", error)
 			throw error.response.data.errors;
 		}
 	}

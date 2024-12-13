@@ -10,7 +10,7 @@ import { useRouter } from "next/router";
 import Button from "@/components/Button";
 import { toast } from "react-toastify";
 import { z, ZodError } from "zod";
-import { isRequiredNumber, isRequiredString } from "@/helpers/validation";
+import { isRequiredNumber, isRequiredPhoneNumber, isRequiredString } from "@/helpers/validation";
 import { ErrorForm } from "@/helpers/errorForm";
 
 const medicineSchema = z.object({
@@ -34,7 +34,7 @@ const prescriptionSchemaWithNewPatient = z.object({
         patient: z.object({
             patientName: isRequiredString(),
             credentialNum: isRequiredString(),
-            phoneNum: isRequiredString(),
+            phoneNum: isRequiredPhoneNumber(),
         }),
     }),
 });
@@ -45,6 +45,7 @@ export default function create() {
     const [existingPatient, setExistingPatient] = useState(true);
     const router = useRouter();
     const [errors, setErrors] = useState({});
+    const [ hasSubmit, setHasSubmit ] = useState(false);
 
     const [formFields, setFormFields] = useState([
         {   
@@ -66,6 +67,7 @@ export default function create() {
     const handleSubmitPrescription = async (e) => {
         e.preventDefault();
         try {
+            setHasSubmit(true)
             let data = {
                 patient: {
                     patientId: -1,
@@ -99,8 +101,6 @@ export default function create() {
             }
             else prescriptionSchemaWithNewPatient.parse(dataToValidate);
 
-            console.log(data)
-
             const res = await addNewPrescription(data);
             toast.success(res.message, {
                 autoClose: 2000,
@@ -110,6 +110,7 @@ export default function create() {
                 router.push(`/prescription`);
             }, 2000);
         } catch (error) {
+            setHasSubmit(false)
             console.log("error: ", error);
             if (error instanceof ZodError) {
                 const newErrors = { ...errors };
@@ -129,7 +130,7 @@ export default function create() {
     return (
         <Layout active="prescription" user={user}>
             <ContentLayout
-                title="Create Prescription"
+                title="Tambah Resep"
                 type="child"
                 backpageUrl="/prescription"
             >
@@ -140,8 +141,8 @@ export default function create() {
                     <div className="flex flex-col gap-2">
                         <Toggle
                             size="lg"
-                            checkedChildren="Existing Patient"
-                            unCheckedChildren="New Patient"
+                            checkedChildren="Pasien Lama"
+                            unCheckedChildren="Pasien Baru"
                             defaultChecked
                             onChange={(e) => setExistingPatient(e)}
                         />
@@ -176,6 +177,7 @@ export default function create() {
                         ) : (
                             <Button
                                 isLoading={isLoading}
+                                    isDisabled={hasSubmit}
                                 appearance="primary"
                                 type="submit"
                             >

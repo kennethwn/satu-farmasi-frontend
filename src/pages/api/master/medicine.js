@@ -22,10 +22,28 @@ export default function useMedicineAPI() {
         }
     }
 
-    const GetAllMedicines = async (page, limit) => {
+    const GetMedicineListById = async (page, limit, search, sortBy, sortMode) => {
         setIsLoading(true)
         try {
-            const response = await axios.get(`/api/v1/medicines?page=${page}&limit=${limit}`)
+            const response = await axios.get(`/api/v1/medicines/summaryById?page=${page}&limit=${limit}&search=${search}&sortBy=${sortBy}&sortMode=${sortMode}`)
+            .then((response) => {
+                setIsLoading(false);
+                return response;
+            })
+            .catch((error) => {
+                setIsLoading(false);
+                return error;
+            })
+            return response
+        } catch (error) {
+            console.error(error);
+        }
+    }
+
+    const GetMedicineListByCode = async (page, limit, search, sortBy, sortMode) => {
+        setIsLoading(true)
+        try {
+            const response = await axios.get(`/api/v1/medicines/summaryByCode?page=${page}&limit=${limit}&search=${search}&sortBy=${sortBy}&sortMode=${sortMode}`)
             .then((response) => {
                 setIsLoading(false);
                 return response;
@@ -196,7 +214,8 @@ export default function useMedicineAPI() {
     return {
         isLoading,
         GetMedicineDropdownList,
-        GetAllMedicines,
+        GetMedicineListById,
+        GetMedicineListByCode,
         GetTotalMedicine,
         GetTotalNeedToRestockMedicine,
         SearchMedicine,

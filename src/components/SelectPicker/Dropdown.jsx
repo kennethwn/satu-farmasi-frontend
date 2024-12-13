@@ -55,7 +55,7 @@ export default function Dropdown({
                 <SelectPicker
                     container={() => containerRef.current}
                     preventOverflow={true}
-                    menuMaxHeight={100}
+                    menuMaxHeight={300}
                     placeholder={placeholder}
                     onChange={onChange}
                     className={`${className} pb-2`}
@@ -65,11 +65,11 @@ export default function Dropdown({
                     block
                     {...props}
                 />
+                {
+                    error &&
+                    <Text className="w-fit" type="danger">{error}</Text>
+                }
             </div>
-            {
-                error &&
-                <Text className="my-2" type="danger">{error}</Text>
-            }
         </>
         // <div className="block w-full rounded-full px-4 border py-1.5 text-dark border-dark placeholder:text-gray-400 sm:text-base sm:leading-6 ">
         // </div>
@@ -83,7 +83,7 @@ Dropdown.propTypes = {
     placement: propTypes.string,
     error: propTypes.string,
     className: propTypes.string,
-    placeholder: propTypes.string,
+    placeholder: propTypes.any,
     onChange: propTypes.func,
     value: propTypes.any,
     defaultValue: propTypes.any,

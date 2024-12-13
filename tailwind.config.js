@@ -12,6 +12,7 @@ module.exports = {
         Nunito_Sans: ["Nunito Sans", "sans-serif"],
       },
       fontSize: {
+        heading_4: "36px",
         heading_3: "40px",
         title: '20px',
         body: '16px',

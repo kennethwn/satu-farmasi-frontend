@@ -14,7 +14,7 @@ export default function ContentLayout(props) {
             <Panel 
                 bordered
                 style={{ borderColor: '#DDDDDD' }}
-                className='mb-2'
+                className='mb-2 pb-4'
             >
                 <div className='flex flex-row items-center gap-5 max-h-16'>
                     {
@@ -29,7 +29,7 @@ export default function ContentLayout(props) {
                 bordered 
                 className='gap-2 overflow-auto h-full'
                 header={header}
-                bodyFill={table}
+                // bodyFill={table}
             >
                 {children}
             </Panel>

@@ -8,10 +8,10 @@ export default function usePharmacist() {
     const [isLoading, setIsLoading] = useState(false);
 
     const addPharmacist = async (data) => {
-        let { email, password, nik, firstName, lastName, phoneNum, dob, role } = data;
+        let { email, password, nik, firstName, lastName, phoneNum, dob, role, sipaNum } = data;
         dob = convertToTimestampString(dob);
         try {
-             return await api.post("/api/v1/pharmacists/", { email, password, nik, firstName, lastName, phoneNum, dob, role })
+             return await api.post("/api/v1/pharmacists/", { email, password, nik, firstName, lastName, phoneNum, dob, role, sipaNum })
         } catch (error) {
 			console.log("error di pharmacist.js", error)
             throw error.response.data.errors;

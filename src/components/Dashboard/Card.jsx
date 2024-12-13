@@ -65,7 +65,7 @@ export default function Card(props) {
                         <span className="font-extrabold text-dark text-3xl">{value}</span>
                     </div>
                 </div>
-                <Button onClick={() => handleRoute(link)} style={{padding: 0}} appearance="link" color="green" className="max-lg:hidden items-start">See Details</Button>
+                <Button onClick={() => handleRoute(link)} style={{padding: 0}} appearance="link" color="green" className="max-lg:hidden items-start">Lihat Detail</Button>
                 <div className="lg:hidden flex w-full justify-end">
                     <FaArrowRight size={24} />
                 </div>

@@ -11,6 +11,7 @@ function PatientForm(props) {
         existingPatient,
         errors,
         setErrors,
+        disabled = false,
     } = props;
 
     if (errors) {
@@ -120,6 +121,7 @@ function PatientForm(props) {
                                 block
                                 cleanable={false}
                                 error={errors["prescription.patient.patientId"]}
+                                disabled={disabled}
                             />
                         ) : (
                             <InputField
@@ -133,17 +135,18 @@ function PatientForm(props) {
                                         "prescription.patient.patientName": "",
                                     });
                                 }}
-                                placeholder="name"
+                                placeholder="Nama Pasien"
                                 error={
                                     errors["prescription.patient.patientName"]
                                 }
                                 value={selectedPatient.PatientName}
+                                disabled={disabled}
                             />
                         )}
                     </div>
                 </div>
                 <div className="flex flex-col gap-2">
-                    <p> Credential Number </p>
+                    <p> Nomor Kredensial </p>
                     <InputField
                         type="text"
                         id="name"
@@ -155,10 +158,10 @@ function PatientForm(props) {
                                 "prescription.patient.credentialNum": "",
                             });
                         }}
-                        placeholder="credential number"
+                        placeholder="Nomor Kredensial"
                         value={selectedPatient.credentialNum}
                         error={errors["prescription.patient.credentialNum"]}
-                        disabled={existingPatient}
+                        disabled={existingPatient || disabled}
                     />
                 </div>
                 <div className="flex flex-col gap-2">
@@ -174,10 +177,10 @@ function PatientForm(props) {
                                 "prescription.patient.phoneNum": "",
                             });
                         }}
-                        placeholder="no handphone"
+                        placeholder="No Handphone"
                         error={errors["prescription.patient.phoneNum"]}
                         value={selectedPatient.phoneNum}
-                        disabled={existingPatient}
+                        disabled={existingPatient || disabled}
                     />
                 </div>
             </div>

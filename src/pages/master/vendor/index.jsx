@@ -3,7 +3,7 @@ import ContentLayout from "@/components/Layouts/Content";
 import { useUserContext } from "@/pages/api/context/UserContext";
 import useVendorAPI from "@/pages/api/master/vendor";
 import { useEffect, useState } from "react";
-import { Pagination, Table } from "rsuite";
+import { Checkbox, Pagination, Table, Tooltip, Whisper } from "rsuite";
 import Button from "@/components/Button";
 import { IoMdAdd } from "react-icons/io";
 import SearchBar from "@/components/SearchBar";
@@ -41,6 +41,7 @@ export default function index() {
                 return;
             }
             setData(res.data.results);
+            console.log("vendor list: ", res.data.results)
             setTotalPage(res.data.total);
         } catch (error) {
             console.error(error);
@@ -61,10 +62,10 @@ export default function index() {
         }
     };
 
-    const HandleDeleteVendor = async () => {
+    const HandleDeleteVendor = async (rowData, index) => {
         try {
-            setEditInput({ ...editInput, is_active: false });
-            const res = await DeleteVendor(editInput);
+            rowData = { ...rowData, isActive: rowData.is_active };
+            const res = await DeleteVendor(rowData);
             if (res.code !== 200) {
                 toast.error(res.message, {
                     autoClose: 2000,
@@ -77,11 +78,17 @@ export default function index() {
                 position: "top-right",
             });
             setOpen({ ...open, create: false, edit: false, delete: false });
-            HandleFetchVendorData();
+            setData(prevData => prevData.map((item, idx) => idx === index ? { ...item, is_active: !item.is_active } : item))
         } catch (error) {
             console.error(error);
         }
     };
+
+    const renderTooltip = (content) => (
+        <Tooltip>
+            {content}
+        </Tooltip>
+    )
 
     useEffect(() => {
         async function fetchData() {
@@ -109,7 +116,7 @@ export default function index() {
                         <SearchBar
                             size="md"
                             className="w-1/4"
-                            placeholder="Search..."
+                            placeholder="Cari Vendor ..."
                             onChange={(value) => setSearch(value)}
                         />
                     </div>
@@ -155,33 +162,45 @@ export default function index() {
                             <Cell dataKey="city" />
                         </Column>
 
+                        <Column width={100} fixed="right">
+                            <HeaderCell className="text-dark text-center font-bold">Status Aktif</HeaderCell>
+                            <Cell className="text-center">
+                                {
+                                    (rowData, index) => {
+                                        return (
+                                            <div className="inline-flex items-center justify-center w-8 h-8 text-center bg-transparent border-0 rounded-lg">
+                                                <Checkbox
+                                                    checked={rowData?.is_active} 
+                                                    onChange={() => {
+                                                        HandleDeleteVendor({ ...rowData, is_active: !rowData.is_active, id: parseInt(rowData.id) }, index);
+                                                    }}
+                                                />
+                                            </div>
+                                        )
+                                    }
+                                }
+                            </Cell>
+                        </Column>
+
                         <Column width={150} fixed="right">
                             <HeaderCell className="text-center text-dark font-bold">
-                                Action
+                                Aksi
                             </HeaderCell>
-                            <Cell className="text-center">
+                            <Cell className="text-center" style={{ padding: '6px' }}>
                                 {(rowData) => {
                                     return (
-                                        <div className="flex justify-center flex-row gap-6">
-                                            <button
-                                                className="inline-flex items-center justify-center w-8 h-8 text-center bg-transparent border-0 rounded-lg"
-                                                onClick={() =>
-                                                    router.push(`/master/vendor/edit/${rowData?.id}`)
-                                                }
-                                            >
-                                                <MdOutlineEdit size="2em" color="#FFD400" />
-                                            </button>
-
-                                            <button
-                                                className="inline-flex items-center justify-center w-8 h-8 text-center bg-transparent border-0 rounded-lg"
-                                                onClick={() => {
-                                                    setEditInput({ ...rowData, is_active: false });
-                                                    setOpen({ ...open, delete: true });
-                                                }}
-                                            >
-                                                <PiTrash size="2em" color="#DC4A43" />
-                                            </button>
-                                        </div>
+                                        <Whisper speaker={renderTooltip("Edit")} placement="top" controlId="control-id-hover" trigger="hover">
+                                            <div className="flex justify-center flex-row gap-6">
+                                                <button
+                                                    className="inline-flex items-center justify-center w-8 h-8 text-center bg-transparent border-0 rounded-lg"
+                                                    onClick={() =>
+                                                        router.push(`/master/vendor/edit/${rowData?.id}`)
+                                                    }
+                                                >
+                                                    <MdOutlineEdit size="2em" color="#FFD400" />
+                                                </button>
+                                            </div>
+                                        </Whisper>
                                     );
                                 }}
                             </Cell>
@@ -216,7 +235,7 @@ export default function index() {
                 body={
                     <>
                         Apakah anda yakin untuk menghapus data{" "}
-                        <span className="text-danger">{editInput.name}</span>?
+                        <p><span className="text-danger">{editInput.name}</span> ?</p>
                     </>
                 }
                 btnText="Hapus"

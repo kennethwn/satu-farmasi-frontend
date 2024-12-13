@@ -15,6 +15,8 @@ import Text from "@/components/Text";
 import { toast } from "react-toastify";
 import { Checkbox, Loader } from "rsuite";
 import Label from "@/components/Input/Label";
+import usePharmacy from "../api/pharmacy";
+import { object } from "prop-types";
 
 const loginSchema = z.object({
     email: isRequiredEmail(),
@@ -25,6 +27,8 @@ const loginSchema = z.object({
 export default function Login() {
     const { router, getUser } = useUser();
     const [isLoading, setIsLoading] = useState(false);
+	const { getPharmacyInfo} = usePharmacy()
+    const [customError,  setCustomError] = useState({});
     const formRef = useRef(null);
 
     const {
@@ -43,18 +47,24 @@ export default function Login() {
         try {
             setIsLoading(true);
             await getUser(data);
-            toast.success("Login successful!", { autoClose: 2000, position: 'top-right' });
+            console.log("success login")
             setTimeout(() => {
+                console.log("redirect ...")
+                //window.location.href = "/";
                 router.push("/");
             }, 2000)
         } catch (error) {
-            // TODO: Handle if the user is not active anymore
-            toast.error(error.message, { autoClose: 2000, position: 'top-right' });
-        } finally {
+            console.log("error: ", error)
             setIsLoading(false);
-
+            setCustomError({ custom: error.message });
         }
     };
+
+    useEffect(() => {
+        if (Object.keys(customError).length > 0) {
+            console.log("customError: ", customError)
+        }
+    }, [customError])
 
     const submitForm = () => formRef.current.requestSubmit();
 
@@ -64,13 +74,11 @@ export default function Login() {
                 isLoading === false ?
                     <form
                         onSubmit={handleSubmit(LoginHandler)}
-                        className="flex justify-center items-center flex-col gap-3 p-8 rounded 
-            bg-background-light border border-border-auth"
+                        className="flex justify-center items-center flex-col gap-3 p-8 rounded bg-background-light border border-border-auth w-[400px]"
                         ref={formRef}
                     >
                         <div className="text-center mb-4">
-                            <Text type="heading_3">Welcome Back</Text>
-                            <Text type="body">Sign in to access your pharmacy dashboard</Text>
+                            <Text type="heading_4">Selamat Datang</Text>
                         </div>
                         <Input
                             label={"Email"}
@@ -94,22 +102,23 @@ export default function Login() {
                         />
                         <div className='flex justify-start items-center w-full'>
                             <Checkbox id="isRemember" name="isRemember" onChange={() => setValue("isRemember", !getValues("isRemember"))}/>
-                            <Label name={"isRemember"} label={"Keep Me Logged In"} />
+                            <Label name={"isRemember"} label={"Ingat Saya"} />
                         </div>
+                        { customError && <Text className="my-2 text-start" type="danger">{customError.custom}</Text> }
                         {
                             isLoading ?
                                 <Button type="button" isDisabled={true} isLoading={isLoading} className="w-full">
-                                    Login
+                                    Masuk
                                 </Button>
                                 :
-                                <Button type="button" onClick={submitForm} isLoading={isLoading} className="w-full">
-                                    Login
+                                <Button type="button" onClick={submitForm} isDisabled={isLoading} isLoading={isLoading} className="w-full">
+                                    Masuk
                                 </Button>
                         }
                         <div className="mt-4">
                             <Text type="body">
-                                Already have an account? <Link href="/auth/register">Sign up</Link>{" "}
-                                here
+                                Sudah punya akun? <Link href="/auth/register">Registrasi</Link>{" "}
+                                di sini
                             </Text>
                         </div>
                     </form>
@@ -118,7 +127,7 @@ export default function Login() {
                         <Loader
                             size="lg"
                             speed="slow"
-                            content="checking your credential..."
+                            content="Sedang Memproses ..."
                             inverse={true}
                             vertical={true}
                         />

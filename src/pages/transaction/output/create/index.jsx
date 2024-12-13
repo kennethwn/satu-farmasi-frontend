@@ -6,17 +6,35 @@ import { useRouter } from "next/router";
 import { useEffect, useState } from "react";
 import { toast } from "react-toastify";
 import { z, ZodError } from "zod";
-import useExpenseMedicineAPI from "@/pages/api/transaction/expenseMedicine";
+import useOutputMedicineAPI from "@/pages/api/transaction/outputMedicine";
 import Dropdown from "@/components/SelectPicker/Dropdown";
 import { isRequiredNumber, isRequiredString } from "@/helpers/validation";
 import useMedicineDropdownOption from "@/pages/api/medicineDropdownOption";
 import { useUserContext } from "@/pages/api/context/UserContext";
 import { ErrorForm } from "@/helpers/errorForm";
+import OutputMedicineWitnessForm from "@/components/DynamicForms/OuputMedicineWitnessForm";
+import usePharmacy from "@/pages/api/pharmacy";
 
+const witnessesSchema = z.object({
+    name: isRequiredString(),
+    nip: isRequiredString(),
+    role: isRequiredString()
+})
+
+const physicalReportSchema = z.object({
+    data: z.object({
+        witnesses: z.array(witnessesSchema)
+    }),
+});
+
+// FIX: Zod isn't working currently
+// HACK: how do I choice the specific medicine ID?
+// TODO: Add reserveStock column or  addjust the currStock
 const medicineSchema = z.object({
     medicineId: isRequiredNumber(),
     quantity: isRequiredNumber(),
     reasonOfDispose: isRequiredString(),
+    physicalReport: physicalReportSchema
 });
 
 const createExpenseMedicineField = [
@@ -43,8 +61,9 @@ const createExpenseMedicineField = [
 export default function Index() {
     const router = useRouter();
     const { user } = useUserContext();
-    const { isLoading, CreateMedicine, GetMedicineById } = useExpenseMedicineAPI();
+    const { isLoading, CreateMedicine, GetMedicineById } = useOutputMedicineAPI();
     const { getMedicineDropdownOptionsById } = useMedicineDropdownOption();
+    const { getPharmacyInfo } = usePharmacy();
     const [medicineDropdownOptions, setMedicineDropdownOptions] = useState([])
     const [currStockMedicine, setCurrStockMedicine] = useState(0);
     const [data, setData] = useState([]);
@@ -55,15 +74,50 @@ export default function Index() {
         oldQuantity: 0,
         medicine: {
             currstock: null,
+        },
+        physicalReport: {
+            data: {
+                pharmacist: "",
+                sipaNumber: "",
+                pharmacy: "",
+                addressPharmacy: "",
+                witnesses: [{ name: "", nip: "", role: "" }],
+            }
         }
     });
-    const [errors, setErrors] = useState({});
+    const [formField, setFormField] = useState([{ name: "", nip: "", role: "" }]);
+    const [errors, setErrors] = useState({
+        medicineId: "",
+        quantity: "",
+        reasonOfDispose: "",
+        oldQuantity: "",
+        medicine: {
+            currstock: "",
+        },
+        physicalReport: {
+            data: {
+                pharmacist: "",
+                sipaNumber: "",
+                pharmacy: "",
+                addressPharmacy: "",
+                witnesses: [{ name: "", nip: "", role: "" }],
+            }
+        }
+    });
 
     const createHandler = async (e) => {
         e.preventDefault();
         try {
+            console.log("form data: ", formData);
+            
+            // binding payload
+            formData.physicalReport.data.pharmacist = user.name;
+            formData.physicalReport.data.sipaNumber = user.sipaNumber || "0001";
+            formData.physicalReport.data.witnesses = formField;
+
             setErrors({});
             medicineSchema.parse(formData);
+
             const res = await CreateMedicine(formData);
             if (res.code !== 200)
                 return toast.error(res.message, {
@@ -72,28 +126,39 @@ export default function Index() {
                 });
             toast.success(res.message, { autoClose: 2000, position: "top-right" });
             setTimeout(() => {
-                router.push("/transaction/expense");
+                router.push("/transaction/output");
             }, 2000)
         } catch (error) {
-            toast.error(error.response.data.message, {
-                autoClose: 2000,
-                position: "top-right",
-            });
-            error = error.response.data.errors
+            console.log("error: ", error);
             if (error instanceof ZodError) {
                 const newErrors = { ...errors };
                 error.issues.forEach((issue) => {
+                    console.log("error zod: ", issue);
                     if (issue.path.length > 0) {
-                        const fieldName = issue.path[0];
-                        newErrors[fieldName] = issue.message;
+                        if (issue.path[0] === "physicalReport") {
+                            const path = issue.path.join('.')
+                            newErrors[path] = issue.message
+                        } else {
+                            const fieldName = issue.path[0];
+                            newErrors[fieldName] = issue.message;
+                        }
                     }
                 });
                 setErrors(newErrors);
             } else {
+                toast.error(error.response?.data.message, {
+                    autoClose: 2000,
+                    position: "top-right",
+                });
+                error = error.response?.data.errors
                 ErrorForm(error, setErrors, false);
             }
         }
     };
+
+    useEffect(() => {
+        console.log("error zod useeffect: ", JSON.stringify(errors));
+    }, [errors]);
 
     const reasonOfDisposeListData = ["Broken", "Lost", "Expired"].map(item => ({ label: item, value: item.toUpperCase() }));
 
@@ -155,12 +220,41 @@ export default function Index() {
         }
     }, [formData.medicineId])
 
+    const handleFetchPharmacyInfo = async () => {
+        try {
+            const res = await getPharmacyInfo();
+            if (res.code !== 200)
+                return toast.error(res.message, {
+                    autoClose: 2000,
+                    position: "top-right",
+            });
+            setFormData({
+                ...formData,
+                physicalReport: {
+                    data: {
+                        pharmacy: res.data.name,
+                        addressPharmacy: res.data.address
+                    }
+                }
+            })
+        } catch (error) {
+            console.error(error);
+        }
+    }
+
+    useEffect(() => {
+        async function fetchData() {
+            await handleFetchPharmacyInfo();
+        }
+        fetchData();
+    }, [router]);
+
     return (
-        <Layout active="master-expense-medicine" user={user}>
+        <Layout active="transaction-output" user={user}>
             <ContentLayout
                 title="Tambah Pengeluaran Obat"
                 type="child"
-                backpageUrl="/transaction/expense"
+                backpageUrl="/transaction/output"
             >
                 <form id="form" onSubmit={createHandler}>
                     <div className="grid grid-cols-1 gap-x-6 gap-y-6 sm:grid-cols-6">
@@ -197,7 +291,7 @@ export default function Index() {
                                         (
                                             <div class="flex gap-x-5">
                                                 <Input
-                                                    label={"jumlah Obat keluar"}
+                                                    label={"Jumlah Obat keluar"}
                                                     type={"number"}
                                                     name={"quantity"}
                                                     onChange={e => inputOnChangeHandler(e, input.name)}
@@ -221,7 +315,27 @@ export default function Index() {
                         })}
                     </div>
 
-                    <div className="flex justify-center gap-2 my-6 lg:justify-end">
+                    {
+                        (formData.reasonOfDispose == "BROKEN" || formData.reasonOfDispose == "EXPIRED") &&
+                            <div className="w-full mt-6 text-lg font-semibold">
+                                Data Petugas Kesehatan
+                            </div>
+                    }
+
+                    <div className="w-full my-6">
+                        {
+                            (formData.reasonOfDispose == "BROKEN" || formData.reasonOfDispose == "EXPIRED") &&
+                                <OutputMedicineWitnessForm 
+                                    isLoading={isLoading}
+                                    formFields={formField}
+                                    setFormFields={setFormField}
+                                    setErrors={setErrors}
+                                    errors={errors}
+                                />
+                        }
+                    </div>
+
+                    <div className="flex justify-center gap-2 mb-6 mt-12 py-4 lg:justify-end">
                         <Button
                             appearance="primary"
                             type="submit"

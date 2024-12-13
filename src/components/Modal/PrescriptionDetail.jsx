@@ -8,13 +8,17 @@ import { useRouter } from "next/router";
 import useTransaction from "@/pages/api/transaction/transaction";
 import { toast } from "react-toastify";
 import Toaster from "./Toaster";
+import usePharmacy from "@/pages/api/pharmacy";
 
 export default function PrescriptionDetail(props) {
-    const { setStatusChanged, prescriptionId, openModal, setOpenModal } = props
+    const { setStatusChanged, prescriptionId, openModal, setOpenModal, user } = props
+    console.log("user: ", user)
     const { Header, Body, Footer } = Modal;
     const router = useRouter();
     const { createTransaction, finishTransaction, publishNotification } = useTransaction();
     const [isListening, setIsListening] = useState(false)
+
+    const { getPharmacyInfo } = usePharmacy();
 
     const { getPrescriptionDetail, cancelPrescription } = usePrescription();
     const [open, setOpen] = useState({
@@ -68,10 +72,10 @@ export default function PrescriptionDetail(props) {
             const res = await cancelPrescription(prescriptionId);
             console.log("cancel: ", res)
             if (res.code !== 200) {
-                toast.error(res.message, { autoClose: 2000, position: "top-center" });
+                toast.error(res.message, { autoClose: 2000, position: "top-right" });
                 return;
             } else {
-                toast.success(`Status Change to Canceled`, { autoClose: 2000, position: "top-center" });
+                toast.success(`Status Change to Canceled`, { autoClose: 2000, position: "top-right" });
                 setStatusChanged({prescriptionId: prescriptionId, status: "CANCELED"})
                 setPrescriptionsData(prescriptionData => ({
                     ...prescriptionData,
@@ -87,15 +91,17 @@ export default function PrescriptionDetail(props) {
         try {
             const data = {
                 patientId: prescriptionData.patient.id,
-                prescriptionId: prescriptionData.id
+                prescriptionId: prescriptionData.id,
+                pharmacistId: user.id
             }
+            console.log("data create transaction: ", data)
             const res = await createTransaction(data);
             console.log(res)
             if (res.code !== 200) {
-                toast.error(res.message, { autoClose: 2000, position: "top-center" });
+                toast.error(res.message, { autoClose: 2000, position: "top-right" });
                 return;
             } else {
-                toast.success(`Status Change to Waiting for Payment`, { autoClose: 2000, position: "top-center" });
+                toast.success(`Status Change to Waiting for Payment`, { autoClose: 2000, position: "top-right" });
                 setStatusChanged({prescriptionId: prescriptionId, status: "WAITING_FOR_PAYMENT"})
                 setPrescriptionsData(prescriptionData => ({
                     ...prescriptionData,
@@ -124,10 +130,10 @@ export default function PrescriptionDetail(props) {
             const res = await finishTransaction(data);
             console.log(res)
             if (res.code !== 200) {
-                toast.error(res.message, { autoClose: 2000, position: "top-center" });
+                toast.error(res.message, { autoClose: 2000, position: "top-right" });
                 return;
             } else {
-                toast.success(`Status Change to Waiting for Payment`, { autoClose: 2000, position: "top-center" });
+                toast.success(`Status Change to Waiting for Payment`, { autoClose: 2000, position: "top-right" });
                 setStatusChanged({prescriptionId: prescriptionId, status: "DONE"})
                 setPrescriptionsData(prescriptionData => ({
                     ...prescriptionData,
@@ -151,6 +157,7 @@ export default function PrescriptionDetail(props) {
             try {
                 if (prescriptionId !== -1) {
                     const response = await getPrescriptionDetail(prescriptionId)
+                    console.log("prescription response: ", response)
                     setPrescriptionsData(response.data)
                 }
             } catch (error) {
@@ -217,8 +224,8 @@ export default function PrescriptionDetail(props) {
             }}
             size="lg"
         >
-            <Header className="text-2xl font-bold">Detail Prescription</Header>
-            <Body className="flex flex-col pt-2 gap-2">
+            <Header className="text-2xl font-bold">Detail Preskripsi</Header>
+            <Body className="flex flex-col py-2 gap-2">
                 <div>
                     <Input
                         type="text"
@@ -241,23 +248,25 @@ export default function PrescriptionDetail(props) {
                     prescriptionData?.status === "UNPROCESSED" && 
                     <>
                         <Button appearance="danger" onClick={() => setOpen({...open, canceled: true})}>
-                            Cancel
+                            Batalkan
                         </Button>
                         <div className="flex flex-row gap-4">
                             <Button appearance="primary" onClick={() => router.push(`/prescription/edit/` + prescriptionData.id)}>
-                                Edit
+                                Ubah
                             </Button>
                             <Button appearance="primary" onClick={() => setOpen({...open, proceedToPayment: true})}>
-                                Proceed to Payment
+                                Proses Pembayaran
                             </Button>
                         </div>
                     </>
                 }
                 {
                     prescriptionData?.status === "ON_PROGRESS" &&
-                    <Button appearance="primary" onClick={() => setOpen({...open, markAsDone: true})}>
-                        Mark as Done
-                    </Button>
+                    <div className="w-full flex justify-end">
+                        <Button appearance="primary" onClick={() => setOpen({...open, markAsDone: true})}>
+                            Mark as Done
+                        </Button>
+                    </div>
                 }
             </div>
 
@@ -267,22 +276,25 @@ export default function PrescriptionDetail(props) {
                 onClose={() => setOpen({ ...open, proceedToPayment: false })}
                 body={
                     <>
-                        Are you sure you want to change this transaction to proceed to payment, 
-                        <b> after confirmation prescription cannot be updated and these changes cannot be revert</b>
+                         Apakah Anda yakin ingin mengubah transaksi ini untuk melanjutkan ke pembayaran?<br/>
+                        Setelah konfirmasi,<span className="font-semibold text-danger"> perubahan ini tidak dapat dikembalikan</span>
                     </>
                 }
-                btnText="Confirm"
+                btnText="Konfirmasi"
                 onClick={handleProcess}
             />
 
             <Toaster
+                type="warning"
                 open={open.markAsDone}
                 onClose={() => setOpen({ ...open, markAsDone: false })}
                 body={
                     <>
-                        Are you sure you want to change this transaction to be mark as done, <b>these changes cannot be revert</b>
+                        Apakah Anda yakin ingin menandai transaksi ini sebagai selesai?
+                        <span className="font-bold text-danger">Perubahan ini tidak dapat dikembalikan</span>
                     </>
                 }
+
                 title={"Mark Prescription as Done"}
                 onClick={handleMarkAsDone}
             />

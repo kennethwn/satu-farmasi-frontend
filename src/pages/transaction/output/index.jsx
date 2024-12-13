@@ -4,20 +4,20 @@ import ContentLayout from "@/components/Layouts/Content";
 import Toaster from "@/components/Modal/Toaster";
 import SearchBar from "@/components/SearchBar";
 import { useUserContext } from "@/pages/api/context/UserContext";
-import useExpenseMedicineAPI from "@/pages/api/transaction/expenseMedicine";
+import useOutputMedicineAPI from "@/pages/api/transaction/outputMedicine";
 import { useRouter } from "next/router";
 import { useEffect, useState } from "react";
 import { IoMdAdd } from "react-icons/io";
 import { MdOutlineEdit } from "react-icons/md";
 import { PiTrash } from "react-icons/pi";
-import { Pagination, SelectPicker, Table } from "rsuite";
+import { Pagination, SelectPicker, Table, Tooltip, Whisper } from "rsuite";
 import { toast } from "react-toastify";
 import formatCalendar from "@/helpers/dayHelper";
 
 export default function Index() {
     const { user } = useUserContext();
     const { HeaderCell, Cell, Column } = Table;
-    const { isLoading, GetAllMedicine, GetMedicineByParams, DeleteMedicine } = useExpenseMedicineAPI();
+    const { isLoading, GetAllMedicine, GetMedicineByParams, DeleteMedicine } = useOutputMedicineAPI();
     const status = ["LOST", "EXPIRED", "BROKEN"];
     const [filter, setFilter] = useState('');
 
@@ -91,6 +91,12 @@ export default function Index() {
         }
     };
 
+    const renderTooltip = (content) => (
+        <Tooltip>
+            {content}
+        </Tooltip>
+    )
+
     useEffect(() => {
         async function fetchData() {
             if (search.q === "" && search.filter === "") {
@@ -103,13 +109,13 @@ export default function Index() {
     }, [page, limit, search]);
 
     return (
-        <Layout active="master-expense" user={user}>
+        <Layout active="transaction-output" user={user}>
             <ContentLayout title="List Pengeluaran Obat">
                 <div className="flex flex-col gap-2 md:flex-row justify-between w-full">
                     <div>
                         <Button
                             prependIcon={<IoMdAdd size={24} />}
-                            onClick={() => router.push(`/transaction/expense/create`)}
+                            onClick={() => router.push(`/transaction/output/create`)}
                         >
                             Tambah
                         </Button>
@@ -193,31 +199,35 @@ export default function Index() {
 
                         <Column width={150} fixed="right">
                             <HeaderCell className="text-center text-dark font-bold">
-                                Action
+                                Aksi
                             </HeaderCell>
-                            <Cell className="text-center">
+                            <Cell className="text-center" style={{ padding: '6px' }}>
                                 {(rowData) => {
                                     return (
                                         <div className="flex justify-center flex-row gap-6">
-                                            <button
-                                                disabled={rowData?.report?.isFinalized} className={`${rowData?.report?.isFinalized ? 'hidden' : ''} inline-flex items-center justify-center w-8 h-8 text-center bg-transparent border-0 rounded-lg`}
-                                                onClick={() =>
-                                                    router.push(`/transaction/expense/edit/${rowData?.id}`)
-                                                }
-                                            >
-                                                <MdOutlineEdit size="2em" color="#FFD400" />
-                                            </button>
+                                            <Whisper speaker={renderTooltip("Edit")} placement="top" controlId="control-id-hover" trigger="hover">
+                                                <button
+                                                    disabled={rowData?.report?.isFinalized} className={`${rowData?.report?.isFinalized ? 'hidden' : ''} inline-flex items-center justify-center w-8 h-8 text-center bg-transparent border-0 rounded-lg`}
+                                                    onClick={() =>
+                                                        router.push(`/transaction/output/edit/${rowData?.id}`)
+                                                    }
+                                                >
+                                                    <MdOutlineEdit size="2em" color="#FFD400" />
+                                                </button>
+                                            </Whisper>
 
-                                            <button
-                                                disabled={rowData?.report?.isFinalized}
-                                                className={`${rowData?.report?.isFinalized ? 'hidden' : ''} inline-flex items-center justify-center w-8 h-8 text-center bg-transparent border-0 rounded-lg`}
-                                                onClick={() => {
-                                                    setEditInput({ ...rowData, is_active: false });
-                                                    setOpen({ ...open, delete: true });
-                                                }}
-                                            >
-                                                <PiTrash size="2em" color="#DC4A43" />
-                                            </button>
+                                            <Whisper speaker={renderTooltip("Hapus")} placement="top" controlId="control-id-hover" trigger="hover">
+                                                <button
+                                                    disabled={rowData?.report?.isFinalized}
+                                                    className={`${rowData?.report?.isFinalized ? 'hidden' : ''} inline-flex items-center justify-center w-8 h-8 text-center bg-transparent border-0 rounded-lg`}
+                                                    onClick={() => {
+                                                        setEditInput({ ...rowData, is_active: false });
+                                                        setOpen({ ...open, delete: true });
+                                                    }}
+                                                >
+                                                    <PiTrash size="2em" color="#DC4A43" />
+                                                </button>
+                                            </Whisper>
                                         </div>
                                     );
                                 }}

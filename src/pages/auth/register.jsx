@@ -7,7 +7,7 @@ import { useForm } from "react-hook-form";
 import { zodResolver } from '@hookform/resolvers/zod';
 import { z } from "zod";
 import Link from 'next/link'
-import { isOptionalString, isPassword, isRequiredOptions, isRequiredEmail, isRequiredString } from "@/helpers/validation";
+import { isOptionalString, isPassword, isRequiredOptions, isRequiredEmail, isRequiredString, isRequiredPhoneNumber } from "@/helpers/validation";
 import Text from "@/components/Text";
 import { ErrorForm } from "@/helpers/errorForm";
 import Button from "@/components/Button";
@@ -19,18 +19,32 @@ const registerSchema = z.object({
     email: isRequiredEmail(),
     password: isPassword(),
     confirmPassword: isPassword(),
-    nik: isRequiredString().min(16, { message: "NIK must be 16 characters" }),
+    nik: isRequiredString().min(16, { message: "Panjang NIK minimal 16 karakter" }),
     firstName: isRequiredString(),
     lastName: isRequiredString(),
-    phoneNum: isRequiredString().min(10, { message: "Phone number must be minimum 10 characters" }),
+    phoneNum: isRequiredPhoneNumber(),
     role: isRequiredOptions(),
     specialist: isOptionalString(),
     dob: isRequiredString(),
-}).superRefine(({ confirmPassword, password }, ctx) => {
+    sipaNum: isOptionalString(),
+}).superRefine(({ role, specialist, sipaNum, password, confirmPassword }, ctx) => {
     if (confirmPassword !== password) {
         ctx.addIssue({
-            message: "Passwords does not match",
+            message: "Password tidak sesuai",
             path: ['confirmPassword']
+        });
+    }
+    if (role === 'doctor' && !specialist) {
+        ctx.addIssue({
+            path: ['specialist'],
+            message: "Bidang ini harus diisi",
+        });
+    }
+
+    if (role === 'pharmacist' && !sipaNum) {
+        ctx.addIssue({
+            path: ['sipaNum'],
+            message: "Bidang ini harus diisi",
         });
     }
 });
@@ -61,9 +75,10 @@ export default function Login() {
 
     const RegisterHandler = async (data) => {
         try {
-            if (data.role === "pharmacist") await addPharmacist(data);
-            else await addDoctor(data);
-            toast.success("Register Successfull", { autoClose: 2000, position: 'top-right' });
+            const submitedData = {...data, phoneNum: data.phoneNum.toString()}
+            if (data.role === "pharmacist") await addPharmacist(submitedData);
+            else await addDoctor(submitedData);
+            toast.success("Pengguna Berhasil Ditambahkan", { autoClose: 2000, position: 'top-right' });
             setTimeout(() => {
                 router.push("/auth/login");
             }, 2000);
@@ -76,14 +91,14 @@ export default function Login() {
     const credentialInputField = [
         { label: "Email", type: "email", name: "email", placeholder: "johndoe@gmail.com", autofocus: true },
         { label: "Password", type: "password", name: "password", placeholder: "**********" },
-        { label: "Confirm Password", type: "password", name: "confirmPassword", placeholder: "**********" },
+        { label: "Konfirmasi Password", type: "password", name: "confirmPassword", placeholder: "**********" },
     ]
 
     const biodataInputField = [
         { label: "NIK", type: "number", name: "nik", placeholder: "12345678" },
         { name: "fullName" },
-        { label: "Phone Number", type: "number", name: "phoneNum", placeholder: "+628xxxxxx" },
-        { label: "Date of Birth", type: "date", name: "dob", placeholder: "01/01/2000" },
+        { label: "No Handphone", type: "number", name: "phoneNum", placeholder: "628xxxxxx" },
+        { label: "Tanggal Lahir", type: "date", name: "dob", placeholder: "01/01/2000" },
         { name: "role" },
     ]
 
@@ -120,8 +135,7 @@ export default function Login() {
             <section ref={credentialsRef}>
                 <div className="flex justify-center items-center flex-col gap-3 p-8 rounded bg-background-light border border-border-auth">
                     <div className="text-center mb-4">
-                        <Text type="heading_3">Create Your Account</Text>
-                        <Text type="body">Create new account to access the pharmacy dashboard</Text>
+                        <Text type="heading_4">Buat Akun Anda</Text>
                     </div>
                     {
                         credentialInputField.map((input) => {
@@ -130,22 +144,21 @@ export default function Login() {
                             )
                         })
                     }
-                    <Button type="button" onClick={nextDataHandler} className='w-full'>Next</Button>
-                    <Text type="body">Don't have an account? <Link href="/auth/login">Sign in</Link> here</Text>
+                    <Button type="button" onClick={nextDataHandler} className='w-full'>Selanjutnya</Button>
+                    <Text type="body">Sudah punya akun? <Link href="/auth/login">Masuk</Link> di sini</Text>
                 </div>
             </section>
             <section ref={biodataRef}>
                 <div className="flex justify-center items-center flex-col gap-3 p-8 rounded bg-background-light border border-border-auth">
                     <div className="text-center mb-4">
-                        <Text type="heading_3">You are almost done</Text>
-                        <Text type="body">Please fill the data bellow</Text>
+                        <Text type="heading_4">Hampir Selesai</Text>
                     </div>
                     {biodataInputField.map((input) => {
                         if (input.name === "fullName") {
                             return (
                                 <div key={input.name} className="flex justify-center items-center gap-x-5">
-                                    <InputField type="text" placeholder="John" name="firstName" register={register} label="First Name" error={errors.firstName?.message} />
-                                    <InputField type="text" placeholder="Doe" name="lastName" register={register} label="Last Name" error={errors.lastName?.message} />
+                                    <InputField type="text" placeholder="John" name="firstName" register={register} label="Nama Depan" error={errors.firstName?.message} />
+                                    <InputField type="text" placeholder="Doe" name="lastName" register={register} label="Nama Belakang" error={errors.lastName?.message} />
                                 </div>
                             )
                         }
@@ -154,8 +167,8 @@ export default function Login() {
                                 <>
                                     <Text type="body" className="w-full text-start">Role</Text>
                                     <RadioGroup name="role-group" inline className="flex flex-row jusitfy-start items-start gap-x-3 w-full">
-                                        <InputField type="radio" name="role" register={register} value="doctor" onChange={selectHandler} label="Doctor" id="doctor" />
-                                        <InputField type="radio" name="role" register={register} value="pharmacist" onChange={selectHandler} label="Pharmacist" id="pharmacist" />
+                                        <InputField type="radio" name="role" register={register} value="doctor" onChange={selectHandler} label="Dokter" id="doctor" />
+                                        <InputField type="radio" name="role" register={register} value="pharmacist" onChange={selectHandler} label="Farmasi" id="pharmacist" />
                                     </RadioGroup>
                                     <div className='px-4 w-full' ref={roleRef}>
                                         {
@@ -171,11 +184,12 @@ export default function Login() {
                         )
                     })}
                     {selectedOption === 'doctor' && <RenderSpecialistInput register={register} errors={errors} />}
+                    {selectedOption === 'pharmacist' && <RenderSipaInput register={register} errors={errors} />}
                     <div className="flex gap-x-5 w-full">
                         <Button type='button' onClick={prevDataHandler} className='w-5 flex-none'>
                             <ArrowLeftIcon className="text-2xl" />
                         </Button>
-                        <Button type='button' isLoading={isLoading} onClick={submitForm} className='w-full shrink'>{isLoading ? '' : 'Register'}</Button>
+                        <Button type='button' isLoading={isLoading} onClick={submitForm} className='w-full shrink'>{isLoading ? '' : 'Daftar'}</Button>
                     </div>
                 </div>
             </section>
@@ -184,9 +198,17 @@ export default function Login() {
 }
 
 const RenderSpecialistInput = ({ register, errors }) =>
-    <InputField type="text" placeholder="Heart" name="specialist" register={register} label="Specialist" error={errors.specialist?.message} />
+    <InputField type="text" placeholder="Heart" name="specialist" register={register} label="Spesialis" error={errors.specialist?.message} />
+
+const RenderSipaInput = ({ register, errors }) =>
+    <InputField type="text" placeholder="SIPA" name="sipaNum" register={register} label="Surat Izin Praktik Apoteker (SIPA)" error={errors.sipaNum?.message} />
 
 RenderSpecialistInput.propTypes = {
+    register: propTypes.func.isRequired,
+    errors: propTypes.object.isRequired
+};
+
+RenderSipaInput.propTypes = {
     register: propTypes.func.isRequired,
     errors: propTypes.object.isRequired
 };

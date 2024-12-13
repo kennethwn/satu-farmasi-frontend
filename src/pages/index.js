@@ -2,7 +2,7 @@ import Layouts from "@/components/Layouts";
 import ContentLayout from "@/components/Layouts/Content";
 import { useUserContext } from "./api/context/UserContext";
 import DashboardView from "@/components/Dashboard/DashboardView";
-import formatDate from "@/helpers/dayHelper";
+import formatDate, { convertToRFC3339 } from "@/helpers/dayHelper";
 import { useEffect, useState } from "react";
 import usePatientAPI from "./api/patient";
 import getDataCard from "@/data/dashboard";
@@ -17,19 +17,21 @@ import getFirstAndLastDateOfMonth from "@/data/date";
 export default function Home() {
   const { getTotalPatient } = usePatientAPI();
   const { GetTotalMedicine, GetTotalNeedToRestockMedicine, CheckExpirationByDate } = useMedicineAPI();
-  const { getOnProgressAndWaitingPaymentTransaction } = useTransaction();
+  const { getOnProgressAndWaitingPaymentTransaction, getTransactionProfitByDate, getAnnualTransactionRecap } = useTransaction();
   const { getMostSalesMedicineByPrescription } = usePrescription();
   const { user } = useUserContext();
 
   const [dataExp, setDataExp] = useState([]);
   const [dataTransaction, setDataTransaction] = useState([]);
-  const [currentMonth, setCurrentMonth] = useState(0);
+  const [currentMonth, setCurrentMonth] = useState(new Date().getMonth()+1);
+  const [currentYear, setCurrentYear] = useState(new Date().getFullYear());
 
   const [totalPatient, setTotalPatient] = useState(0);
   const [totalMedicine, setTotalMedicine] = useState(0);
   const [totalProfit, setTotalProfit] = useState(0);
   const [totalNeedToRestock, setTotalNeedToRestock] = useState(0);
   const [mostSalesMedicines, setMostSalesMedicines] = useState([]);
+  const [annualReport, setAnnualReport] = useState([]);
 
   const router = useRouter();
 
@@ -58,6 +60,7 @@ export default function Home() {
       const date = new Date;
       const response = await CheckExpirationByDate({expiredDate: date.toISOString()});
       if (response.code != 200) return;
+        console.log("expired", response.data);
       setDataExp(response.data);
     } catch (error) {
       console.error(error);
@@ -96,9 +99,39 @@ export default function Home() {
     }
   }
 
+  const handleFetchDailyProfit = async () => {
+    try {
+      const today = new Date()
+      const startDate = convertToRFC3339(new Date(today.getFullYear(), today.getMonth(), today.getDate(), 0, 0, 0, 0));
+      const lastDate = convertToRFC3339(new Date(today.getFullYear(), today.getMonth(), today.getDate(), 23, 59, 59, 999));
+      const payload = {
+        startDate,
+        lastDate,
+      };
+      const response = await getTransactionProfitByDate(payload);
+      if (response.code != 200) return;
+      setTotalProfit(response.data);
+    } catch (error) {
+      console.error(error);
+    }
+  }
+
+  const handleFetchAnnualReport = async () => {
+    try {
+      const payload = {year: currentYear}
+      const response = await getAnnualTransactionRecap(payload);
+      if (response.code != 200) return;
+      setAnnualReport(response.data);
+    } catch (error) {
+      console.error(error);
+    }
+  }
+
   useEffect(() => {
     async function fetchData() {
       if (router.isReady) {
+        await handleFetchDailyProfit();
+        await handleFetchAnnualReport();
         await handleFetchTotalPatient();
         await handleFetchTotalMedicine();
         await handleFetchExpiredMedicines();
@@ -114,15 +147,21 @@ export default function Home() {
     handleFetchMostSalesMedicinesByPrescription();
   }, [currentMonth]);
 
+  useEffect(() => {
+    handleFetchAnnualReport();
+  }, [currentYear]);
+
   return (
     <Layouts user={user}>
-      <ContentLayout title={`Welcome, ${user?.name}`}>
+      <ContentLayout title={`Selamat Datang, ${user?.name}`}>
         <DashboardView 
-          dataCard={getDataCard(totalPatient, totalMedicine, formatRupiah(52000), totalNeedToRestock)}
+          dataCard={getDataCard(totalPatient, totalMedicine, formatRupiah(totalProfit), totalNeedToRestock)}
           dataExpired={dataExp}
           dataTransaction={dataTransaction}
           dataMonthlyReport={mostSalesMedicines}
+          dataAnnualReport={annualReport}
           setCurrentMonth={setCurrentMonth}
+          setCurrentYear={setCurrentYear}
         />
       </ContentLayout>
     </Layouts>

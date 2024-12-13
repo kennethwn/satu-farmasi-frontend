@@ -4,24 +4,27 @@ import propTypes from 'prop-types';
 
 // Check another modal props -> https://rsuitejs.com/components/modal/#props
 export default function Toaster({
+    size = "xs",
     title,
     body,
     type,
     btnText = 'Lanjutkan',
     onClick,
     isLoading,
+    showBtn = true,
     btnAppearance = 'danger',
     ...props
 }) {
+    console.log("size: ", size)
 
     const renderTitle = () => {
         switch (type) {
             case 'success':
-                return <span className="text-center w-full text-success">Berhasil</span>
+                return <span className="text-center w-full text-success font-bold">Berhasil</span>
             case 'warning':
-                return <p className="text-center w-full text-danger">Peringatan!</p>
+                return <p className="text-center w-full text-danger font-bold">Peringatan!</p>
             default:
-                return <span className="text-center w-full text-dark">{title}</span>
+                return <span className="text-center w-full text-dark font-bold">{title}</span>
         }
     }
 
@@ -37,13 +40,13 @@ export default function Toaster({
                     </div>
                 )
             default:
-                return <Button className="w-full" onClick={() => onClick()}>Lanjutkan</Button>
+                return <Button className="w-full" onClick={() => onClick()}>{btnText}</Button>
         }
     }
 
     return (
         <Modal 
-            size="xs" 
+            size={size}
             {...props}
         >
             <Modal.Header className="w-full">
@@ -52,9 +55,11 @@ export default function Toaster({
             <Modal.Body>
                 <p className="font-medium text-dark text-center">{body}</p>
             </Modal.Body>
-            <Modal.Footer className="w-full items-center justify-center">
-                {renderButton()}
-            </Modal.Footer>
+            {showBtn &&
+                <Modal.Footer className="w-full items-center justify-center">
+                    {renderButton()}
+                </Modal.Footer>
+            }
         </Modal>
     )
 }
