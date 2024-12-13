@@ -94,10 +94,11 @@ export default function TransactionDetail(props) {
             setErrors({})
             const data = {
                 id: parseInt(transactionData.id),
+                pharmacistId: user.id,
                 paymentMethod: paymentMethod,
                 physicalReport: physicalReport
             }
-            // TODO: zod not working after first confirm action
+            
             transactionSchema.parse(data)
             const res = await confirmPayment(data);
             console.log(res)
@@ -169,12 +170,18 @@ export default function TransactionDetail(props) {
         }
     }, [statusUpdated])
 
+
+    useEffect(() => {
+        console.log("erorrs:", errors)
+    }, [errors])
+
     return (
         <Modal
             backdrop="static"
             open={openModal}
             onClose={() => {
                 setOpenModal(false);
+                setErrors({})
             }}
             size="lg"
         >
@@ -234,8 +241,8 @@ export default function TransactionDetail(props) {
                                 style={{ width: 200 }}
                                 cleanable={false}
                                 onChange={(value) => {
-                                    setPaymentMethod(value)
                                     setErrors({})
+                                    setPaymentMethod(value)
                                 }}
                                 placeholder="Methode Pembayaran"
                                 error={errors.paymentMethod}
@@ -260,7 +267,10 @@ export default function TransactionDetail(props) {
 
             <Toaster
                 open={open}
-                onClose={() => setOpen(false)}
+                onClose={() => {
+                    setErrors({})
+                    setOpen(false)
+                }}
                 body={
                     <> Apakah Anda yakin ingin mengkonfirmasi pembayaran ini? <b><span className="text-danger"> Perubahan tidak dapat dikembalikan</span></b> </>
                 }

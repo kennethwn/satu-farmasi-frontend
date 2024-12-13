@@ -32,6 +32,7 @@ export default function Page() {
     const id = router.query.idx;
     const [errors, setErrors] = useState({});
     const [ medicineWithCurrStock, setMedicineWithCurrStock ] = useState([])
+    const [ hasSubmit, setHasSubmit ] = useState(false);
 
     const [formFields, setFormFields] = useState([
         {   
@@ -150,6 +151,7 @@ export default function Page() {
     const handleUpdatePrescription = async (e) => {
         e.preventDefault();
         try {
+            setHasSubmit(true);
             let data = {
                 prescriptionId: -1,
                 medicineList : [{
@@ -186,6 +188,7 @@ export default function Page() {
                 router.push(`/prescription`);
             }, 2000);
         } catch (error) {
+            setHasSubmit(false)
             console.log("error: ", error);
             if (error instanceof ZodError) {
                 const newErrors = { ...errors };
@@ -246,6 +249,7 @@ export default function Page() {
                         ) : (
                             <Button
                                 isLoading={isLoading}
+                                isDisabled={hasSubmit}
                                 appearance="primary"
                                 type="submit"
                             >

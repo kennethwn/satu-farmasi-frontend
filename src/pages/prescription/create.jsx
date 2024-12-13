@@ -45,6 +45,7 @@ export default function create() {
     const [existingPatient, setExistingPatient] = useState(true);
     const router = useRouter();
     const [errors, setErrors] = useState({});
+    const [ hasSubmit, setHasSubmit ] = useState(false);
 
     const [formFields, setFormFields] = useState([
         {   
@@ -66,6 +67,7 @@ export default function create() {
     const handleSubmitPrescription = async (e) => {
         e.preventDefault();
         try {
+            setHasSubmit(true)
             let data = {
                 patient: {
                     patientId: -1,
@@ -108,6 +110,7 @@ export default function create() {
                 router.push(`/prescription`);
             }, 2000);
         } catch (error) {
+            setHasSubmit(false)
             console.log("error: ", error);
             if (error instanceof ZodError) {
                 const newErrors = { ...errors };
@@ -174,6 +177,7 @@ export default function create() {
                         ) : (
                             <Button
                                 isLoading={isLoading}
+                                    isDisabled={hasSubmit}
                                 appearance="primary"
                                 type="submit"
                             >

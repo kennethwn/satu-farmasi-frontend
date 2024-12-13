@@ -93,7 +93,7 @@ export default function index() {
 
     return (
         <Layout active="transaction-receive" user={user}>
-            <ContentLayout title="Penerimaan Obat">
+            <ContentLayout title="List Penerimaan Obat">
             <div className="w-full h-[500px]">
                 <div className="flex flex-row justify-between items-center w-full pb-6">
                     <Button

@@ -33,7 +33,7 @@ const isRequiredNumber = () =>
         .min(1, { message: "Bidang isi harus diisi" });
 
 const isOptionalBoolean = () => isBoolean().optional();
-const isOptionalString = () => isString().optional();
+const isOptionalString = () => isString().optional().nullable();
 const isRequiredEmail = () =>
     isString()
         .min(1, { message: "Bidang isi harus diisi" })
