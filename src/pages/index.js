@@ -121,7 +121,7 @@ export default function Home() {
       const payload = {year: currentYear}
       const response = await getAnnualTransactionRecap(payload);
       if (response.code != 200) return;
-      setTotalProfit(response.data);
+      setAnnualReport(response.data);
     } catch (error) {
       console.error(error);
     }

@@ -203,7 +203,7 @@ export default function Layout(props) {
                                     }}
                                 >
                                     {renderTitle(
-                                        "Resep",
+                                        "Preskripsi",
                                         "parent",
                                         activeKey === "prescription",
                                     )}

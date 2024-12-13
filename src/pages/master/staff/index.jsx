@@ -19,7 +19,7 @@ export default function Index() {
     const [limit, setLimit] = useState(10);
     const [sortColumn, setSortColumn] = useState();
     const [sortType, setSortType] = useState();
-    const roles = ["Dokter", "Farmasi", "Admin"];
+    const roles = ["Dokter", "Apoteker", "Admin"];
     const [data, setData] = useState([]);
 
     const router = useRouter();
@@ -54,7 +54,7 @@ export default function Index() {
         try {
             let filterToSubmit = ""
             if (filter === "Dokter") filterToSubmit = "doctor";
-            else if (filter === "Farmasi") filterToSubmit = "pharmacist";
+            else if (filter === "Apoteker") filterToSubmit = "pharmacist";
             else if (filter === "Admin") filterToSubmit = "admin";
             const res = await GetAllStaff(page, limit, search,filterToSubmit);
             const dataArr = res.data.results.map(item => ({

@@ -19,19 +19,39 @@ import { ErrorForm } from "@/helpers/errorForm";
 const staffSchema = z.object({
     firstName: isRequiredString(),
     lastName: isRequiredString(),
+    role: isRequiredString(),
     email: isRequiredEmail(),
     dob: isRequiredString(),
     nik: isRequiredString(),
     phoneNum: isRequiredPhoneNumber(),
     specialist: isOptionalString(),
+    sipaNum: isOptionalString(),
     is_active: isOptionalBoolean(),
-});
+}).superRefine((data, ctx) => {
+    const { role, specialist, sipaNum } = data;
+    console.log("role: ", role);
+    if (role.toLowerCase() === 'doctor' && !specialist) {
+        ctx.addIssue({
+            path: ['specialist'],
+            message: "Bidang ini harus diisi",
+        });
+    }
+
+    if (role.toLowerCase() === 'pharmacist' && !sipaNum) {
+        console.log("masuk sini");
+        ctx.addIssue({
+            path: ['sipaNum'],
+            message: "Bidang ini harus diisi",
+        });
+    }
+})
 
 export default function Index() {
     const router = useRouter();
     const id = router.query.id;
     const { isLoading, GetStaffByNik, EditAdmin, EditDoctor, EditPharmacist } = useStaffAPI();
     const [isChecked, setIsChecked] = useState(false);
+    const [hasSubmit, setHasSubmit] = useState(false);
     const { user } = useUserContext();
     const formRef = useRef();
     const {
@@ -60,7 +80,7 @@ export default function Index() {
         try {
             const res = await GetStaffByNik(id);
             if (res.code !== 200) {
-                toast.error(res.message, { autoClose: 2000, position: "top-center" });
+                toast.error(res.message, { autoClose: 2000, position: "top-right" });
                 return;
             }
             Object.keys(res.data).forEach((key) => {
@@ -76,8 +96,10 @@ export default function Index() {
         }
     };
 
-    const handleSubmitStaff = async (data) => {
+    const handleSubmitStaff = async (data, e) => {
+        e.preventDefault();
         try {
+            setHasSubmit(true);
             let res = null;
             data = {
                 ...data,
@@ -88,14 +110,13 @@ export default function Index() {
                 oldEmail: getValues("oldEmail"),
                 oldNik: getValues("oldNik"),
             }
-            console.log("data: ", data)
             res = await handleRole(data);
             toast.success(res.message, { autoClose: 2000, position: "top-right" });
             setTimeout(() => {
                 router.push("/master/staff");
             }, 2000);
         } catch (error) {
-            console.log("erorr: ", error);
+            setHasSubmit(false);
             ErrorForm(error, setError);
         }
     };
@@ -127,15 +148,10 @@ export default function Index() {
         formRef.current.requestSubmit();
     }
 
-    useEffect(() => {
-        console.log(errors);
-    }, [errors])
-
-    {/* TODO: add register, delete values */ }
     return (
         <Layout active="master-staff" user={user}>
             <ContentLayout title="Ubah Staf" type="child" backpageUrl="/master/staff">
-                <form id="form" onSubmit={handleSubmit(() =>  handleSubmitStaff)} ref={formRef}>
+                <form id="form" onSubmit={handleSubmit(handleSubmitStaff)} ref={formRef}>
                     <div className="grid grid-cols-1 gap-x-6 gap-y-6 sm:grid-cols-6">
                         <div className="sm:col-span-3">
                             <div className="mt-2">
@@ -252,7 +268,7 @@ export default function Index() {
                             <div className="mt-2">
                                 {isLoading ?
                                     <Input
-                                        label="No Handlphone"
+                                        label="No Handphone"
                                         type="number"
                                         id="phone_number"
                                         name="phoneNum"
@@ -263,7 +279,7 @@ export default function Index() {
                                     />
                                     :
                                     <Input
-                                        label="No Handlphone"
+                                        label="No Handphone"
                                         type="number"
                                         id="phone_number"
                                         name="phoneNum"
@@ -285,6 +301,7 @@ export default function Index() {
                                                 id="specialist"
                                                 name="specialist"
                                                 placeholder="specialist"
+                                                disabled
                                                 error={errors.specialist?.message}
                                                 register={register}
                                             />
@@ -296,6 +313,36 @@ export default function Index() {
                                                 name="specialist"
                                                 placeholder="specialist"
                                                 error={errors.specialist?.message}
+                                                register={register}
+                                            />
+                                        }
+                                    </div>
+                                </div>
+                            )
+                        }
+                        {
+                            getValues("role").toLowerCase() === "pharmacist" && (
+                                <div className="sm:col-span-6">
+                                    <div className="mt-2">
+                                        {isLoading ?
+                                            <Input
+                                                label="Surat Izin Praktik Apoteker (SIPA)"
+                                                type="text"
+                                                id="sipaNum"
+                                                name="sipaNum"
+                                                placeholder="SIPA"
+                                                disabled
+                                                error={errors.sipaNum?.message}
+                                                register={register}
+                                            />
+                                            :
+                                            <Input
+                                                label="Surat Izin Praktik Apoteker (SIPA)"
+                                                type="text"
+                                                id="sipaNum"
+                                                name="sipaNum"
+                                                placeholder="SIPA"
+                                                error={errors.sipaNum?.message}
                                                 register={register}
                                             />
                                         }
@@ -342,6 +389,7 @@ export default function Index() {
                             :
                             <Button
                                 type="button"
+                                isDisabled={hasSubmit}
                                 appearance="primary"
                                 onClick={submitForm} >
                                 Simpan

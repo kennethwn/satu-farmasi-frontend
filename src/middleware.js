@@ -25,13 +25,17 @@ export const middleware = async (req) => {
     // Authenticated user
     if (isPublicUrl && token) {
         try {
+            console.log("in public url");
             userCurrentRole = await validateCookie(token);
+            console.log('token: ', token);
             return NextResponse.redirect(new URL("/", req.url));
         } catch (err) {
             console.log("Token is invalid: ", err.message);
         }
     }
     if (!isPublicUrl) {
+        console.log("not public url");
+        console.log("token", token);
         if (!token)
             return NextResponse.redirect(new URL("/auth/login", req.url));
         try {

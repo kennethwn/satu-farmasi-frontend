@@ -88,6 +88,17 @@ export default function useOutputMedicineAPI() {
         }
     };
 
+    const bulkCreate = async (data) => {
+        setIsLoading(true);
+        try {
+            return await axios.post("/api/v1/outputMedicines/bulkCreate", {data});
+        } catch (error) {
+            throw error;
+        } finally {
+            setIsLoading(false);
+        }
+    }
+
     return {
         isLoading,
         GetAllMedicine,
@@ -97,5 +108,6 @@ export default function useOutputMedicineAPI() {
         DeleteMedicine,
         GetMedicineByParams,
         GetOutputMedicineById,
+        bulkCreate,
     };
 }

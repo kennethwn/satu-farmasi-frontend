@@ -89,7 +89,7 @@ export default function index() {
 
     return (
         <Layout active="prescription" user={user}>
-            <ContentLayout title="List Resep">
+            <ContentLayout title="List Preskripsi">
             <div className="flex flex-col gap-2 md:flex-row justify-between w-full">
                 <div>
                     <Button
@@ -110,6 +110,7 @@ export default function index() {
                         value={filterStatus}
                         onChange={(value) => {
                             setFilterStatus(value);
+                            setPage(1);
                             console.log(value);
                         }}
                     />   
@@ -143,7 +144,7 @@ export default function index() {
                         </Column>
 
                         <Column flexGrow={1} resizable>
-                            <HeaderCell className="text-dark font-bold">Resep ID</HeaderCell>
+                            <HeaderCell className="text-dark font-bold">Preskripsi ID</HeaderCell>
                             <Cell dataKey='id'/>
                         </Column>
 

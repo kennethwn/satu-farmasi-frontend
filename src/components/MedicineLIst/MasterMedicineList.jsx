@@ -131,6 +131,11 @@ export default function MasterMedicineList(props) {
                 </Column>
 
                 <Column width={250} sortable fullText resizable>
+                    <HeaderCell className="text-dark font-bold">Stok Reservasi</HeaderCell>
+                    <Cell dataKey='reservedStock'/>
+                </Column>
+
+                <Column width={250} sortable fullText resizable>
                     <HeaderCell className="text-dark font-bold">Stok Minimum</HeaderCell>
                     <Cell dataKey='minStock'/>
                 </Column>
