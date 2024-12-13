@@ -7,6 +7,7 @@ import { isRequiredNumber, isRequiredString } from "@/helpers/validation";
 import { useUserContext } from "@/pages/api/context/UserContext";
 import useVendorAPI from "@/pages/api/master/vendor";
 import usePharmacy from "@/pages/api/pharmacy";
+import { useRouter } from "next/router";
 import { useEffect, useState } from "react";
 import { Divider } from "rsuite";
 import { z, ZodError } from "zod";
@@ -18,16 +19,15 @@ const medicineSchema = z.object({
 });
 
 const dataSchema = z.object({
-    cityVendor: isRequiredString(),
-    leftNum: isRequiredString(),
-    middleNum: isRequiredString(),
-    rightNum: isRequiredString(),
-    phoneVendor: isRequiredString(),
-    vendor: isRequiredString(),
+    leftNum: isRequiredNumber(),
+    middleNum: isRequiredNumber(),
+    rightNum: isRequiredNumber(),
+    vendorId: isRequiredNumber(),
     medicines: z.array(medicineSchema)
 })
 
 export default function Index() {
+    const router = useRouter();
     const { user } = useUserContext();
     const { GetAllActiveVendor } = useVendorAPI();
     const { getPharmacyInfo } = usePharmacy();
@@ -68,6 +68,18 @@ export default function Index() {
     }
 
     const handleSwitchForm = (typeState) => {
+        setVendor([]);
+        setFormFields([{ medicine: "", quantity: 0, remark: "" }]);
+        setInput({ 
+            leftNum: "",
+            middleNum: "",
+            rightNum: "",
+            vendor: "",
+            vendorId: "",
+            cityVendor: "",
+            phoneVendor: ""
+        });
+
         switch (typeState) {
             case 0:
                 setType(0);
@@ -82,8 +94,6 @@ export default function Index() {
                 setType(0);
                 break;
         }
-        setInput({});
-        setFormFields([{ medicine: "", quantity: 0, remark: "" }]);
     }
 
     const handleFetchVendor = async () => {
@@ -138,7 +148,7 @@ export default function Index() {
         }
         fetchData();
         setInput({});
-    }, [type]);
+    }, [router, type]);
 
     return (
         <Layout user={user} active="transaction-receive">

@@ -17,10 +17,6 @@ export default function RequestMedicineForm(props) {
         dataVendor,
     } = props;
 
-    useEffect(() => {
-        console.log("input from component: ", input);
-    })
-
     return (
         <div className="w-full pb-8">
             <Text type="body">
@@ -40,7 +36,7 @@ export default function RequestMedicineForm(props) {
                             placeholder='0'
                             value={input ? input?.leftNum: ''}
                             onChange={e => {
-                                setInput({...input, leftNum: e.target.value})
+                                setInput({...input, leftNum: parseInt(e.target.value)})
                                 setErrors({...errors, 'leftNum': ''})
                             }}
                             error={errors['leftNum']} />
@@ -52,7 +48,7 @@ export default function RequestMedicineForm(props) {
                             placeholder='0'
                             value={input ? input?.middleNum: ''}
                             onChange={e => {
-                                setInput({...input, middleNum: e.target.value})
+                                setInput({...input, middleNum: parseInt(e.target.value)})
                                 setErrors({...errors, 'middleNum': ''})
                             }}
                             error={errors['middleNum']} />
@@ -64,7 +60,7 @@ export default function RequestMedicineForm(props) {
                             placeholder='0'
                             value={input ? input?.rightNum: ''}
                             onChange={e => {
-                                setInput({...input, rightNum: e.target.value})
+                                setInput({...input, rightNum: parseInt(e.target.value)})
                                 setErrors({...errors, 'rightNum': ''})
                             }}
                             error={errors['rightNum']} />
@@ -83,8 +79,7 @@ export default function RequestMedicineForm(props) {
                     placeholder={<span className="text-sm">vendor</span>}
                     size='lg'
                     labelKey="label"
-                    valueKey="id"
-                    value={input ? input?.id : ''}
+                    value={input?.vendorId}
                     block
                     data={dataVendor?.map(item => ({
                         ...item,
@@ -94,17 +89,16 @@ export default function RequestMedicineForm(props) {
                     onChange={value => {
                         setInput({
                             ...input, 
+                            vendorId: value,
                             vendor: dataVendor?.find(item => item.id == value)?.name,
                             cityVendor: dataVendor?.find(item => item.id == value)?.city,
                             phoneVendor: dataVendor?.find(item => item.id == value)?.phoneNum,
                         })
                         setErrors({...errors, 
-                            'vendor': '', 
-                            'cityVendor': '',
-                            'phoneVendor': ''
+                            'vendorId': '',
                         })
                     }}
-                    error={errors['vendor']}
+                    error={errors['vendorId']}
                 />
 
                 {/* Vendor's City */}

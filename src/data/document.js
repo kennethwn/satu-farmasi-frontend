@@ -42,7 +42,7 @@ export const generateOrderBasicMedicine = (input, formField) => {
                     widths: ['*', '*'],
                     body: [
                         [`Yth. ${input?.vendor}`, { text: `${formatDate(new Date())}`, alignment: 'right' }],
-                        [`\ndi ${input?.cityPharmacy}`, ''],
+                        [`\ndi ${input?.cityVendor}`, ''],
                     ],
                 },
                 margin: [0, 30, 0, 10],

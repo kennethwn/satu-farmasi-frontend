@@ -213,9 +213,7 @@ export default function Layout(props) {
                                 <Nav.Item
                                     icon={renderIcon(
                                         "report",
-                                        activeKey === "report-dashboard" ||
-                                        activeKey === "report-receive" ||
-                                        activeKey === "report-output",
+                                        activeKey === "report-medicine"
                                     )}
                                     onClick={() => {
                                         router.push(
@@ -223,13 +221,14 @@ export default function Layout(props) {
                                             undefined,
                                             { shallow: true },
                                         );
-                                        setActiveKey("report-dashboard");
+                                        setActiveKey("report-medicine");
                                     }}
-                                    eventKey="report-dashboard"
+                                    eventKey="report-medicine"
                                 >
                                     {renderTitle(
                                         "Laporan Obat",
-                                        activeKey === "report-dashboard",
+                                        "parent",
+                                        activeKey === "report-medicine",
                                     )}
                                 </Nav.Item>
                             )}
