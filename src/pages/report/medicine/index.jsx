@@ -8,7 +8,7 @@ import { Router, useRouter } from "next/router";
 import { useEffect, useState } from "react";
 import { PiListMagnifyingGlass } from "react-icons/pi";
 import { toast } from "react-toastify";
-import { Checkbox, Pagination, Table } from "rsuite";
+import { Checkbox, Pagination, Table, Tooltip, Whisper } from "rsuite";
 
 export default function index() {
     const { user } = useUserContext();
@@ -41,6 +41,12 @@ export default function index() {
         }
     };
 
+    const renderTooltip = (content) => (
+        <Tooltip>
+            {content}
+        </Tooltip>
+    )
+
     useEffect(() => {
         async function fetchData() {
             await HandleFetchReportsData();
@@ -49,7 +55,7 @@ export default function index() {
     }, [page, limit, search]);
 
     return (
-        <Layout active="master-report" user={user}>
+        <Layout active="report-dashboard" user={user}>
             <ContentLayout title="List Laporan Obat">
                 <div className="w-full h-[500px]">
                     <div className="flex flex-row justify-end items-center w-full pb-6">
@@ -120,18 +126,20 @@ export default function index() {
                             <HeaderCell className="text-center text-dark font-bold">
                                 Action
                             </HeaderCell>
-                            <Cell className="text-center">
+                            <Cell className="text-center" style={{ padding: '6px' }}>
                                 {(rowData) => {
                                     return (
-                                        <div className="flex justify-center flex-row gap-6">
-                                            <button className="inline-flex items-center justify-center w-8 h-8 text-center bg-transparent border-0 rounded-lg"
-                                                onClick={() => {
-                                                    router.push(`/report/medicine/${rowData.id}`);
+                                        <Whisper speaker={renderTooltip("Lihat Detail")} placement="top" controlId="control-id-hover" trigger="hover">
+                                            <div className="flex justify-center flex-row gap-6">
+                                                <button className="inline-flex items-center justify-center w-8 h-8 text-center bg-transparent border-0 rounded-lg"
+                                                    onClick={() => {
+                                                        router.push(`/report/medicine/${rowData.id}`);
 
-                                                }}>
-                                                <PiListMagnifyingGlass />
-                                            </button>
-                                        </div>
+                                                    }}>
+                                                    <PiListMagnifyingGlass size="1.5em" />
+                                                </button>
+                                            </div>
+                                        </Whisper>
                                     );
                                 }}
                             </Cell>

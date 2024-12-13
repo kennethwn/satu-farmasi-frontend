@@ -3,7 +3,7 @@ import ContentLayout from "@/components/Layouts/Content";
 import { useUserContext } from "@/pages/api/context/UserContext";
 import useVendorAPI from "@/pages/api/master/vendor";
 import { useEffect, useState } from "react";
-import { Checkbox, Pagination, Table } from "rsuite";
+import { Checkbox, Pagination, Table, Tooltip, Whisper } from "rsuite";
 import Button from "@/components/Button";
 import { IoMdAdd } from "react-icons/io";
 import SearchBar from "@/components/SearchBar";
@@ -83,6 +83,12 @@ export default function index() {
             console.error(error);
         }
     };
+
+    const renderTooltip = (content) => (
+        <Tooltip>
+            {content}
+        </Tooltip>
+    )
 
     useEffect(() => {
         async function fetchData() {
@@ -180,19 +186,21 @@ export default function index() {
                             <HeaderCell className="text-center text-dark font-bold">
                                 Aksi
                             </HeaderCell>
-                            <Cell className="text-center">
+                            <Cell className="text-center" style={{ padding: '6px' }}>
                                 {(rowData) => {
                                     return (
-                                        <div className="flex justify-center flex-row gap-6">
-                                            <button
-                                                className="inline-flex items-center justify-center w-8 h-8 text-center bg-transparent border-0 rounded-lg"
-                                                onClick={() =>
-                                                    router.push(`/master/vendor/edit/${rowData?.id}`)
-                                                }
-                                            >
-                                                <MdOutlineEdit size="2em" color="#FFD400" />
-                                            </button>
-                                        </div>
+                                        <Whisper speaker={renderTooltip("Edit")} placement="top" controlId="control-id-hover" trigger="hover">
+                                            <div className="flex justify-center flex-row gap-6">
+                                                <button
+                                                    className="inline-flex items-center justify-center w-8 h-8 text-center bg-transparent border-0 rounded-lg"
+                                                    onClick={() =>
+                                                        router.push(`/master/vendor/edit/${rowData?.id}`)
+                                                    }
+                                                >
+                                                    <MdOutlineEdit size="2em" color="#FFD400" />
+                                                </button>
+                                            </div>
+                                        </Whisper>
                                     );
                                 }}
                             </Cell>

@@ -10,7 +10,7 @@ import useTransaction from "@/pages/api/transaction/transaction";
 import { useEffect, useState } from "react";
 import { PiListMagnifyingGlass } from "react-icons/pi";
 import { toast } from "react-toastify";
-import { Pagination, SelectPicker, Table } from "rsuite";
+import { Pagination, SelectPicker, Table, Tooltip, Whisper } from "rsuite";
 
 export default function index() {
   const { user } = useUserContext();
@@ -57,6 +57,12 @@ const [filterStatus, setFilterStatus] = useState("")
       console.error(error);
     }
   }
+
+  const renderTooltip = (content) => (
+    <Tooltip>
+      {content}
+    </Tooltip>
+  )
 
   useEffect( () => {
     let newEvent
@@ -230,16 +236,18 @@ const [filterStatus, setFilterStatus] = useState("")
                 {(rowData) => {
                   return (
                     <div className="flex justify-center flex-row gap-6 items-center">
-                      <button className="inline-flex items-center justify-center w-8 h-8 text-center bg-transparent border-0 rounded-lg"
-                        onClick={() => {
-                            console.log(rowData.id);
-                            setSelectedTransactionId(rowData.id);
-                            setOpenModal(true);
-                        }}>
-                        <PiListMagnifyingGlass 
-                          size='1.5em'
-                        />
-                      </button>
+                      <Whisper speaker={renderTooltip("Lihat Detail")} placement="top" controlId="control-id-hover" trigger="hover">
+                        <button className="inline-flex items-center justify-center w-8 h-8 text-center bg-transparent border-0 rounded-lg"
+                          onClick={() => {
+                              console.log(rowData.id);
+                              setSelectedTransactionId(rowData.id);
+                              setOpenModal(true);
+                          }}>
+                          <PiListMagnifyingGlass 
+                            size='1.5em'
+                          />
+                        </button>
+                      </Whisper>
                     </div>
                   );
                 }}

@@ -1,201 +1,205 @@
-import PrescriptionForm from "@/components/DynamicForms/PrescriptionForm";
 import Layout from "@/components/Layouts";
-import ContentLayout from "@/components/Layouts/Content";
 import { useUserContext } from "../api/context/UserContext";
-import {  useState } from "react";
-import PatientForm from "@/components/DynamicForms/PatientForm";
-import Input from "@/components/Input";
-import useSubmitDiagnose from "../api/submitDiagnose";
-import { Toggle } from "rsuite";
-import { z, ZodError } from "zod";
-import { isRequiredNumber, isRequiredPhoneNumber, isRequiredString } from "@/helpers/validation";
-import { ErrorForm } from "@/helpers/errorForm";
-import { toast } from "react-toastify";
+import ContentLayout from "@/components/Layouts/Content";
 import Button from "@/components/Button";
+import SearchBar from "@/components/SearchBar";
+import { useEffect, useState } from "react";
+import { IoMdAdd } from "react-icons/io";
+import { useRouter } from "next/router";
+import { Pagination, Table, Tooltip, Whisper } from "rsuite";
+import { PiListMagnifyingGlass } from "react-icons/pi";
+import useDiagnose from "../api/diagnose";
+import { toast } from "react-toastify";
+import formatDate from "@/helpers/dayHelper";
+import prescriptionStatusMapped from "@/helpers/prescriptionStatusMap";
+import DiagnoseDetail from "@/components/Modal/DiagnoseDetail";
 
-const medicineSchema = z.object({
-    instruction: isRequiredString(),
-    code: isRequiredString(),
-    quantity: isRequiredNumber(),
-})
-
-const diagnoseSchemaWithExistingPatient = z.object({
-    description: isRequiredString(),
-    title: isRequiredString(),
-    prescription: z.object({
-        medicineList: z.array(medicineSchema),
-        patient:  z.object({
-            patientId: isRequiredNumber(),
-        }),
-    }),
-})
-
-const diagnoseSchemaNewPatient = z.object({
-    description: isRequiredString(),
-    title: isRequiredString(),
-    prescription: z.object({
-        medicineList: z.array(medicineSchema),
-        patient:  z.object({
-            patientName: isRequiredString(),
-            credentialNum: isRequiredString(),
-            phoneNum: isRequiredPhoneNumber(),
-        }),
-    }),
-})
-
-export default function index() {
+export default function Index() {
+    const router = useRouter();
     const { user } = useUserContext();
-    const { submitDiagnose } = useSubmitDiagnose();
-    const [title, setTitle] = useState("")
-    const [errors, setErrors] = useState({})
-    const [description, setDescription] = useState("")
-    const [existingPatient, setExistingPatient] = useState(true)
+    const { getDiagnoseSummary } = useDiagnose();
+    const { Column, HeaderCell, Cell } = Table;
 
-    const [formFields, setFormFields] = useState([
-        {   
-            code: "",
-            medicineName: "",
-            quantity: 0,
-            price: 0,
-            totalPrice: 0,
-            instruction: "",
-            currStock: 0
-        }
-    ])
-    const [selectedPatient, setSelectedPatient] = useState(
-        {
-            patientId: -1,
-            patientName: "",
-            credentialNum: "",
-            phoneNum: ""
-        }
-    )
+    const [isLoading, setIsLoading] = useState(false);
+    const [selectedDiagnose, setSelectedDiagnose] = useState(0);
+    const [page, setPage] = useState(1);
+    const [totalPage, setTotalPage] = useState(0);
+    const [limit, setLimit] = useState(10);
+    const [search, setSearch] = useState("");
+    const [data, setData] = useState([]);
+    const [open, setOpen] = useState({
+        view: false
+    })
+    const prescriptionStatusMap = prescriptionStatusMapped;
 
-    const handleSubmitDiagnose = async (e) => {
-        e.preventDefault()
+    const handleFetchDiagnose = async () => {
         try {
-            let data = {
-                doctorId : 1,
-                title : "",
-                description : "",
-                prescription : {
-                    patient: {
-                        patientId: -1,
-                        patientName: "",
-                        credentialNum: "",
-                        phoneNum: ""
-                    },
-                    medicineList : [{
-                        code : -1,
-                        price: 0,
-                        quantity : 0,
-                        instruction: "",
-                        currStock: 0
-                    }]
-                }
+            let payload = { data: { doctorEmail: user.email } }
+            if (search !== "") {
+                payload = { data: { doctorEmail: user.email, patientName: search } }
             }
-
-            data.doctorId = 1,
-            data.title = title
-            data.description = description
-            data.prescription.patient = selectedPatient
-            data.prescription.medicineList.pop()
-            const temp = [...formFields]
-            temp.map(item => data.prescription.medicineList.push({
-                code: item.code,
-                quantity: parseInt(item.quantity),
-                instruction: item.instruction,
-                price: item.totalPrice,
-            }))
-            setErrors({});
-
-            if (existingPatient) diagnoseSchemaWithExistingPatient.parse(data);
-            else diagnoseSchemaNewPatient.parse(data)
-            const res = await submitDiagnose(data)
-            toast.success(res.message, { autoClose: 2000, position: "top-right" });
+            const res = await getDiagnoseSummary(payload, limit, page)
+            if (res.code !== 200) {
+                toast.error(res.message, { autoClose: 2000, position: "top-right" });
+                return;
+            }
+            setData(res.data.results);
+            setTotalPage(res.data.total);
         } catch (error) {
-            console.log("error try catch: ", error)
-            if (error instanceof ZodError) {
-                const newErrors = { ...errors };
-                error.issues.forEach((issue) => {
-                    if (issue.path.length > 0) {
-                        const fieldName = issue.path.join(".");
-                        newErrors[fieldName] = issue.message;
-                    }
-                });
-                setErrors(newErrors);
-            }
-            else {
-                ErrorForm(error, setErrors, false)
-            }
+            console.error(error);
         }
     }
 
+    const renderTooltip = (content) => (
+        <Tooltip>
+            {content}
+        </Tooltip>
+    )
+
+    useEffect(() => {
+        async function fetchData() {
+            await handleFetchDiagnose();
+        }
+        fetchData();
+    }, []);
+
     return (
-        <Layout active="diagnose" user={user}>
-            <ContentLayout title="Tambah Diagnosis">
-                <form onSubmit={handleSubmitDiagnose} className="flex flex-col gap-6">
-                    <div className="flex flex-col gap-2">
-                        <p> Judul </p>
-                        <Input 
-                            type="text" 
-                            id="title" name="title" 
-                            onChange={(e) => {
-                                setTitle(e.target.value)
-                                setErrors({ ...errors, "title": "" });
-                            }} 
-                            placeholder="Judul" 
-                            error={errors["title"]} 
+        <Layout active="diagnose" user={user} >
+            <ContentLayout title="Diagnosis">
+                <div className="w-full h-[500px]">
+                    <div className="flex flex-row justify-between items-center w-full pb-6">
+                        <Button
+							prependIcon={<IoMdAdd size={24} />}
+							onClick={() => {
+								router.push('/diagnose/create')
+							}}
+						>
+							Tambah
+						</Button>
+
+						<SearchBar
+							size="md"
+							className="w-1/4"
+							placeholder=" Pasien ..."
+							onChange={(value) => setSearch(value)}
+						/>
+                    </div>
+
+                    <Table
+                        data={data || []}
+                        bordered
+                        cellBordered
+                        height={400}
+                        shouldUpdateScroll={false}
+                        affixHorizontalScrollbar
+                        loading={isLoading}
+                    >
+                        <Column width={50} fixed="left">
+                            <HeaderCell className="text-center text-dark ">No</HeaderCell>
+                            <Cell className="text-center text-dark">
+                                {(rowData, index) => index + 1}
+                            </Cell>
+                        </Column>
+
+                        <Column width={250} fullText resizable>
+                            <HeaderCell className="text-dark font-bold">Judul</HeaderCell>
+                            <Cell dataKey='title'/>
+                        </Column>
+
+                        <Column width={250} fullText resizable>
+                            <HeaderCell className="text-dark font-bold">Deskripsi</HeaderCell>
+                            <Cell dataKey='description'/>
+                        </Column>
+
+                        <Column width={250} fullText resizable>
+                            <HeaderCell className="text-dark font-bold">Pasien</HeaderCell>
+                            <Cell dataKey='prescription.patient.name'/>
+                        </Column>
+
+                        <Column width={250} fullText resizable>
+                            <HeaderCell className="text-dark font-bold">Timestamp</HeaderCell>
+                            <Cell dataKey='created_at'>
+                                {rowData => formatDate(rowData?.created_at)}
+                            </Cell>
+                        </Column>
+
+                        <Column width={250} fullText resizable>
+                            <HeaderCell className="text-dark font-bold">Timestamp</HeaderCell>
+                            <Cell dataKey='created_at'>
+                                {rowData => formatDate(rowData?.created_at)}
+                            </Cell>
+                        </Column>
+
+                        <Column width={180} fullText fixed="right" resizable>
+                            <HeaderCell className="text-dark font-bold">Status</HeaderCell>
+                            <Cell className="text-center">
+                                {(rowData) => {
+                                    return (
+                                        <div className="flex justify-center flex-row gap-6 text-white">
+                                            <p 
+                                                style={{ backgroundColor: prescriptionStatusMap.get(rowData.prescription.status)?.color }}
+                                                className="font-extrabold text-center rounded-lg w-full">
+                                                {prescriptionStatusMap.get(rowData.prescription.status)?.label}
+                                            </p>
+                                        </div>
+                                    );
+                                }}
+                            </Cell>
+                        </Column>
+
+                        <Column width={150} fixed="right">
+                            <HeaderCell className="text-center text-dark font-bold">Action</HeaderCell>
+                            <Cell className="text-center" style={{ padding: '6px' }}>
+                                {
+                                    rowData => {
+                                        return (
+                                            <div className="flex justify-center flex-row gap-6">
+                                                <Whisper speaker={renderTooltip("Detail")} placement="top" controlId="control-id-hover" trigger="hover">
+                                                    <button
+                                                        className="inline-flex items-center justify-center w-8 h-8 text-center bg-transparent border-0 rounded-lg"
+                                                        onClick={() => {
+                                                            console.log(rowData);
+                                                            // router.push(`/diagnose/detail/${rowData?.id}`)
+                                                            setSelectedDiagnose(rowData?.id);
+                                                            setOpen({...open, view: true});
+                                                        }}
+                                                    >
+                                                        <PiListMagnifyingGlass size="1.5em" />
+                                                    </button>
+                                                </Whisper>
+                                            </div>
+                                        )
+                                    }
+                                }
+                            </Cell>
+                        </Column>
+                    </Table>
+                    <div className="pt-4">
+                        <Pagination
+                            prev
+                            next
+                            first
+                            last
+                            ellipsis
+                            boundaryLinks
+                            maxButtons={5}
+                            size="xs"
+                            layout={["total", "-", "limit", "|", "pager"]}
+                            total={totalPage || 0}
+                            limitOptions={[5, 10, 15]}
+                            limit={limit}
+                            activePage={page}
+                            onChangePage={page => setPage(page)}
+                            onChangeLimit={limit => setLimit(limit)}
                         />
                     </div>
-                    <div className="flex flex-col gap-2">
-                        <Toggle 
-                            size="lg" 
-                            checkedChildren="Pasien Lama" 
-                            unCheckedChildren="Pasien Baru" 
-                            defaultChecked 
-                            onChange={(e) => {
-                                setExistingPatient(e)
-                                setErrors({
-                                    ...errors,
-                                    "prescription.patient.patientId": "",
-                                    "prescription.patient.patientName": "",
-                                    "prescription.patient.credentialNum": "",
-                                    "prescription.patient.phoneNum": ""
-                                })
-                            }}/>
-                        <PatientForm
-                            selectedPatient = {selectedPatient}
-                            setSelectedPatient = {setSelectedPatient}
-                            existingPatient = {existingPatient}
-                            errors = {errors}
-                            setErrors = {setErrors}
-                        />
-                    </div>
-                    <PrescriptionForm 
-                        formFields={formFields} 
-                        setFormFields={setFormFields}
-                        errors={errors}
-                        setErrors={setErrors}
-                    />
-                    <div className="flex flex-col gap-2">
-                        <p> Deskripsi </p>
-                        <Input 
-                            type="text" 
-                            id="description" 
-                            name="description" 
-                            onChange={(e) => {
-                                setDescription(e.target.value)
-                                setErrors({ ...errors, "description": "" });
-                            }} 
-                            placeholder="Deskripsi" error={errors["description"]} />
-                    </div>
-                    <div className="flex justify-center gap-2 my-6 lg:justify-end">
-                        <Button type="submit" appearance="primary">
-                            Simpan
-                        </Button>
-                    </div>
-                </form>
+                </div>
+
+                <DiagnoseDetail
+                    diagnoseId={selectedDiagnose}
+                    openModal={open.view}
+                    setOpenModal={setOpen}
+                />
             </ContentLayout>
         </Layout>
     )

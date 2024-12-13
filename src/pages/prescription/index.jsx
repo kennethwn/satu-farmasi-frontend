@@ -3,7 +3,7 @@ import ContentLayout from "@/components/Layouts/Content";
 import { useUserContext } from "../api/context/UserContext";
 import usePrescription from "../api/prescription";
 import { useEffect, useState } from "react";
-import {  Pagination, SelectPicker, Table } from "rsuite";
+import {  Pagination, SelectPicker, Table, Tooltip, Whisper } from "rsuite";
 import SearchBar from "@/components/SearchBar";
 import { formatDateWithTime } from "@/helpers/dayHelper";
 import Button from "@/components/Button";
@@ -53,6 +53,12 @@ export default function index() {
         
         return data;
     }
+
+    const renderTooltip = (content) => (
+        <Tooltip>
+            {content}
+        </Tooltip>
+    )
 
     useEffect(() => {
         const temp = [...prescriptionsData]
@@ -177,18 +183,18 @@ export default function index() {
                                 {
                                     rowData => {
                                         return (
-                                        <button
-                                            className="inline-flex items-center justify-center w-8 h-8 text-center bg-transparent border-0 rounded-lg"
-                                            onClick={() => {
-                                                console.log("id: ", rowData.id);
-                                                setSelectedPrescriptionId(rowData.id);
-                                                setOpenModal(true);
-                                            }}
-                                        >
-                                        <PiListMagnifyingGlass 
-                                            size='1.5em'
-                                        />
-                                        </button>
+                                            <Whisper speaker={renderTooltip("Lihat Detail")} placement="top" controlId="control-id-hover" trigger="hover">
+                                                <button
+                                                    className="inline-flex items-center justify-center w-8 h-8 text-center bg-transparent border-0 rounded-lg"
+                                                    onClick={() => {
+                                                        console.log("id: ", rowData.id);
+                                                        setSelectedPrescriptionId(rowData.id);
+                                                        setOpenModal(true);
+                                                    }}
+                                                >
+                                                    <PiListMagnifyingGlass size='1.5em' />
+                                                </button>
+                                            </Whisper>
                                         )
                                     }
                                 }
