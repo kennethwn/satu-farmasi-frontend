@@ -178,7 +178,7 @@ export default function index() {
 					<div className="flex flex-col gap-2">
 						<label>No Handphone</label>
 						<Input
-							type="string"
+							type="number"
 							id="phoneNum"
 							name="phoneNum"
 							placeholder="Nomor Telepon Farmasi"

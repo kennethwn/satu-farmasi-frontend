@@ -1,12 +1,15 @@
-import { useRouter } from "next/router";
+// import { useRouter } from "next/router";
+import { useRouter } from "next/navigation";
 import api from "../../configs/axios/satufarmasi-service-axios";
 import { useEffect, useState } from "react";
 import { useUserContext } from "./context/UserContext";
+import usePharmacy from "../api/pharmacy";
 
 export default function useUser() {
     const router = useRouter(); //👈 buat pindah halaman
     const [isLoading, setIsLoading] = useState(false);
     const { user, setUser } = useUserContext();
+    const { getPharmacyInfo} = usePharmacy()
 
     const getUser = async (data) => {
         const { email, password, isRemember } = data;
@@ -17,9 +20,9 @@ export default function useUser() {
                 password,
                 isRemember,
             });
-            const fullName = response.data.firstName + " " + response.data.lastName;
-            setUser({ name: fullName, email: response.data.email, role: response.data.role });
-            return response;
+        const fullName = response.data.firstName + " " + response.data.lastName;
+        setUser({ id: response.data.id, name: fullName, email: response.data.email, role: response.data.role });
+        return response;
         } catch (error) {
             throw error.response.data;
         }

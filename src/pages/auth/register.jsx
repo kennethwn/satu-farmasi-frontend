@@ -19,19 +19,32 @@ const registerSchema = z.object({
     email: isRequiredEmail(),
     password: isPassword(),
     confirmPassword: isPassword(),
-    nik: isRequiredString().min(16, { message: "NIK must be 16 characters" }),
+    nik: isRequiredString().min(16, { message: "Panjang NIK minimal 16 karakter" }),
     firstName: isRequiredString(),
     lastName: isRequiredString(),
     phoneNum: isRequiredPhoneNumber(),
     role: isRequiredOptions(),
     specialist: isOptionalString(),
     dob: isRequiredString(),
-    sipa: isOptionalString(),
-}).superRefine(({ confirmPassword, password }, ctx) => {
+    sipaNum: isOptionalString(),
+}).superRefine(({ role, specialist, sipaNum, password, confirmPassword }, ctx) => {
     if (confirmPassword !== password) {
         ctx.addIssue({
-            message: "Passwords does not match",
+            message: "Password tidak sesuai",
             path: ['confirmPassword']
+        });
+    }
+    if (role === 'doctor' && !specialist) {
+        ctx.addIssue({
+            path: ['specialist'],
+            message: "Bidang ini harus diisi",
+        });
+    }
+
+    if (role === 'pharmacist' && !sipaNum) {
+        ctx.addIssue({
+            path: ['sipaNum'],
+            message: "Bidang ini harus diisi",
         });
     }
 });
@@ -188,7 +201,7 @@ const RenderSpecialistInput = ({ register, errors }) =>
     <InputField type="text" placeholder="Heart" name="specialist" register={register} label="Spesialis" error={errors.specialist?.message} />
 
 const RenderSipaInput = ({ register, errors }) =>
-    <InputField type="text" placeholder="Heart" name="sipa" register={register} label="Surat Izin Praktik Apoteker (SIPA)" error={errors.sipa?.message} />
+    <InputField type="text" placeholder="SIPA" name="sipaNum" register={register} label="Surat Izin Praktik Apoteker (SIPA)" error={errors.sipaNum?.message} />
 
 RenderSpecialistInput.propTypes = {
     register: propTypes.func.isRequired,

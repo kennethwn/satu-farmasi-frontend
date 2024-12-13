@@ -42,11 +42,25 @@ export default function useReportAPI() {
         }
     }
 
+    const checkExpiredMedicine = async () => {
+        setIsLoading(true);
+        try {
+            const currDate = new Date();
+            return await axios.get(`/api/v1/reports/expiredMedicine?reportDate=${currDate}`);
+        } catch (error) {
+            console.error(error.response.data);
+            throw error.response.data;
+        } finally {
+            setIsLoading(false);
+        }
+    }
+
 
     return {
         isLoading,
         GetAllReports,
         GetReportById,
         finalizeReport,
+        checkExpiredMedicine,
     };
 }
