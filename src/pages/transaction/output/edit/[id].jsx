@@ -14,10 +14,23 @@ import { useUserContext } from "@/pages/api/context/UserContext";
 import { ErrorForm } from "@/helpers/errorForm";
 import OutputMedicineWitnessForm from "@/components/DynamicForms/OuputMedicineWitnessForm";
 
+const witnessesSchema = z.object({
+    name: isRequiredString(),
+    nip: isRequiredString(),
+    role: isRequiredString()
+})
+
+const physicalReportSchema = z.object({
+    data: z.object({
+        witnesses: z.array(witnessesSchema)
+    }),
+});
+
 export const medicineSchema = z.object({
     medicineId: isRequiredNumber(),
     quantity: isRequiredNumber(),
     reasonOfDispose: isRequiredString(),
+    physicalReport: physicalReportSchema
 });
 
 export const createExpenseMedicineField = [
@@ -55,10 +68,36 @@ export default function Index() {
         oldQuantity: 0,
         medicine: {
             currStock: null
+        },
+        physicalReport: {
+            data: {
+                pharmacist: "",
+                sipaNumber: "",
+                pharmacy: "",
+                addressPharmacy: "",
+                witnesses: [{ name: "", nip: "", role: "" }],
+            }
         }
     });
     const [formField, setFormField] = useState([{ name: "", nip: "", role: "" }]);
-    const [errors, setErrors] = useState({});
+    const [errors, setErrors] = useState({
+        medicineId: "",
+        quantity: "",
+        reasonOfDispose: "",
+        oldQuantity: "",
+        medicine: {
+            currstock: "",
+        },
+        physicalReport: {
+            data: {
+                pharmacist: "",
+                sipaNumber: "",
+                pharmacy: "",
+                addressPharmacy: "",
+                witnesses: [{ name: "", nip: "", role: "" }],
+            }
+        }
+    });
 
     const handleFetchMedicineById = async () => {
         try {
@@ -100,21 +139,27 @@ export default function Index() {
                 router.push("/transaction/output");
             }, 2000)
         } catch (error) {
-            toast.error(error.response.data.message, {
-                autoClose: 2000,
-                position: "top-right",
-            });
-            error = error.response.data.errors
             if (error instanceof ZodError) {
                 const newErrors = { ...errors };
                 error.issues.forEach((issue) => {
+                    console.log("error zod: ", issue);
                     if (issue.path.length > 0) {
-                        const fieldName = issue.path[0];
-                        newErrors[fieldName] = issue.message;
+                        if (issue.path[0] === "physicalReport") {
+                            const path = issue.path.join('.')
+                            newErrors[path] = issue.message
+                        } else {
+                            const fieldName = issue.path[0];
+                            newErrors[fieldName] = issue.message;
+                        }
                     }
                 });
                 setErrors(newErrors);
             } else {
+                toast.error(error.response?.data.message, {
+                    autoClose: 2000,
+                    position: "top-right",
+                });
+                error = error.response?.data.errors
                 ErrorForm(error, setErrors, false);
             }
         }
@@ -238,9 +283,12 @@ export default function Index() {
                         })}
                     </div>
 
-                    <div className="w-full mt-6 text-lg font-semibold">
-                        Data Petugas Kesehatan
-                    </div>
+                    {
+                        (formData.reasonOfDispose == "BROKEN" || formData.reasonOfDispose == "EXPIRED") &&
+                            <div className="w-full mt-6 text-lg font-semibold">
+                                Data Petugas Kesehatan
+                            </div>
+                    }
 
                     <div className="w-full my-6">
                         {
@@ -249,8 +297,8 @@ export default function Index() {
                                     isLoading={isLoading}
                                     formFields={formField}
                                     setFormFields={setFormField}
-                                    setError={setErrors}
-                                    error={errors["physicalReport"]}
+                                    setErrors={setErrors}
+                                    errors={errors}
                                 />
                         }
                     </div>

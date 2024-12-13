@@ -11,6 +11,7 @@ function PatientForm(props) {
         existingPatient,
         errors,
         setErrors,
+        disabled = false,
     } = props;
 
     if (errors) {
@@ -120,6 +121,7 @@ function PatientForm(props) {
                                 block
                                 cleanable={false}
                                 error={errors["prescription.patient.patientId"]}
+                                disabled={disabled}
                             />
                         ) : (
                             <InputField
@@ -138,6 +140,7 @@ function PatientForm(props) {
                                     errors["prescription.patient.patientName"]
                                 }
                                 value={selectedPatient.PatientName}
+                                disabled={disabled}
                             />
                         )}
                     </div>
@@ -158,7 +161,7 @@ function PatientForm(props) {
                         placeholder="Nomor Kredensial"
                         value={selectedPatient.credentialNum}
                         error={errors["prescription.patient.credentialNum"]}
-                        disabled={existingPatient}
+                        disabled={existingPatient || disabled}
                     />
                 </div>
                 <div className="flex flex-col gap-2">
@@ -177,7 +180,7 @@ function PatientForm(props) {
                         placeholder="No Handphone"
                         error={errors["prescription.patient.phoneNum"]}
                         value={selectedPatient.phoneNum}
-                        disabled={existingPatient}
+                        disabled={existingPatient || disabled}
                     />
                 </div>
             </div>

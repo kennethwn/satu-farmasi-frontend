@@ -44,9 +44,9 @@ export default function Login() {
             setIsLoading(true);
             await getUser(data);
             toast.success("Berhasil Masuk!", { autoClose: 2000, position: 'top-right' });
-            setTimeout(() => {
+            // setTimeout(() => {
                 router.push("/");
-            }, 2000)
+            // }, 2000)
         } catch (error) {
             toast.error(error.message, { autoClose: 2000, position: 'top-right' });
         } finally {

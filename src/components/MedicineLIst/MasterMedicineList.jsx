@@ -2,7 +2,7 @@ import { formatRupiah } from "@/helpers/currency";
 import formatDate, { formatDateWithTime } from "@/helpers/dayHelper";
 import { resolveStatusStockMedicine } from "@/helpers/resolveStatus";
 import { useRouter } from "next/router";
-import { Pagination, Table } from "rsuite";
+import { Pagination, Table, Tooltip, Whisper } from "rsuite";
 import SearchBar from "../SearchBar";
 import { MdOutlineEdit } from "react-icons/md";
 import { PiTrash } from "react-icons/pi";
@@ -37,6 +37,12 @@ export default function MasterMedicineList(props) {
         setSortBy(sortColumn);
         setSortMode(sortType);
     };
+
+    const renderTooltip = (content) => (
+        <Tooltip>
+            {content}
+        </Tooltip>
+    )
 
     return (
         <div className="flex flex-col gap-2">
@@ -173,7 +179,7 @@ export default function MasterMedicineList(props) {
                             </Cell>
                         </Column>
 
-                        <Column width={150} fixed="right">
+                        <Column width={100} fixed="right">
                             <HeaderCell className="text-center text-dark font-bold">Aksi</HeaderCell>
                             <Cell className="text-center" style={{ padding: '6px' }}>
                                 {
@@ -181,31 +187,35 @@ export default function MasterMedicineList(props) {
                                         return (
                                             <div className="flex justify-center flex-row gap-6">
                                                 {allowEdit &&
-                                                    <button
-                                                        className="inline-flex items-center justify-center w-8 h-8 text-center bg-transparent border-0 rounded-lg"
-                                                        onClick={() => {
-                                                            console.log(rowData);
-                                                            router.push(`/master/medicine/edit/${rowData?.code}`)
-                                                        }}
-                                                    >
-                                                        <MdOutlineEdit size="2em" color="#FFD400" />
-                                                    </button>
+                                                    <Whisper speaker={renderTooltip("Edit")} placement="top" controlId="control-id-hover" trigger="hover">
+                                                        <button
+                                                            className="inline-flex items-center justify-center w-8 h-8 text-center bg-transparent border-0 rounded-lg"
+                                                            onClick={() => {
+                                                                console.log(rowData);
+                                                                router.push(`/master/medicine/edit/${rowData?.code}`)
+                                                            }}
+                                                        >
+                                                            <MdOutlineEdit size="2em" color="#FFD400" />
+                                                        </button>
+                                                    </Whisper>
                                                 }
 
                                                 {allowDeleteData &&
-                                                    <button
-                                                        className="inline-flex items-center justify-center w-8 h-8 text-center bg-transparent border-0 rounded-lg"
-                                                        onClick={() => {
-                                                            console.log(rowData);
-                                                            setSelectedMedicine(rowData);
-                                                            setModalDelete(true);
-                                                        }}
-                                                    >
-                                                        <PiTrash 
-                                                            size="2em" 
-                                                            color="#DC4A43" 
-                                                        />
-                                                    </button>
+                                                    <Whisper speaker={renderTooltip("Hapus")} placement="top" controlId="control-id-hover" trigger="hover">
+                                                        <button
+                                                            className="inline-flex items-center justify-center w-8 h-8 text-center bg-transparent border-0 rounded-lg"
+                                                            onClick={() => {
+                                                                console.log(rowData);
+                                                                setSelectedMedicine(rowData);
+                                                                setModalDelete(true);
+                                                            }}
+                                                        >
+                                                            <PiTrash 
+                                                                size="2em" 
+                                                                color="#DC4A43" 
+                                                            />
+                                                        </button>
+                                                    </Whisper>
                                                 }
                                             </div>
                                         )

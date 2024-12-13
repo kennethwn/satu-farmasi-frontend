@@ -39,11 +39,20 @@ export default function OutputMedicineWitnessForm(props) {
 		data.splice(index, 1);
 		setFormFields(data);
 
-		// Object.keys(errors).forEach((item) => {
-		// 	if (item.includes(index.toString())) {
-
-		// 	}
-		// })
+		Object.keys(errors).forEach(key => {
+			if (key.startsWith("physicalReport.data.witnesses.")) {
+				const path = key.split('.')
+				const currPathIndex = path[3];
+				if (currPathIndex === index.toString()) {
+					delete errors[key]
+				} else if (currPathIndex > index.toString()) {
+					path[3] = (currPathIndex - 1).toString()
+					const newKey = path.join('.')
+					errors[newKey] = errors[key]
+					delete errors[key]
+				}
+			}
+		})
 	};
 
 	const handleCheckError = (field) => {
@@ -58,28 +67,28 @@ export default function OutputMedicineWitnessForm(props) {
 	console.log("error from dynamic form: ", errors);
 
 	return (
-		<div id="form-2">
-			<div className="grid grid-cols-1 w-full gap-x-6 gap-y-2">
+		<div id="form-2 w-full">
+			<div className="grid grid-cols-1 gap-x-6 gap-y-2 w-full">
 				{formFields?.map((form, index) => (
-					<div key={index} className='col-span-12 w-full grid lg:grid-cols-11 gap-x-6'>
+					<div key={index} className='col-span-12 w-full lg:grid lg:grid-cols-11 gap-x-6'>
 						<div className='max-lg:w-full'>
 							{index === 0 && (
 								<div className="flex text-sm invisible font-medium leading-6 text-gray-900 lg:justify-center">
 									.
 								</div>
 							)}
-							<div className="flex items-center w-full justify-start mt-2 lg:gap-2">
-								{((index === formFields.length - 1)) ?
-									<Button size="small" onClick={(e) => addFormField()} isDisabled={disabled}>
+							<div className="flex flex-col justify-start lg:gap-2">
+								{(index === formFields.length - 1) ? 
+									<Button className={formFields.length > 1 ? 'mt-2' : null} size="small" onClick={(e) => addFormField()} isDisabled={disabled}>
 										<IoIosAdd size={"1.6rem"} />
 									</Button>
-									:
-									<div className='lg:px-6 lg:py-2'></div>
+									: null
 								}
-								{/* <p className={`${index < formFields.length - 1 ? 'lg:mx-auto' : 'lg:ml-[1px]'}`}>{index + 1}</p> */}
 							</div>
 						</div>
-						<div className="col-span-3">
+
+						{/* Nama */}
+						<div className="lg:col-span-3">
 							{(index === 0) && (
 								<label className="block text-body font-medium leading-6 text-gray-900">
 									Nama
@@ -93,10 +102,9 @@ export default function OutputMedicineWitnessForm(props) {
 										name='name'
 										placeholder='Nama'
 										size='lg'
-										className="py-1.5"
+										className="py-1.5 block"
 										disabled={true}
 										value={form.name}
-										block
 									/>
 									:
 									<>
@@ -105,7 +113,7 @@ export default function OutputMedicineWitnessForm(props) {
                                             name='name'
                                             placeholder='Nama'
                                             size='lg'
-                                            className="py-1.5"
+                                            className="py-1.5 block"
                                             value={form.name}
                                             block
 											onChange={(e) => {
@@ -130,7 +138,9 @@ export default function OutputMedicineWitnessForm(props) {
 								}
 							</div>
 						</div>
-						<div className="col-span-3">
+
+						{/* NIP */}
+						<div className="lg:col-span-3">
 							{(index === 0) && (
 								<label className="block text-body font-medium leading-6 text-gray-900">
 									Nomor Identitas Pegawai
@@ -181,7 +191,9 @@ export default function OutputMedicineWitnessForm(props) {
 								}
 							</div>
 						</div>
-						<div className="col-span-3">
+
+						{/* Jabatan */}
+						<div className="lg:col-span-3">
 							{(index === 0) && (
 								<label className="block text-body font-medium leading-6 text-gray-900">
 									Jabatan
@@ -233,7 +245,7 @@ export default function OutputMedicineWitnessForm(props) {
 							</div>
 						</div>
 						{(disabled === undefined || disabled === null || disabled === false) && (
-							<div className="max-lg:col-span-10 lg:w-full">
+							<div className="max-lg:col-span-10 col-span-1 lg:w-full">
 								{(index === 0) && (
 									<label className="flex text-md font-medium leading-6 text-gray-900 lg:justify-center">
 										Action

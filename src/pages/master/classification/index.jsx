@@ -5,7 +5,7 @@ import { useState, useEffect, useRef } from "react";
 import useClassificationsAPI from "@/pages/api/master/classification";
 import { z } from "zod";
 import { isRequiredString } from "@/helpers/validation";
-import { Checkbox, Modal, Pagination, Table } from "rsuite";
+import { Checkbox, Modal, Pagination, Table, Tooltip, Whisper } from "rsuite";
 import Button from "@/components/Button";
 import { IoMdAdd } from "react-icons/io";
 import SearchBar from "@/components/SearchBar";
@@ -171,6 +171,12 @@ export default function index() {
 		}
 	};
 
+	const renderTooltip = (content) => (
+		<Tooltip>
+			{content}
+		</Tooltip>
+	)
+
 	useEffect(() => {
 		async function fetchData() {
 			if (search === "") {
@@ -262,18 +268,20 @@ export default function index() {
 								{(rowData) => {
 									return (
 										<div className="flex justify-center flex-row gap-6">
-											<button
-												className="inline-flex items-center justify-center w-8 h-8 text-center bg-transparent border-0 rounded-lg"
-												onClick={() => {
-													setEditInput(rowData);
-													setValue("id", rowData.id);
-													setValue("label", rowData.label);
-													setValue("value", rowData.value);
-													setOpen({ ...open, edit: true });
-												}}
-											>
-												<MdOutlineEdit size="2em" color="#FFD400" />
-											</button>
+											<Whisper speaker={renderTooltip("Edit")} placement="top" controlId="control-id-hover" trigger="hover">
+												<button
+													className="inline-flex items-center justify-center w-8 h-8 text-center bg-transparent border-0 rounded-lg"
+													onClick={() => {
+														setEditInput(rowData);
+														setValue("id", rowData.id);
+														setValue("label", rowData.label);
+														setValue("value", rowData.value);
+														setOpen({ ...open, edit: true });
+													}}
+												>
+													<MdOutlineEdit size="2em" color="#FFD400" />
+												</button>
+											</Whisper>
 										</div>
 									);
 								}}

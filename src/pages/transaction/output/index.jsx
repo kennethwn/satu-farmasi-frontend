@@ -10,7 +10,7 @@ import { useEffect, useState } from "react";
 import { IoMdAdd } from "react-icons/io";
 import { MdOutlineEdit } from "react-icons/md";
 import { PiTrash } from "react-icons/pi";
-import { Pagination, SelectPicker, Table } from "rsuite";
+import { Pagination, SelectPicker, Table, Tooltip, Whisper } from "rsuite";
 import { toast } from "react-toastify";
 import formatCalendar from "@/helpers/dayHelper";
 
@@ -90,6 +90,12 @@ export default function Index() {
             console.error(error);
         }
     };
+
+    const renderTooltip = (content) => (
+        <Tooltip>
+            {content}
+        </Tooltip>
+    )
 
     useEffect(() => {
         async function fetchData() {
@@ -193,31 +199,35 @@ export default function Index() {
 
                         <Column width={150} fixed="right">
                             <HeaderCell className="text-center text-dark font-bold">
-                                Action
+                                Aksi
                             </HeaderCell>
-                            <Cell className="text-center">
+                            <Cell className="text-center" style={{ padding: '6px' }}>
                                 {(rowData) => {
                                     return (
                                         <div className="flex justify-center flex-row gap-6">
-                                            <button
-                                                disabled={rowData?.report?.isFinalized} className={`${rowData?.report?.isFinalized ? 'hidden' : ''} inline-flex items-center justify-center w-8 h-8 text-center bg-transparent border-0 rounded-lg`}
-                                                onClick={() =>
-                                                    router.push(`/transaction/output/edit/${rowData?.id}`)
-                                                }
-                                            >
-                                                <MdOutlineEdit size="2em" color="#FFD400" />
-                                            </button>
+                                            <Whisper speaker={renderTooltip("Edit")} placement="top" controlId="control-id-hover" trigger="hover">
+                                                <button
+                                                    disabled={rowData?.report?.isFinalized} className={`${rowData?.report?.isFinalized ? 'hidden' : ''} inline-flex items-center justify-center w-8 h-8 text-center bg-transparent border-0 rounded-lg`}
+                                                    onClick={() =>
+                                                        router.push(`/transaction/output/edit/${rowData?.id}`)
+                                                    }
+                                                >
+                                                    <MdOutlineEdit size="2em" color="#FFD400" />
+                                                </button>
+                                            </Whisper>
 
-                                            <button
-                                                disabled={rowData?.report?.isFinalized}
-                                                className={`${rowData?.report?.isFinalized ? 'hidden' : ''} inline-flex items-center justify-center w-8 h-8 text-center bg-transparent border-0 rounded-lg`}
-                                                onClick={() => {
-                                                    setEditInput({ ...rowData, is_active: false });
-                                                    setOpen({ ...open, delete: true });
-                                                }}
-                                            >
-                                                <PiTrash size="2em" color="#DC4A43" />
-                                            </button>
+                                            <Whisper speaker={renderTooltip("Hapus")} placement="top" controlId="control-id-hover" trigger="hover">
+                                                <button
+                                                    disabled={rowData?.report?.isFinalized}
+                                                    className={`${rowData?.report?.isFinalized ? 'hidden' : ''} inline-flex items-center justify-center w-8 h-8 text-center bg-transparent border-0 rounded-lg`}
+                                                    onClick={() => {
+                                                        setEditInput({ ...rowData, is_active: false });
+                                                        setOpen({ ...open, delete: true });
+                                                    }}
+                                                >
+                                                    <PiTrash size="2em" color="#DC4A43" />
+                                                </button>
+                                            </Whisper>
                                         </div>
                                     );
                                 }}

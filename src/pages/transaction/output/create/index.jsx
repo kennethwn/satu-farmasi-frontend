@@ -291,7 +291,7 @@ export default function Index() {
                                         (
                                             <div class="flex gap-x-5">
                                                 <Input
-                                                    label={"jumlah Obat keluar"}
+                                                    label={"Jumlah Obat keluar"}
                                                     type={"number"}
                                                     name={"quantity"}
                                                     onChange={e => inputOnChangeHandler(e, input.name)}
@@ -315,9 +315,12 @@ export default function Index() {
                         })}
                     </div>
 
-                    <div className="w-full mt-6 text-lg font-semibold">
-                        Data Petugas Kesehatan
-                    </div>
+                    {
+                        (formData.reasonOfDispose == "BROKEN" || formData.reasonOfDispose == "EXPIRED") &&
+                            <div className="w-full mt-6 text-lg font-semibold">
+                                Data Petugas Kesehatan
+                            </div>
+                    }
 
                     <div className="w-full my-6">
                         {

@@ -11,16 +11,17 @@ import { useEffect, useState } from "react";
 import { IoMdAdd } from "react-icons/io";
 import { PiTrash } from "react-icons/pi";
 import { IoDocumentTextOutline } from "react-icons/io5";
+import { IoMdCheckboxOutline } from "react-icons/io";
 import { FcAddDatabase } from "react-icons/fc";
 import { toast } from "react-toastify";
-import { Modal, Pagination, Panel, Table } from "rsuite";
+import { Modal, Pagination, Panel, Table, Tooltip, Whisper } from "rsuite";
 import { HeaderCell, Column, Cell } from "rsuite-table";
 import { useRouter } from "next/router";
 import { MdOutlineEdit } from "react-icons/md";
 import Text from "@/components/Text";
 import Toaster from "@/components/Modal/Toaster";
 
-export default function index() {
+export default function Index() {
     const router = useRouter();
     const { user } = useUserContext();
     const { GetAllReceiveMedicines, SearchReceiveMedicine, DeleteReceiveMedicine } = useReceiveMedicineAPI();
@@ -80,6 +81,14 @@ export default function index() {
         }
     }
 
+    const renderTooltip = (content) => {
+        return (
+            <Tooltip >
+                {content}
+            </Tooltip>
+        )
+    }
+
     useEffect(() => {
         async function fetchData() {
             if (search === '') {
@@ -121,113 +130,117 @@ export default function index() {
                     loading={isLoading}
                 >
                     <Column width={50} fixed="left">
-                        <HeaderCell className="text-center text-dark ">No</HeaderCell>
+                        <HeaderCell className="text-center text-dark font-bold">No</HeaderCell>
                         <Cell className="text-center text-dark">
                             {(rowData, index) => index + 1}
                         </Cell>
                     </Column>
 
                     <Column width={250} fullText resizable>
-                        <HeaderCell className="text-dark ">No Dokumen</HeaderCell>
+                        <HeaderCell className="text-dark font-bold">No Dokumen</HeaderCell>
                         <Cell dataKey='documentNumber'/>
                     </Column>
 
                     <Column width={250} fullText resizable>
-                        <HeaderCell className="text-dark ">Batch Code</HeaderCell>
+                        <HeaderCell className="text-dark font-bold">Batch Code</HeaderCell>
                         <Cell dataKey='batchCode'/>
                     </Column>
 
                     <Column width={250} fullText resizable>
-                        <HeaderCell className="text-dark ">Kode Obat</HeaderCell>
+                        <HeaderCell className="text-dark font-bold">Kode Obat</HeaderCell>
                         <Cell dataKey='medicine.code'/>
                     </Column>
 
                     <Column width={250} fullText resizable>
-                        <HeaderCell className="text-dark ">Nama Obat</HeaderCell>
+                        <HeaderCell className="text-dark font-bold">Nama Obat</HeaderCell>
                         <Cell dataKey="medicine.name" />
                     </Column>
 
                     <Column width={250} fullText resizable>
-                        <HeaderCell className="text-dark ">Quantity</HeaderCell>
+                        <HeaderCell className="text-dark font-bold">Quantity</HeaderCell>
                         <Cell dataKey="quantity" />
                     </Column>
 
                     <Column width={250} fullText resizable>
-                        <HeaderCell className="text-dark ">Vendor</HeaderCell>
+                        <HeaderCell className="text-dark font-bold">Vendor</HeaderCell>
                         <Cell dataKey='vendor.name'/>
                     </Column>
 
                     <Column width={250} fullText resizable>
-                        <HeaderCell className="text-dark ">Alamat Vendor</HeaderCell>
+                        <HeaderCell className="text-dark font-bold">Alamat Vendor</HeaderCell>
                         <Cell dataKey='vendor.address'/>
                     </Column>
 
                     <Column width={250} fullText resizable>
-                        <HeaderCell className="text-dark ">Harga</HeaderCell>
+                        <HeaderCell className="text-dark font-bold">Harga</HeaderCell>
                         <Cell dataKey='buyingPrice'>
                             {(rowData) => formatRupiah(rowData?.buyingPrice)}    
                         </Cell>
                     </Column>
 
                     <Column width={250} fullText resizable>
-                        <HeaderCell className="text-dark ">Metode Pembayaran</HeaderCell>
+                        <HeaderCell className="text-dark font-bold">Metode Pembayaran</HeaderCell>
                         <Cell dataKey='paymentMethod'/>
                     </Column>
 
                     <Column width={250} fullText resizable>
-                        <HeaderCell className="text-dark ">Tenggat Waktu</HeaderCell>
+                        <HeaderCell className="text-dark font-bold">Tenggat Waktu</HeaderCell>
                         <Cell dataKey='deadline'>
                             {rowData => formatDate(rowData?.deadline)}
                         </Cell>
                     </Column>
 
                     <Column width={250} fullText resizable>
-                        <HeaderCell className="text-dark ">Created At</HeaderCell>
+                        <HeaderCell className="text-dark font-bold">Timestamp</HeaderCell>
                         <Cell dataKey='created_at'>
                             {rowData => formatDate(rowData?.created_at)}
                         </Cell>
                     </Column>
 
                     <Column width={150} fixed="right">
-                        <HeaderCell className="text-dark ">Status Pembayaran</HeaderCell>
+                        <HeaderCell className="text-dark font-bold">Status Pembayaran</HeaderCell>
                         <Cell dataKey='isPaid'>
                             {rowData => resolveIsPaidStatus(rowData?.isPaid)}
                         </Cell>
                     </Column>
 
                     <Column width={150} fixed="right">
-                        <HeaderCell className="text-center text-dark ">Action</HeaderCell>
+                        <HeaderCell className="text-center text-dark font-bold">Aksi</HeaderCell>
                         <Cell className="text-center" style={{ padding: '6px' }}>
                             {
                                 rowData => {
                                     return (
                                         <div className="flex justify-center flex-row gap-6">
                                             {!rowData?.is_active || !rowData?.isPaid ?
-                                                <button
-                                                    className="inline-flex items-center justify-center w-8 h-8 text-center bg-transparent border-0 rounded-lg"
-                                                    onClick={() => {
-                                                        console.log(rowData);
-                                                        router.push(`/transaction/receive/confirm/${rowData?.id}`)
-                                                    }}
-                                                >
-                                                    <MdOutlineEdit size="2em" color="#FFD400" />
-                                                </button>
+                                                <Whisper speaker={renderTooltip("Konfirmasi")} placement="top" controlId="control-id-hover" trigger="hover">
+                                                    <button
+                                                        className="inline-flex items-center justify-center w-8 h-8 text-center bg-transparent border-0 rounded-lg"
+                                                        onClick={() => {
+                                                            console.log(rowData);
+                                                            router.push(`/transaction/receive/confirm/${rowData?.id}`)
+                                                        }}
+                                                    >
+                                                        <IoMdCheckboxOutline size="2em" color="#79B12A" />
+                                                    </button>
+                                                </Whisper>
                                                 : null       
                                             }
                                             {!rowData?.is_active || !rowData?.isPaid ?
-                                                <button
-                                                    className="inline-flex items-center justify-center w-8 h-8 text-center bg-transparent border-0 rounded-lg"
-                                                    onClick={() => {
-                                                        console.log(rowData);
-                                                        setSelectedMedicine(rowData);
-                                                        setModalDelete(!modalDelete);
-                                                    }}
-                                                >
-                                                    <PiTrash 
-                                                        size="1.7em" 
-                                                        color="#DC4A43" 
-                                                    />
-                                                </button>
+                                                <Whisper speaker={renderTooltip("Hapus")} placement="top" controlId="control-id-hover" trigger="hover">
+                                                    <button
+                                                        className="inline-flex items-center justify-center w-8 h-8 text-center bg-transparent border-0 rounded-lg"
+                                                        onClick={() => {
+                                                            console.log(rowData);
+                                                            setSelectedMedicine(rowData);
+                                                            setModalDelete(!modalDelete);
+                                                        }}
+                                                    >
+                                                        <PiTrash 
+                                                            size="1.7em" 
+                                                            color="#DC4A43" 
+                                                        />
+                                                    </button>
+                                                </Whisper>
                                                 : null
                                             }
                                         </div>

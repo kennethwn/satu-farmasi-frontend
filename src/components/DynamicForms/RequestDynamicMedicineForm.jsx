@@ -6,8 +6,7 @@ import Input from "../Input";
 import { MdDeleteOutline } from "react-icons/md";
 
 export default function RequestDynamicMedicineForm(props) {
-    const { disabled, formFields, setFormFields, branch, subCoa,  effectiveStartDate, effectiveEndDate } = props;
-    const [errorMessage, setErrorMessage] = useState("");
+    const { disabled, formFields, setFormFields, errors, setErrors } = props;
 
     const handleChange = (fieldName, value, index) => {
         try {
@@ -28,6 +27,19 @@ export default function RequestDynamicMedicineForm(props) {
         let data = [...formFields];
         data.splice(index, 1);
         setFormFields(data);
+
+        Object.keys(errors).forEach(key => {
+            const path = key.split('.')
+            const currPathIndex = path[1];
+            if (currPathIndex === index.toString()) {
+                delete errors[key]
+            } else if (currPathIndex > index.toString()) {
+                path[1] = (currPathIndex - 1).toString()
+                const newKey = path.join('.')
+                errors[newKey] = errors[key]
+                delete errors[key]
+            }
+		})
     }
 
     return (
@@ -36,7 +48,7 @@ export default function RequestDynamicMedicineForm(props) {
                 {formFields?.map((form, index) => {
                     return (
                         <React.Fragment key={index}>
-                            {/* CTA Add Button */}
+                            {/* CTA Add Button */} 
                             <div className="flex flex-col lg:gap-2">
                                 {index == 0 && (
                                     <label className="invisible">No</label>
@@ -59,7 +71,13 @@ export default function RequestDynamicMedicineForm(props) {
                                         className="block"
                                         value={form?.medicine}
                                         placeholder="obat"
-                                        onChange={(e) => handleChange("medicine", e.target.value, index)}
+                                        onChange={(e) => {
+                                            handleChange("medicine", e.target.value, index)
+                                            setErrors({...errors, 
+                                                [`medicines.${index}.medicine`]: ''
+                                            });
+                                        }}
+                                        error={errors[`medicines.${index}.medicine`]}
                                     />
                                 </div>
                             </div>
@@ -73,7 +91,13 @@ export default function RequestDynamicMedicineForm(props) {
                                         value={form?.quantity}
                                         type="number"
                                         placeholder="0"
-                                        onChange={(e) => handleChange("quantity", e.target.value, index)}
+                                        onChange={(e) => {
+                                            handleChange("quantity", parseInt(e.target.value), index)
+                                            setErrors({...errors, 
+                                                [`medicines.${index}.quantity`]: ''
+                                            });
+                                        }}
+                                        error={errors[`medicines.${index}.quantity`]}
                                     />
                                 </div>
                             </div>
@@ -86,7 +110,13 @@ export default function RequestDynamicMedicineForm(props) {
                                         className="block"
                                         value={form?.remark}
                                         placeholder="keterangan"
-                                        onChange={(e) => handleChange("remark", e.target.value, index)} 
+                                        onChange={(e) => {
+                                            handleChange("remark", e.target.value, index)
+                                            setErrors({...errors, 
+                                                [`medicines.${index}.remark`]: ''
+                                            });
+                                        }} 
+                                        error={errors[`medicines.${index}.remark`]}
                                     />
                                 </div>
                             </div>
@@ -101,7 +131,7 @@ export default function RequestDynamicMedicineForm(props) {
                                     )
                                     }
                                     <button
-                                        className={`flex justify-center w-full rounded-md py-1.5 mt-1 stroke-2 shadow-sm ${formFields?.length > 1 ? 'stroke-white bg-button-danger lg:bg-white' : 'lg:stroke-gray-300 bg-border-box stroke-white'} lg:shadow-none lg:border-0 border-2 border-gray-300 placeholder:text-gray-400 sm:text-sm sm:leading-6`}
+                                        className={`flex justify-center w-full rounded-md py-1.5 mt-1 stroke-2 shadow-sm ${formFields?.length > 1 ? 'stroke-white bg-button-danger lg:bg-white' : 'lg:stroke-gray-300 stroke-white'} lg:shadow-none lg:border-0 border-2 border-gray-300 placeholder:text-gray-400 sm:text-sm sm:leading-6`}
                                         disabled={(formFields?.length > 1 ? false : true) || disabled}
                                         onClick={(e) => {
                                             e.preventDefault();

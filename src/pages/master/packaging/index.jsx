@@ -5,7 +5,7 @@ import SearchBar from "@/components/SearchBar";
 import { useUserContext } from "@/pages/api/context/UserContext";
 import { useEffect, useRef, useState } from "react";
 import { IoMdAdd } from "react-icons/io";
-import { Pagination, SelectPicker, Table, Modal, Checkbox } from "rsuite";
+import { Pagination, SelectPicker, Table, Modal, Checkbox, Whisper, Tooltip } from "rsuite";
 import { MdOutlineEdit } from "react-icons/md";
 import { PiTrash } from "react-icons/pi";
 import { toast } from "react-toastify";
@@ -149,6 +149,12 @@ export default function index(props) {
         }
     }
 
+    const renderTooltip = (content) => (
+        <Tooltip>
+            {content}
+        </Tooltip>
+    )
+
     useEffect(() => {
         async function fetchData() {
             if (search === '') {
@@ -224,26 +230,28 @@ export default function index(props) {
 
                         <Column width={150} fixed="right">
                             <HeaderCell className="text-center text-dark font-bold">Aksi</HeaderCell>
-                            <Cell className="text-center">
+                            <Cell className="text-center" style={{ padding: '6px' }}>
                                 {
                                     rowData => {
                                         return (
                                             <div className="flex justify-center flex-row gap-6">
-                                                <button
-                                                    className="inline-flex items-center justify-center w-8 h-8 text-center bg-transparent border-0 rounded-lg"
-                                                    onClick={() => {
-                                                        setEditInput(rowData);
-                                                        setValue("id", rowData.id);
-                                                        setValue("label", rowData.label);
-                                                        setValue("value", rowData.value);
-                                                        setOpen({ ...open, edit: true });
-                                                    }}
-                                                >
-                                                    <MdOutlineEdit
-                                                        size="2em"
-                                                        color="#FFD400"
-                                                    />
-                                                </button>
+                                                <Whisper speaker={renderTooltip("Edit")} placement="top" controlId="control-id-hover" trigger="hover">
+                                                    <button
+                                                        className="inline-flex items-center justify-center w-8 h-8 text-center bg-transparent border-0 rounded-lg"
+                                                        onClick={() => {
+                                                            setEditInput(rowData);
+                                                            setValue("id", rowData.id);
+                                                            setValue("label", rowData.label);
+                                                            setValue("value", rowData.value);
+                                                            setOpen({ ...open, edit: true });
+                                                        }}
+                                                    >
+                                                        <MdOutlineEdit
+                                                            size="2em"
+                                                            color="#FFD400"
+                                                        />
+                                                    </button>
+                                                </Whisper>
                                             </div>
                                         )
                                     }

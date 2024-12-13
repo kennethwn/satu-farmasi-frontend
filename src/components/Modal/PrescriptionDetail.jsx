@@ -223,7 +223,7 @@ export default function PrescriptionDetail(props) {
             }}
             size="lg"
         >
-            <Header className="text-2xl font-bold">Detail Prescription</Header>
+            <Header className="text-2xl font-bold">Detail Preskripsi</Header>
             <Body className="flex flex-col py-2 gap-2">
                 <div>
                     <Input

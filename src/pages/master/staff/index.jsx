@@ -2,7 +2,7 @@ import Layout from "@/components/Layouts";
 import ContentLayout from "@/components/Layouts/Content";
 import { useEffect, useState } from "react";
 import SearchBar from "@/components/SearchBar";
-import { Checkbox, Pagination, SelectPicker, Table } from "rsuite";
+import { Checkbox, Pagination, SelectPicker, Table, Tooltip, Whisper } from "rsuite";
 import useStaffAPI from "@/pages/api/master/staff";
 import { toast} from "react-toastify";
 import formatDate from "@/helpers/dayHelper";
@@ -68,6 +68,12 @@ export default function Index() {
             console.log(error);
         }
     }
+
+    const renderTooltip = (content) => (
+        <Tooltip>
+            {content}
+        </Tooltip>
+    )
 
     useEffect(() => {
         async function fetchData() {
@@ -179,21 +185,23 @@ export default function Index() {
 
                         <Column width={100} fixed="right">
                             <HeaderCell className="text-center text-dark font-bold">Aksi</HeaderCell>
-                            <Cell className="text-center">
+                            <Cell className="text-center" style={{ padding: '6px' }}>
                                 {
                                     rowData => {
                                         return (
-                                            <button
-                                                className="inline-flex items-center justify-center w-8 h-8 text-center bg-transparent border-0 rounded-lg"
-                                                onClick={() => {
-                                                    router.push(`/master/staff/edit/${rowData?.nik}`);
-                                                }}
-                                            >
-                                                <MdOutlineEdit
-                                                    size="2em"
-                                                    color="#FFD400"
-                                                />
-                                            </button>
+                                            <Whisper speaker={renderTooltip("Edit")} placement="top" controlId="control-id-hover" trigger="hover">
+                                                <button
+                                                    className="inline-flex items-center justify-center w-8 h-8 text-center bg-transparent border-0 rounded-lg"
+                                                    onClick={() => {
+                                                        router.push(`/master/staff/edit/${rowData?.nik}`);
+                                                    }}
+                                                >
+                                                    <MdOutlineEdit
+                                                        size="2em"
+                                                        color="#FFD400"
+                                                    />
+                                                </button>
+                                            </Whisper>
                                         )
                                     }
                                 }
