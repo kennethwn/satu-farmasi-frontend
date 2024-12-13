@@ -20,9 +20,9 @@ export default function useUser() {
                 password,
                 isRemember,
             });
-        const fullName = response.data.firstName + " " + response.data.lastName;
-        setUser({ id: response.data.id, name: fullName, email: response.data.email, role: response.data.role });
-        return response;
+            const fullName = response.data.firstName + " " + response.data.lastName;
+            setUser({ id: response.data.id, name: fullName, email: response.data.email, role: response.data.role, sipaNumber: response.data.sipaNumber });
+            return response;
         } catch (error) {
             throw error.response.data;
         }

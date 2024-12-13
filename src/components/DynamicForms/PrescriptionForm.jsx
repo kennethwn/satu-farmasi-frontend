@@ -8,7 +8,7 @@ import { formatRupiah } from "@/helpers/currency";
 import Dropdown from "../SelectPicker/Dropdown";
 
 function PrescriptionForm(props) {
-  const { formFields, setFormFields, setAvailableStock = () => {}, errors, setErrors } = props;
+  const { formFields, setFormFields, setAvailableStock = () => {}, errors, setErrors, disabled } = props;
 
   const { getMedicineDropdownOptions } = useMedicineDropdownOption();
   const [medicineDropdownOptions, setMedicineDropdownOptions] = useState([]);
@@ -146,6 +146,7 @@ function PrescriptionForm(props) {
                                     <Button
                                         size="small"
                                         onClick={(e) => handleAddFormFieldRow()}
+                                        isDisabled={disabled}
                                     >
                                         <IoIosAdd size={"1.6rem"} />
                                     </Button>
@@ -176,6 +177,7 @@ function PrescriptionForm(props) {
                                         `prescription.medicineList.${index}.code`
                                         ]
                                     }
+                                    disabled={disabled}
                                 />
                             </div>
                             <div className="col-span-1">
@@ -186,7 +188,7 @@ function PrescriptionForm(props) {
                                     name="quantity"
                                     placeholder="Jumlah"
                                     value={formField.quantity}
-                                    disabled={formField.code == -1}
+                                    disabled={formField.code == -1 || disabled}
                                     onChange={(e) => {
                                         handleMedicineQuantity(
                                             index,
@@ -252,6 +254,7 @@ function PrescriptionForm(props) {
                                     name="instruction"
                                     value={formField?.instruction} // TODO: fix handle change
                                     placeholder="Instruksi"
+                                    disabled={disabled}
                                     onChange={(e) => {
                                         handleInstructionField(
                                             index,
@@ -275,6 +278,7 @@ function PrescriptionForm(props) {
                                     className={`flex justify-center w-full rounded-md py-2 stroke-2 shadow-sm ${formFields.length > 1 ? "stroke-white bg-button-danger lg:bg-white" : "lg:stroke-gray-300 stroke-white"} lg:shadow-none lg:border-0 border-2 border-gray-300 placeholder:text-gray-400 sm:text-sm sm:leading-6`}
                                     disabled={
                                         formFields?.length > 1 ? false : true
+                                        || disabled
                                     }
                                     onClick={(e) =>
                                         handleRemoveFormFieldRow(index)
@@ -312,6 +316,7 @@ function PrescriptionForm(props) {
                                         `prescription.medicineList.${index}.instruction`
                                         ]
                                     }
+                                    disabled={disabled}
                                 />
                             </div>
                         </div>

@@ -213,9 +213,7 @@ export default function Layout(props) {
                                 <Nav.Item
                                     icon={renderIcon(
                                         "report",
-                                        activeKey === "report-dashboard" ||
-                                        activeKey === "report-receive" ||
-                                        activeKey === "report-expense",
+                                        activeKey === "report-medicine"
                                     )}
                                     onClick={() => {
                                         router.push(
@@ -223,13 +221,14 @@ export default function Layout(props) {
                                             undefined,
                                             { shallow: true },
                                         );
-                                        setActiveKey("report-dashboard");
+                                        setActiveKey("report-medicine");
                                     }}
-                                    eventKey="report-dashboard"
+                                    eventKey="report-medicine"
                                 >
                                     {renderTitle(
                                         "Laporan Obat",
-                                        activeKey === "report-dashboard",
+                                        "parent",
+                                        activeKey === "report-medicine",
                                     )}
                                 </Nav.Item>
                             )}
@@ -238,13 +237,9 @@ export default function Layout(props) {
                                     eventKey="transaction"
                                     trigger="hover"
                                     title="Transaksi"
-                                    icon={renderIcon(
-                                        "transaction",
-                                        activeKey === "transaction-dashboard" ||
-                                        activeKey ===
-                                        "transaction-receive" ||
-                                        activeKey === "transaction-expense",
-                                    )}
+                                    icon={renderIcon("transaction", activeKey === "transaction-dashboard"
+                                        || activeKey === "transaction-receive" 
+                                        || activeKey === "transaction-output")}
                                     placement="rightStart"
                                 >
                                     <Nav.Item
@@ -286,21 +281,11 @@ export default function Layout(props) {
                                     </Nav.Item>
                                     <Nav.Item
                                         onClick={() => {
-                                            router.push(
-                                                "/transaction/expense",
-                                                undefined,
-                                                { shallow: true },
-                                            );
-                                            setActiveKey("transaction-expense");
+                                            router.push("/transaction/output", undefined, { shallow: true });
+                                            setActiveKey("transaction-output");
                                         }}
-                                        eventKey="transaction-expense"
-                                    >
-                                        {renderTitle(
-                                            "Pengeluaran Obat",
-                                            "child",
-                                            activeKey === "transaction-expense",
-                                        )}
-                                    </Nav.Item>
+                                        eventKey="transaction-output"
+                                    >{renderTitle("Pengeluaran Obat", "child", activeKey === "transaction-output")}</Nav.Item>
                                 </Nav.Menu>
                             )}
                             {(userRole === "pharmacist" ||

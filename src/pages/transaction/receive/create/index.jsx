@@ -26,29 +26,34 @@ const paymentMethodSchema = z.object({
     paymentMethod: isRequiredString(),
 })
 
-const medicineSchema = z.object({
-    documentNumber: isRequiredString(),
-    batchNumber: isRequiredString(),
-    medicineId: isRequiredNumber(),
+const medicineRequestSchema = z.object({
     name: isRequiredString(),
+    genericNameId: isRequiredNumber(),
     merk: isRequiredString(),
     price: isRequiredNumber(),
+    description: isRequiredString(),
     currStock: isRequiredNumber(),
     minStock: isRequiredNumber(),
     maxStock: isRequiredNumber(),
-    genericNameId: isRequiredNumber(),
     packagingId: isRequiredNumber(),
     unitOfMeasure: isRequiredString().nullable().refine(value => value !== null, {
         message: "This field is required",
     }),
-    classificationList: z.array(classificationSchema),
     sideEffect: isRequiredString(),
+    classificationList: z.array(classificationSchema),
     expiredDate: isRequiredDate(),
-    description: isRequiredString(),
+})
+
+const medicineSchema = z.object({
+    documentNumber: isRequiredString(),
+    batchCode: isRequiredString(),
+    quantity: isRequiredNumber(),
     vendorId: isRequiredNumber(),
     buyingPrice: isRequiredNumber(),
     paymentMethod: z.array(paymentMethodSchema),
+    deadline: isRequiredDate(),
     isPaid: z.boolean(),
+    medicineRequest: medicineRequestSchema
 }).refine(data => data.minStock < data.maxStock, {
     message: "Minimum stock must be less than maximum stock",
     path: ["minStock"],
@@ -254,8 +259,8 @@ export default function Index() {
                 reportId: 0
             }
 
-            // setErrors({});
-            // medicineSchema.parse(payload);
+            setErrors({});
+            medicineSchema.parse(payload);
             const res = await CreateReceiveMedicine(payload);
             if (res.code !== 200) {
                 toast.error(res.response.data.message, { autoClose: 2000, position: "top-right" });
@@ -266,6 +271,7 @@ export default function Index() {
                 router.push("/transaction/receive");
             }, 2000)
         } catch (error) {
+            console.log("error receive medicine: ", error)
             if (error instanceof ZodError) {
                 const newErrors = { ...errors };
                 error.issues.forEach((issue) => {
@@ -279,6 +285,7 @@ export default function Index() {
                         }
                     }
                 });
+                console.log("new error: ", newErrors)
                 setErrors(newErrors);
             }
         }
