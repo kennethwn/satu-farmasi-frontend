@@ -20,6 +20,8 @@ export default function DashboardView(props) {
         onChangeMonthlyReport, 
         linkTransaction,
     } = props;
+    const highestSales = Math.max(...dataAnnualReport?.map(item => parseInt(item?.sales))) + 100
+    const highestRevenue = Math.max(...dataAnnualReport?.map(item => parseInt(item?.revenue))) + 1000000
 
     const TableExpired = (props) => (
         <Table {...props}>
@@ -81,7 +83,7 @@ export default function DashboardView(props) {
                     text: 'Sales',
                 },
                 min: 0,
-                max: 200,
+                max: highestSales,
                 labels: {
                     formatter: function (value) {
                         return value.toFixed(0); // Format angka biasa untuk Sales
@@ -94,7 +96,7 @@ export default function DashboardView(props) {
                     text: 'Revenue',
                 },
                 min: 0,
-                max: 200000000,
+                max: highestRevenue,
                 labels: {
                     formatter: function (value) {
                         return formatRupiah(value);
