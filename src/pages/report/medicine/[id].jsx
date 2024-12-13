@@ -46,6 +46,9 @@ export default function index() {
     const [unFinalized, setUnFinalized] = useState(false);
     const [hasExpiredMedicine, setHasExpiredMedicine] = useState(false);
     const [showExpiredMedicine, setShowExpiredMedicine] = useState(false);
+    const [showVendor, setShowVendor] = useState(false);
+
+
     const [expiredMedicineList, setExpiredMedicineList] = useState([]);
     const [errorData, setErrorData] = useState(false);
     const [open, setOpen] = useState(false);
@@ -528,9 +531,7 @@ export default function index() {
                                                     <button
                                                         className="inline-flex items-center justify-center w-8 h-8 text-center bg-transparent border-0 rounded-lg"
                                                         onClick={() =>
-                                                            router.push(
-                                                                `/master/vendor/edit/${rowData.vendor.id}`,
-                                                            )
+                                                            setShowVendor(true)
                                                         }
                                                     >
                                                         <PiListMagnifyingGlass />
@@ -684,6 +685,29 @@ export default function index() {
                     }}
                     btnText="Lihat Laporan"
                     btnAppearance="primary"
+                />
+
+
+                <Toaster
+                    type="warning"
+                    showBtn="false"
+                    open={unFinalized}
+                    onClose={() => setShowVendor(false)}
+                    body={
+                        <div className="sm:col-span-6">
+                            <Input
+                                label={"Nama Vendor"}
+                                type={"text"}
+                                //name={}
+                                //autofocus={input.autofocus}
+                                //placeholder={input.placeholder}
+                                //error={errors[input.name]?.message}
+                            />
+                        </div>
+                    }
+                    onClick={() => {
+                        setShowVendor(false)
+                    }}
                 />
 
                 <Toaster
