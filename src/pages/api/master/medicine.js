@@ -4,6 +4,24 @@ import { useState } from "react";
 export default function useMedicineAPI() {
     const [isLoading, setIsLoading] = useState(false);
 
+    const GetMedicineDropdownList = async () => {
+        setIsLoading(true);
+        try {
+            const response = await axios.get(`/api/v1/medicines/dropdownOptions`)
+            .then((response) => {
+                setIsLoading(false);
+                return response;
+            })
+            .catch((error) => {
+                setIsLoading(false);
+                return error;
+            })
+            return response
+        } catch (error) {
+            console.error(error);
+        }
+    }
+
     const GetAllMedicines = async (page, limit) => {
         setIsLoading(true)
         try {
@@ -26,6 +44,24 @@ export default function useMedicineAPI() {
         setIsLoading(true);
         try {
             const response = await axios.get('/api/v1/medicines/total')
+            .then(response => {
+                setIsLoading(false);
+                return response;
+            })
+            .catch(error => {
+                setIsLoading(false);
+                return error;
+            })
+            return response;
+        } catch (error) {
+            console.error(error);
+        }
+    }
+
+    const GetTotalNeedToRestockMedicine = async () => {
+        setIsLoading(true);
+        try {
+            const response = await axios.get('/api/v1/medicines/total/need-to-restock')
             .then(response => {
                 setIsLoading(false);
                 return response;
@@ -131,18 +167,11 @@ export default function useMedicineAPI() {
     const EditMedicine = async (data) => {
         setIsLoading(true)
         try {
-            const response = await axios.post('/api/v1/medicines/edit', data)
-            .then((response) => {
-                setIsLoading(false);
-                return response;
-            })
-            .catch((error) => {
-                setIsLoading(false);
-                return error;
-            })
-            return response
+            return await axios.post('/api/v1/medicines/edit', data)
         } catch (error) {
-            console.error(error);
+            throw error.response.data;
+        } finally {
+            setIsLoading(false);
         }
     }
 
@@ -166,8 +195,10 @@ export default function useMedicineAPI() {
 
     return {
         isLoading,
+        GetMedicineDropdownList,
         GetAllMedicines,
         GetTotalMedicine,
+        GetTotalNeedToRestockMedicine,
         SearchMedicine,
         CreateMedicine,
         AddCurrentStock,

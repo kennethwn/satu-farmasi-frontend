@@ -1,4 +1,3 @@
-import { useRouter } from 'next/router';
 import api from "../../configs/axios/satufarmasi-service-axios"
 import { useState } from 'react';
 
@@ -67,10 +66,39 @@ export default function usePrescription() {
         }
     }
 
+    const getMostSalesMedicineByPrescription = async (data) => {
+        setIsLoading(true)
+        try {
+            const response = await api.post('/api/v1/prescriptions/most-sales-medicines', data)
+            .then((response) => {
+                setIsLoading(false);
+                return response;
+            })
+            .catch((error) => {
+                setIsLoading(false);
+                return error;
+            })
+            return response;
+        } catch (error) {
+            console.error(error);
+        }
+    }
+
     const updatePrescription = async (data) => {
         setIsLoading(true)
         try {
             return await api.put('/api/v1/prescriptions', {data})
+        } catch (error) {
+            throw error.response.data.errors
+        } finally {
+            setIsLoading(false)
+        }
+    }
+
+    const cancelPrescription = async (data) => {
+        setIsLoading(true)
+        try {
+            return await api.put('/api/v1/prescriptions/cancel/' + data)
         } catch (error) {
             throw error.response.data.errors
         } finally {
@@ -84,6 +112,8 @@ export default function usePrescription() {
         getSearchedPrescription,
         addNewPrescription,
         getPrescriptionDetail,
+        getMostSalesMedicineByPrescription,
+        cancelPrescription,
         updatePrescription
     }
 }

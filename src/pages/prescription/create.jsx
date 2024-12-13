@@ -15,7 +15,7 @@ import { ErrorForm } from "@/helpers/errorForm";
 
 const medicineSchema = z.object({
     instruction: isRequiredString(),
-    medicineId: isRequiredNumber(),
+    code: isRequiredString(),
     quantity: isRequiredNumber(),
 });
 
@@ -47,8 +47,8 @@ export default function create() {
     const [errors, setErrors] = useState({});
 
     const [formFields, setFormFields] = useState([
-        {
-            medicineId: -1,
+        {   
+            code: "",
             medicineName: "",
             quantity: 0,
             price: 0,
@@ -73,34 +73,33 @@ export default function create() {
                     credentialNum: "",
                     phoneNum: "",
                 },
-                medicineList: [
-                    {
-                        medicineId: -1,
-                        price: 0,
-                        quantity: 0,
-                        instruction: "",
-                    },
-                ],
-            };
+                medicineList : [{
+                    code: "",
+                    price: 0,
+                    quantity : 0,
+                    instruction: ""
+                }]
+            }
 
-            data.patient = selectedPatient;
-            data.medicineList.pop();
-            const temp = [...formFields];
-            console.log(temp);
-            temp.map((item) =>
-                data.medicineList.push({
-                    medicineId: parseInt(item.medicineId),
-                    quantity: parseInt(item.quantity),
-                    instruction: item.instruction,
-                    price: item.totalPrice,
-                }),
-            );
-
+            data.patient = selectedPatient
+            data.medicineList.pop()
+            const temp = [...formFields]
+            console.log(temp)
+            temp.map(item => data.medicineList.push({
+                code: item.code,
+                quantity: parseInt(item.quantity),
+                instruction: item.instruction,
+                price: item.totalPrice,
+            }))
             setErrors({});
             const dataToValidate = { prescription: data };
-            if (existingPatient)
+            if (existingPatient){
+                console.log("to be validate", dataToValidate)
                 prescriptionSchemaWithExistingPatient.parse(dataToValidate);
+            }
             else prescriptionSchemaWithNewPatient.parse(dataToValidate);
+
+            console.log(data)
 
             const res = await addNewPrescription(data);
             toast.success(res.message, {

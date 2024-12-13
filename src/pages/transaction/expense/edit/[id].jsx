@@ -13,13 +13,13 @@ import useMedicineDropdownOption from "@/pages/api/medicineDropdownOption";
 import { useUserContext } from "@/pages/api/context/UserContext";
 import { ErrorForm } from "@/helpers/errorForm";
 
-const medicineSchema = z.object({
+export const medicineSchema = z.object({
     medicineId: isRequiredNumber(),
     quantity: isRequiredNumber(),
     reasonOfDispose: isRequiredString(),
 });
 
-const createExpenseMedicineField = [
+export const createExpenseMedicineField = [
     {
         label: "Nama Obat",
         type: "text",
@@ -40,25 +40,27 @@ const createExpenseMedicineField = [
     },
 ];
 
-export default function index() {
+export default function Index() {
     const router = useRouter();
     const { user } = useUserContext();
     const id = router.query.id;
-    const { isLoading, GetMedicineById, EditMedicine } = useExpenseMedicineAPI();
-    const { getMedicineDropdownOptions } = useMedicineDropdownOption();
-    const [medicineDropdownOptions, setMedicineDropdownOptions] = useState([])
+    const { isLoading, GetMedicineById, EditMedicine, GetOuputMedicineById } = useExpenseMedicineAPI();
+    const [ medicineData, setMedicineData ] = useState({})
     const [formData, setFormData] = useState({
         medicineId: 0,
         quantity: 0,
         reasonOfDispose: "",
+        oldMedicineId: 0,
         oldQuantity: 0,
-        medicine: {}
+        medicine: {
+            currStock: null
+        }
     });
     const [errors, setErrors] = useState({});
 
     const handleFetchMedicineById = async () => {
         try {
-            const res = await GetMedicineById(id);
+            const res = await GetOuputMedicineById(id);
             if (res.code !== 200)
                 return toast.error(res.message, {
                     autoClose: 2000,
@@ -67,7 +69,11 @@ export default function index() {
             setFormData({
                 ...res.data,
                 medicineId: res.data.medicine.id,
+                oldMedicineId: res.data.medicine.id,
                 oldQuantity: parseInt(res.data.quantity),
+                medicine: {
+                    currstock: res.data.medicine.currStock,
+                },
             })
         } catch (error) {
             console.error(error);
@@ -79,7 +85,8 @@ export default function index() {
         try {
             setErrors({});
             medicineSchema.parse(formData);
-            const res = await EditMedicine(formData);
+            const submitedForm = {...formData, oldQuantity: formData.oldMedicineId !== formData.medicineId ? 0 : formData.oldQuantity}
+            const res = await EditMedicine(submitedForm);
             if (res.code !== 200)
                 return toast.error(res.message, {
                     autoClose: 2000,
@@ -90,6 +97,11 @@ export default function index() {
                 router.push("/transaction/expense");
             }, 2000)
         } catch (error) {
+            toast.error(error.response.data.message, {
+                autoClose: 2000,
+                position: "top-right",
+            });
+            error = error.response.data.errors
             if (error instanceof ZodError) {
                 const newErrors = { ...errors };
                 error.issues.forEach((issue) => {
@@ -108,25 +120,10 @@ export default function index() {
     const reasonOfDisposeListData = ["Broken", "Lost", "Expired"]
         .map(item => ({ label: item, value: item.toUpperCase() }));
 
-    const data = Object.entries(medicineDropdownOptions)
-        .map(([key, item]) => ({ label: item.name, value: key, }));
-
     useEffect(() => {
         const fetchData = async () => await handleFetchMedicineById();
         if (router.isReady) fetchData();
     }, [id]);
-
-    useEffect(() => {
-        async function fetchMedicineDropdownOptionsData() {
-            try {
-                const response = await getMedicineDropdownOptions()
-                setMedicineDropdownOptions(response)
-            } catch (error) {
-                console.error(error);
-            }
-        }
-        fetchMedicineDropdownOptionsData()
-    }, [])
 
     const inputOnChangeHandler = (e, name) => {
         if (name === "medicineId" || name === "reasonOfDispose") {
@@ -137,6 +134,38 @@ export default function index() {
             setErrors((prevErrors) => ({ ...prevErrors, [e.target.name]: "" }));
         }
     };
+
+    const handleFetchCurrentMedicineStock = async () => {
+        try {
+            const currMedicineId = formData.medicineId;
+            const res = await GetMedicineById(currMedicineId);
+            if (res.code !== 200)
+                return toast.error(res.message, {
+                    autoClose: 2000,
+                    position: "top-right",
+                });
+            setFormData({
+                ...formData,
+                medicine: {
+                    currStock: res.data.currStock
+                }
+            })
+            setMedicineData(res.data)
+            if (res.data.quantity === 0) {
+                const newErrors = { ...errors };
+                newErrors["currStock"] = "Current Medicine Stock is empty";
+                setErrors(newErrors);
+            }
+        } catch (error) {
+            console.error(error);
+        }
+    }
+
+    useEffect(() => {
+        if (formData.medicineId !== 0) {
+            handleFetchCurrentMedicineStock();
+        }
+    }, [formData.medicineId])
 
     return (
         <Layout active="master-expense-medicine" user={user}>
@@ -149,15 +178,16 @@ export default function index() {
                     <div className="grid grid-cols-1 gap-x-6 gap-y-6 sm:grid-cols-6">
                         {createExpenseMedicineField.map((input, index) => {
                             return (
-                                <div className="sm:col-span-6">
+                                <div key={index} className="sm:col-span-6">
                                     {
                                         input.name == "reasonOfDispose" &&
                                         <Dropdown
                                             id={index}
                                             name={input.name}
                                             label={input.label}
-                                            data={reasonOfDisposeListData}
-                                            value={formData.reasonOfDispose}
+                                            data={["Broken", "Lost", "Expired"]
+                                                .map(item => ({ label: item, value: item.toUpperCase() }))}
+                                            value={formData.reasonOfDispose.toUpperCase()}
                                             onChange={e => inputOnChangeHandler(e, input.name)}
                                             searchable={false}
                                             placeholder="Select Reason of Dispose"
@@ -166,23 +196,22 @@ export default function index() {
                                     }
                                     {
                                         input.name == "medicineId" &&
-                                        <Dropdown
+                                        <Input
                                             id={index}
                                             name={input.name}
                                             label={input.label}
-                                            data={data}
-                                            value={formData.medicineId.toString()}
-                                            onChange={e => inputOnChangeHandler(e, input.name)}
+                                            value={medicineData.name}
                                             placeholder="Select Medicine Name"
                                             error={errors[input.name]}
+                                            disabled="true"
                                         />
                                     }
                                     {
                                         input.name == "quantity" &&
                                         (
-                                            <div class="flex ">
+                                            <div class="flex gap-x-5">
                                                 <Input
-                                                    label={"Jumlah Keluar"}
+                                                    label={"Jumlah Obat Keluar"}
                                                     type={"number"}
                                                     name={"quantity"}
                                                     value={formData.quantity}

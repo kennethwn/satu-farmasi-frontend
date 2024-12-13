@@ -7,7 +7,9 @@ export default function useExpenseMedicineAPI() {
     const GetAllMedicine = async (page, limit) => {
         setIsLoading(true);
         try {
-            return await axios.get(`/api/v1/outputMedicines?page=${page}&limit=${limit}`);
+            return await axios.get(
+                `/api/v1/outputMedicines?page=${page}&limit=${limit}`,
+            );
         } catch (error) {
             console.error(error);
         } finally {
@@ -17,10 +19,11 @@ export default function useExpenseMedicineAPI() {
 
     const GetMedicineByParams = async (params) => {
         setIsLoading(true);
-		let query = "";
-		if (params.q.length !== 0 && params.filter.length !== 0) query = `?q=${params.q}&filter=${params.filter}`;
-		else if (params.q.length !== 0) query = `?q=${params.q}`;
-		else if (params.filter.length !== 0) query = `?filter=${params.filter}`;
+        let query = "";
+        if (params.q.length !== 0 && params.filter.length !== 0)
+            query = `?q=${params.q}&filter=${params.filter}`;
+        else if (params.q.length !== 0) query = `?q=${params.q}`;
+        else if (params.filter.length !== 0) query = `?filter=${params.filter}`;
         try {
             return await axios.get(`/api/v1/outputMedicines${query}`);
         } catch (error) {
@@ -30,10 +33,18 @@ export default function useExpenseMedicineAPI() {
         }
     };
 
+    const GetOuputMedicineById = async (id) => {
+        try {
+            return await axios.get(`/api/v1/outputMedicines/${id}`);
+        } catch (error) {
+            console.error(error);
+        }
+    };
+
     const GetMedicineById = async (id) => {
         setIsLoading(true);
         try {
-            return await axios.get(`/api/v1/outputMedicines/${id}`);
+            return await axios.get(`/api/v1/medicines/${id}`);
         } catch (error) {
             console.error(error);
         } finally {
@@ -46,7 +57,7 @@ export default function useExpenseMedicineAPI() {
         try {
             return await axios.post("/api/v1/outputMedicines/", data);
         } catch (error) {
-            console.error(error);
+            throw error;
         } finally {
             setIsLoading(false);
         }
@@ -57,7 +68,7 @@ export default function useExpenseMedicineAPI() {
         try {
             return await axios.put(`/api/v1/outputMedicines/`, data);
         } catch (error) {
-			throw error.response.data.errors;
+            throw error
         } finally {
             setIsLoading(false);
         }
@@ -67,7 +78,9 @@ export default function useExpenseMedicineAPI() {
         setIsLoading(true);
         try {
             data.medicineId = data.medicine.id;
-            return await axios.delete(`/api/v1/outputMedicines/`, { data: data });
+            return await axios.delete(`/api/v1/outputMedicines/`, {
+                data: data,
+            });
         } catch (error) {
             console.error(error);
         } finally {
@@ -83,5 +96,6 @@ export default function useExpenseMedicineAPI() {
         EditMedicine,
         DeleteMedicine,
         GetMedicineByParams,
+        GetOuputMedicineById,
     };
 }

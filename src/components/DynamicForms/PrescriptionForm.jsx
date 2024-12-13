@@ -8,101 +8,100 @@ import { formatRupiah } from "@/helpers/currency";
 import Dropdown from "../SelectPicker/Dropdown";
 
 function PrescriptionForm(props) {
-    const { formFields, setFormFields, errors, setErrors } = props;
+  const { formFields, setFormFields, errors, setErrors } = props;
 
-    const { getMedicineDropdownOptions } = useMedicineDropdownOption();
-    const [medicineDropdownOptions, setMedicineDropdownOptions] = useState([]);
+  const { getMedicineDropdownOptions } = useMedicineDropdownOption();
+  const [medicineDropdownOptions, setMedicineDropdownOptions] = useState([]);
 
-    const data = Object.entries(medicineDropdownOptions).map(([key, item]) => ({
-        label: item.name,
-        value: parseInt(key),
-    }));
+  const data = Object.entries(medicineDropdownOptions).map(([key, item]) => ({
+    label: key + " - " + item.name,
+    value: key,
+  }));
 
-    useEffect(() => {
-        async function fetchMedicineDropdownOptionsData() {
-            try {
-                const response = await getMedicineDropdownOptions();
-                setMedicineDropdownOptions(response);
-            } catch (error) {
-                console.log("error #getMedicineOptions");
-            }
+  useEffect(() => {
+    async function fetchMedicineDropdownOptionsData(){
+        try {
+            const response = await getMedicineDropdownOptions()
+            setMedicineDropdownOptions(response.data)
+        } catch (error) {
+            console.log("error #getMedicineOptions")
         }
-        fetchMedicineDropdownOptionsData();
-    }, []);
+    } 
+    fetchMedicineDropdownOptionsData();
+  }, []);
 
-    useEffect(() => {
-        console.log(formFields);
-    }, [formFields]);
+  useEffect(() => {
+      console.log(formFields);
+  }, [formFields]);
 
-    const handleMedicineChange = (formFieldId, medicineId) => {
-        let updatedData = {
-            medicineId: medicineId,
-            medicineName: medicineDropdownOptions[medicineId]?.name,
-            quantity: 0,
-            price: medicineDropdownOptions[medicineId].price,
-            totalPrice: 0,
-        };
-        let temp = [...formFields];
+  const handleMedicineChange = (formFieldId, code) => {
+    const checkIfStockIsInsufficient = (medicineDropdownOption, quantity) => {
+      return medicineDropdownOption.currStock - quantity < 0
+    }
 
-        temp.forEach((item, index) => {
-            if (index === formFieldId) {
-                item.medicineId = updatedData.medicineId;
-                item.medicineName = updatedData.medicineName;
-                item.quantity = 0;
-                item.price = updatedData.price;
-                item.totalPrice = 0;
-            }
-        });
-
-        setFormFields(temp);
+    let updatedData = {
+      code: code,
+      medicineName: medicineDropdownOptions[code]?.name,
+      quantity: 0,
+      price: medicineDropdownOptions[code]?.price,
+      totalPrice: 0,
+      insufficientStock: checkIfStockIsInsufficient(medicineDropdownOptions[code], quantity)
     };
+    let temp = [...formFields];
 
-    const handleAddFormFieldRow = () => {
-        const newFormField = {
-            medicineId: -1,
-            medicineName: "",
-            quantity: 0,
-            price: 0,
-            totalPrice: 0,
-            instruction: "",
-            insufficientStock: false,
-        };
-        setFormFields([...formFields, newFormField]);
+    temp.forEach((item, index) => {
+      if (index === formFieldId) {
+        item.code = updatedData.code;
+        item.medicineName = updatedData.medicineName;
+        item.quantity = 0;
+        item.price = updatedData.price;
+        item.totalPrice = 0;
+      }
+    });
+
+    setFormFields(temp);
+  };
+
+  const handleAddFormFieldRow = () => {
+    const newFormField = {
+      code: "",
+      medicineName: "",
+      quantity: 0,
+      price: 0,
+      totalPrice: 0,
+      instruction: "",
+      insufficientStock: false
     };
+    setFormFields([...formFields, newFormField]);
+  };
 
-    const handleMedicineQuantity = (formFieldId, quantity) => {
-        const medicineId = formFields[formFieldId].medicineId;
-        const checkIfStockIsInsufficient = (
-            medicineDropdownOption,
-            quantity,
-        ) => {
-            return medicineDropdownOption.currStock - quantity < 0;
-        };
+  const handleMedicineQuantity = (formFieldId, quantity) => {
+    const code = formFields[formFieldId].code;
+    const checkIfStockIsInsufficient = (medicineDropdownOption, quantity) => {
+      return medicineDropdownOption.currStock - quantity < 0
+    }
 
-        let updatedData = {
-            id: formFieldId,
-            medicineId: medicineId,
-            medicineName: medicineDropdownOptions[medicineId].name,
-            quantity: quantity,
-            price: medicineDropdownOptions[medicineId].price,
-            totalPrice: medicineDropdownOptions[medicineId].price * quantity,
-            insufficientStock: checkIfStockIsInsufficient(
-                medicineDropdownOptions[medicineId],
-                quantity,
-            ),
-        };
-        let temp = [...formFields];
+    let updatedData = {
+      id: formFieldId,
+      code: code,
+      medicineName: medicineDropdownOptions[code] && medicineDropdownOptions[code].name,
+      quantity: quantity,
+      price: medicineDropdownOptions[code] ? medicineDropdownOptions[code].price : 0,
+      totalPrice: medicineDropdownOptions[code] ? medicineDropdownOptions[code].price * quantity : 0,
+      insufficientStock: medicineDropdownOptions[code] && checkIfStockIsInsufficient(medicineDropdownOptions[code], quantity)
+    };
+    let temp = [...formFields];
 
-        temp.forEach((item, index) => {
-            if (index === formFieldId) {
-                item.medicineId = updatedData.medicineId;
-                item.medicineName = updatedData.medicineName;
-                item.quantity = updatedData.quantity;
-                item.price = updatedData.price;
-                item.totalPrice = updatedData.totalPrice;
-                item.insufficientStock = updatedData.insufficientStock;
-            }
-        });
+    temp.forEach((item, index) => {
+      if (index === formFieldId) {
+        item.code = updatedData.code;
+        item.medicineName = updatedData.medicineName;
+        item.quantity = updatedData.quantity;
+        item.price = updatedData.price;
+        item.totalPrice = updatedData.totalPrice;
+        item.insufficientStock = updatedData.insufficientStock
+      }
+    });
 
         setFormFields(temp);
     };
@@ -164,31 +163,31 @@ function PrescriptionForm(props) {
                                         handleMedicineChange(index, value);
                                         setErrors({
                                             ...errors,
-                                            [`prescription.medicineList.${index}.medicineId`]:
+                                            [`prescription.medicineList.${index}.code`]:
                                                 "",
                                         });
                                     }}
-                                    value={formField.medicineId}
-                                    renderValue={
-                                        formField.medicineId != -1
-                                            ? (value) => (
-                                                <div className="text-sm">
-                                                    {
-                                                        medicineDropdownOptions[
-                                                            value
-                                                        ].name
-                                                    }
-                                                </div>
-                                            )
-                                            : null
-                                    }
+                                    value={formField.code}
+                                    // renderValue={
+                                    //     formField.medicineId != ""
+                                    //         ? (value) => (
+                                    //             <div className="text-sm">
+                                    //                 {
+                                    //                     medicineDropdownOptions[
+                                    //                         value
+                                    //                     ]?.name
+                                    //                 }
+                                    //             </div>
+                                    //         )
+                                    //         : null
+                                    // }
                                     block
                                     style={{}}
                                     placement="bottomStart"
                                     cleanable={false}
                                     error={
                                         errors[
-                                        `prescription.medicineList.${index}.medicineId`
+                                        `prescription.medicineList.${index}.code`
                                         ]
                                     }
                                 />

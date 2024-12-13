@@ -16,9 +16,10 @@ export default function Button(props) {
 
     if (appearance === 'primary') className.push('bg-button-primary text-white hover:bg-hover-dark')
     if (appearance === 'danger') className.push('bg-button-danger text-danger hover:bg-danger hover:text-white')
+    if (appearance === 'subtle') className.push('bg-button-subtle text-dark hover:bg-hover-light')
 
-    if (size === 'small') className.push(`text-sm inline-block py-2 ${isLoading || appendIcon ? 'px-4' : 'px-6'}`)
-    if (size === 'medium') className.push(`inline-block py-2.5 ${isLoading || appendIcon ? 'px-4' : 'px-6'}`)
+    if (size === 'small') className.push(`text-sm font-medium inline-block py-2 ${isLoading || appendIcon ? 'px-4' : 'px-6'}`)
+    if (size === 'medium') className.push(`inline-block font-semibold py-2.5 ${isLoading || appendIcon ? 'px-4' : 'px-6'}`)
 
     const onClick = () => {
         if (props.onClick && !isLoading) props.onClick()
@@ -26,7 +27,7 @@ export default function Button(props) {
 
     return (
         <button 
-            className={`select-none rounded-lg font-semibold cursor-pointer ${className.join(" ")}`} 
+            className={`select-none rounded-lg cursor-pointer ${className.join(" ")}`} 
             type={type}
             disabled={isDisabled} 
             onClick={onClick}
@@ -65,5 +66,5 @@ Button.propTypes = {
     appendIcon: propTypes.node,
     size: propTypes.oneOf(['small', 'medium', 'large', 'flex']),
     isDisabled: propTypes.bool,
-    isLoading: propTypes.bool
+    isLoading: propTypes.bool,
 }
