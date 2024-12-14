@@ -260,7 +260,7 @@ export default function Index() {
             }
 
             setErrors({});
-            medicineSchema.parse(payload);
+            //medicineSchema.parse(payload);
             const res = await CreateReceiveMedicine(payload);
             if (res.code !== 200) {
                 toast.error(res.response.data.message, { autoClose: 2000, position: "top-right" });

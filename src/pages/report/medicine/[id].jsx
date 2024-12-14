@@ -18,16 +18,21 @@ import { generateOutputMedicine } from "@/data/document";
 import OutputMedicineWitnessForm from "@/components/DynamicForms/OuputMedicineWitnessForm";
 import formatDate, { formatCalendar } from "@/helpers/dayHelper";
 import usePharmacy from "@/pages/api/pharmacy";
+import Text from "@/components/Text";
+import prescriptionStatusMapped from "@/helpers/prescriptionStatusMap";
 
 export default function index() {
     const router = useRouter();
     const id = router.query.id;
     const { Header, Body, Footer } = Modal;
     const { HeaderCell, Cell, Column } = Table;
-    const { isLoading, GetReportById, finalizeReport, checkExpiredMedicine } = useReportAPI();
+    const { isLoading, GetReportById, finalizeReport, checkExpiredMedicine } =
+        useReportAPI();
+
+    const prescriptionStatusMap = prescriptionStatusMapped;
     const [currState, setCurrState] = useState(0);
-    const { bulkCreate,GetOutputMedicineById } = useOutputMedicineAPI();
-	const { getPharmacyInfo } = usePharmacy()
+    const { bulkCreate, GetOutputMedicineById } = useOutputMedicineAPI();
+    const { getPharmacyInfo } = usePharmacy();
 
     const [modalState, setModalState] = useState([
         {
@@ -42,12 +47,107 @@ export default function index() {
     ]);
 
     const { user } = useUserContext();
-    const [value, setValue] = useState({});
+    const [value, setValue] = useState({
+        transactions: [
+            {
+                id: 0,
+                patient: {
+                    id: 0,
+                    name: "",
+                },
+                prescription: {
+                    id: 0,
+                    status: "",
+                    medicineList: [
+                        {
+                            id: 0,
+                            medicineCode: "",
+                            quantity: 0,
+                            instruction: "",
+                            totalPrice: "",
+                            draft: false,
+                            medicine: {
+                                id: 0,
+                                name: "",
+                                price: "",
+                            },
+                        },
+                    ],
+                    diagnose: {
+                        doctor: {
+                            fullName: "",
+                        },
+                    },
+                },
+                pharmacist: {
+                    id: 5,
+                    firstName: "",
+                    lastName: "",
+                    fullName: "",
+                },
+                totalPrice: "",
+            },
+        ],
+        receiveMedicines: [
+            {
+                vendor: {},
+                medicine: {
+                    packaging: {
+                        id: "",
+                        value: "",
+                    },
+                    genericName: {
+                        id: "",
+                        value: "",
+                    },
+                    classifications: [
+                        {
+                            classification: {
+                                id: "",
+                                value: "",
+                            },
+                        },
+                    ],
+                },
+            },
+        ],
+        outputMedicines: [
+            {
+                id: 0,
+                quantity: 0,
+                reasonOfDispose: "",
+                physicalReportId: 0,
+                medicine: {
+                    id: 0,
+                    code: "",
+                    name: "",
+                    batchCode: "",
+                    genericNameId: 0,
+                    merk: "",
+                    description: "",
+                    unitOfMeasure: "",
+                    price: "",
+                    expiredDate: "",
+                    packagingId: 0,
+                    currStock: 0,
+                    minStock: 0,
+                    maxStock: 0,
+                    reservedStock: 0,
+                    sideEffect: "",
+                },
+                medicineName: ""
+            },
+        ]
+    });
     const [unFinalized, setUnFinalized] = useState(false);
     const [hasExpiredMedicine, setHasExpiredMedicine] = useState(false);
     const [showExpiredMedicine, setShowExpiredMedicine] = useState(false);
+    const [showPrescirptions, setShowPrescriptions] = useState(false);
+    const [activeIndex, setActiveIndex] = useState(0);
     const [showVendor, setShowVendor] = useState(false);
-
+    const [showOutputMedicine, setShowOuputMedicine] = useState(false);
+    const [showReceiveMedicineDetail, setShowReceiveMedicineDetail] =
+        useState(false);
 
     const [expiredMedicineList, setExpiredMedicineList] = useState([]);
     const [errorData, setErrorData] = useState(false);
@@ -68,13 +168,21 @@ export default function index() {
             console.log(res.data);
             setValue({
                 ...res.data,
-                //receiveMedicines: res.data.receiveMedicines.map(item => ({
-                //    ...item,
-                //    buyingPrice: formatRupiah(item.buyingPrice),
-                //})),
+                receiveMedicines: res.data.receiveMedicines.map((item) => ({
+                    ...item,
+                    buyingPrice: formatRupiah(item.buyingPrice),
+                    medicine: {
+                        ...item.medicine,
+                        expiredDate: formatCalendar(item.medicine.expiredDate)
+                    }
+                })),
                 outputMedicines: res.data.outputMedicines.map((item) => ({
                     ...item,
                     medicineName: item.medicine.name,
+                    medicine: {
+                        ...item.medicine,
+                        expiredDate: formatCalendar(item.medicine.expiredDate)
+                    }
                 })),
                 transactions: res.data.transactions.map((item) => ({
                     ...item,
@@ -123,6 +231,7 @@ export default function index() {
     const handleFinalizeReport = async () => {
         try {
             const res = await finalizeReport(id);
+            console.log("res finalizeReport: ", res);
             setValue({ ...value, isFinalized: true });
             toast.success(res.message, {
                 autoClose: 2000,
@@ -130,6 +239,7 @@ export default function index() {
             });
             console.log(res.data);
         } catch (error) {
+            console.log("error finalizeReport: ", error);
             console.error(error);
             error.errors.forEach((errorObject) => {
                 Object.entries(errorObject).forEach(([field, details]) => {
@@ -146,18 +256,18 @@ export default function index() {
             });
         }
     };
-    
+
     const handleFetchExpiredMedicine = async () => {
         try {
             const res = await checkExpiredMedicine();
             setShowExpiredMedicine(true);
             // TODO: Fix the date formating
-            const temp = [...res.data]
-            temp.map(item => ({
+            const temp = [...res.data];
+            temp.map((item) => ({
                 ...item,
-                expiredDate: formatDate(item.expiredDate)
-            }))
-            setExpiredMedicineList(temp)
+                expiredDate: formatDate(item.expiredDate),
+            }));
+            setExpiredMedicineList(temp);
         } catch (error) {
             console.error(error);
         }
@@ -275,7 +385,7 @@ export default function index() {
 
     const handleBulkMedicine = async () => {
         try {
-            const { name, address } = await handleFetchPharmacyInfo()
+            const { name, address } = await handleFetchPharmacyInfo();
             const submitedData = {
                 medicineList: expiredMedicineList,
                 physicalReport: {
@@ -285,10 +395,10 @@ export default function index() {
                         sipaNumber: user.sipaNumber,
                         pharmacy: name,
                         addressPharmacy: address,
-                        witnesses: formField
-                    }
-                }
-            }
+                        witnesses: formField,
+                    },
+                },
+            };
             const res = await bulkCreate(submitedData);
             toast.success(res.message, {
                 autoClose: 2000,
@@ -297,28 +407,42 @@ export default function index() {
             console.log("expired medicine: ", expiredMedicineList);
             setValue({
                 ...value,
-                outputMedicine: value.outputMedicines.push(...expiredMedicineList)
-            })
-            setShowExpiredMedicine(false)
+                outputMedicine: value.outputMedicines.push(
+                    ...expiredMedicineList,
+                ),
+            });
+            setShowExpiredMedicine(false);
         } catch (error) {
             console.error(error);
         }
-    }
+    };
 
     useEffect(() => {
         console.log("value: ", value);
-    }, [value])
+        console.log("value: ", JSON.stringify(value));
+    }, [value]);
 
+    useEffect(() => {
+        console.log("showVendor: ", showVendor);
+    }, [showVendor]);
+
+    useEffect(() => {
+        console.log("activeIndex", activeIndex);
+    }, [activeIndex]);
+
+    useEffect(() => {
+        console.log("hasExpiredMedicine", hasExpiredMedicine);
+    }, [hasExpiredMedicine]);
 
     const handleFetchPharmacyInfo = async () => {
         try {
             const res = await getPharmacyInfo();
-            const { name, address } = res.data
-            return { name, address }
+            const { name, address } = res.data;
+            return { name, address };
         } catch (error) {
             console.error(error);
         }
-    }
+    };
 
     return (
         <Layout active="master-report" user={user}>
@@ -422,11 +546,14 @@ export default function index() {
                                                 <div className="flex justify-center flex-row gap-6">
                                                     <button
                                                         className="inline-flex items-center justify-center w-8 h-8 text-center bg-transparent border-0 rounded-lg"
-                                                        onClick={() =>
-                                                            router.push(
-                                                                `/prescription/edit/${rowData.prescription.id}`,
-                                                            )
-                                                        }
+                                                        onClick={() => {
+                                                            setShowPrescriptions(
+                                                                true,
+                                                            );
+                                                            setActiveIndex(
+                                                                index,
+                                                            );
+                                                        }}
                                                     >
                                                         <PiListMagnifyingGlass />
                                                     </button>
@@ -530,9 +657,12 @@ export default function index() {
                                                 <div className="flex justify-center flex-row gap-6">
                                                     <button
                                                         className="inline-flex items-center justify-center w-8 h-8 text-center bg-transparent border-0 rounded-lg"
-                                                        onClick={() =>
-                                                            setShowVendor(true)
-                                                        }
+                                                        onClick={() => {
+                                                            setShowVendor(true);
+                                                            setActiveIndex(
+                                                                index,
+                                                            );
+                                                        }}
                                                     >
                                                         <PiListMagnifyingGlass />
                                                     </button>
@@ -552,11 +682,14 @@ export default function index() {
                                                 <div className="flex justify-center flex-row gap-6">
                                                     <button
                                                         className="inline-flex items-center justify-center w-8 h-8 text-center bg-transparent border-0 rounded-lg"
-                                                        onClick={() =>
-                                                            router.push(
-                                                                `/master/medicine/edit/${rowData.medicine.id}`,
-                                                            )
-                                                        }
+                                                        onClick={() => {
+                                                            setShowReceiveMedicineDetail(
+                                                                true,
+                                                            );
+                                                            setActiveIndex(
+                                                                index,
+                                                            );
+                                                        }}
                                                     >
                                                         <PiListMagnifyingGlass />
                                                     </button>
@@ -633,6 +766,29 @@ export default function index() {
                                                 <div className="flex justify-center flex-row gap-6">
                                                     <button
                                                         className="inline-flex items-center justify-center w-8 h-8 text-center bg-transparent border-0 rounded-lg"
+                                                        onClick={() => {
+                                                            setShowOuputMedicine(true)
+                                                            setActiveIndex(index)
+                                                        }}
+                                                    >
+                                                        <PiListMagnifyingGlass />
+                                                    </button>
+                                                </div>
+                                            );
+                                        }}
+                                    </Cell>
+                                </Column>
+
+                                <Column width={150} flexGrow={1}>
+                                    <HeaderCell className="text-center text-dark font-bold">
+                                        Export PDF
+                                    </HeaderCell>
+                                    <Cell className="text-center">
+                                        {(rowData, index) => {
+                                            return (
+                                                <div className="flex justify-center flex-row gap-6">
+                                                    <button
+                                                        className="inline-flex items-center justify-center w-8 h-8 text-center bg-transparent border-0 rounded-lg"
                                                         onClick={() =>
                                                             HandleFetchOutputMedicinePhysicalReport(
                                                                 rowData?.id,
@@ -687,28 +843,538 @@ export default function index() {
                     btnAppearance="primary"
                 />
 
+                {value && value.transactions.length > 0 ? (
+                    <Toaster
+                        size="lg"
+                        type="primary"
+                        showBtn={false}
+                        title={"Detail Resep"}
+                        open={showPrescirptions}
+                        onClose={() => setShowPrescriptions(false)}
+                        body={
+                            <div className="sm:col-span-6 text-start">
+                                <div className="flex gap-x-5">
+                                    <Input
+                                        label={"Nama Pasien"}
+                                        value={
+                                            value.transactions[activeIndex]
+                                                .patient.name
+                                        }
+                                        type={"text"}
+                                        disabled
+                                        name={"name"}
+                                        autofocus={false}
+                                        placeholder={"Nama Pasien"}
+                                    />
 
-                <Toaster
-                    type="warning"
-                    showBtn="false"
-                    open={unFinalized}
-                    onClose={() => setShowVendor(false)}
-                    body={
-                        <div className="sm:col-span-6">
-                            <Input
-                                label={"Nama Vendor"}
-                                type={"text"}
-                                //name={}
-                                //autofocus={input.autofocus}
-                                //placeholder={input.placeholder}
-                                //error={errors[input.name]?.message}
-                            />
-                        </div>
-                    }
-                    onClick={() => {
-                        setShowVendor(false)
-                    }}
-                />
+                                    <Input
+                                        label={"Nama Farmasi"}
+                                        value={
+                                            value.transactions[activeIndex]
+                                                .pharmacist.fullName
+                                        }
+                                        type={"text"}
+                                        disabled
+                                        name={"name"}
+                                        autofocus={false}
+                                        placeholder={"Nama Farmasi"}
+                                    />
+                                </div>
+
+                                <Input
+                                    label={"Status Resep"}
+                                    value={
+                                        prescriptionStatusMap.get(
+                                            value.transactions[activeIndex]
+                                                .prescription.status,
+                                        )?.label
+                                    }
+                                    type={"text"}
+                                    disabled
+                                    name={"status"}
+                                    autofocus={false}
+                                    placeholder={"Status Resep"}
+                                />
+
+                                <Input
+                                    label={"Total Harga Transaksi"}
+                                    value={
+                                        value.transactions[activeIndex]
+                                            .totalPrice
+                                    }
+                                    type={"text"}
+                                    currency={true}
+                                    disabled
+                                    name={"totalPrice"}
+                                    autofocus={false}
+                                    placeholder={"Total Harga Transaksi"}
+                                />
+
+                                <Text type={"title"} className="mb-3">
+                                    List Obat
+                                </Text>
+
+                                {value.transactions[
+                                    activeIndex
+                                ].prescription.medicineList.map((item) => {
+                                    return (
+                                        <>
+                                            <div className="flex gap-x-5">
+                                                <Input
+                                                    label={"Nama Obat"}
+                                                    value={item.medicine.name}
+                                                    type={"text"}
+                                                    disabled
+                                                    name={"medicineName"}
+                                                    autofocus={false}
+                                                    placeholder={"Nama Obat"}
+                                                />
+
+                                                <Input
+                                                    label={"Jumlah Obat"}
+                                                    value={item.quantity}
+                                                    type={"text"}
+                                                    disabled
+                                                    name={"quantity"}
+                                                    autofocus={false}
+                                                    placeholder={"Jumlah Obat"}
+                                                />
+
+                                                <Input
+                                                    label={"Harga Per Obat"}
+                                                    value={item.medicine.price}
+                                                    type={"text"}
+                                                    disabled
+                                                    name={"price"}
+                                                    autofocus={false}
+                                                    placeholder={
+                                                        "Harga Per Obat"
+                                                    }
+                                                />
+
+                                                <Input
+                                                    label={"Total Harga Obat"}
+                                                    value={item.totalPrice}
+                                                    type={"text"}
+                                                    disabled
+                                                    name={"totalPrice"}
+                                                    autofocus={false}
+                                                    placeholder={
+                                                        "Total Harga Obat"
+                                                    }
+                                                />
+                                            </div>
+
+                                            <Input
+                                                label={"Kode Obat"}
+                                                value={item.medicineCode}
+                                                type={"text"}
+                                                disabled
+                                                name={"medicineCode"}
+                                                autofocus={false}
+                                                placeholder={"Kode Obat"}
+                                            />
+                                        </>
+                                    );
+                                })}
+                            </div>
+                        }
+                        onClick={() => {
+                            setShowPrescriptions(false);
+                        }}
+                    />
+                ) : null}
+
+
+                {value && value.outputMedicines.length > 0 ? (
+<>
+                        <Toaster
+                            size="lg"
+                            type="primary"
+                            showBtn={false}
+                            title={"Detail Obat Keluar"}
+                            open={showOutputMedicine}
+                            onClose={() => setShowOuputMedicine(false)}
+                            body={
+                                <div className="sm:col-span-6 text-start">
+                                    <div className="flex gap-x-5">
+                                        <Input
+                                            label={"Nama Obat"}
+                                            value={
+                                                value.outputMedicines[
+                                                    activeIndex
+                                                ].medicine.name
+                                            }
+                                            type={"text"}
+                                            disabled
+                                            name={"medicineName"}
+                                            autofocus={false}
+                                            placeholder={"Nama Obat"}
+                                        />
+
+                                        <Input
+                                            label={"Kode Batch"}
+                                            value={
+                                                value.outputMedicines[
+                                                    activeIndex
+                                                ].medicine.batchCode
+                                            }
+                                            type={"text"}
+                                            disabled
+                                            name={"batchCode"}
+                                            autofocus={false}
+                                            placeholder={"Kode Batch"}
+                                        />
+                                    </div>
+
+                                    <Input
+                                        label={"Merek"}
+                                        value={
+                                            value.outputMedicines[activeIndex]
+                                                .medicine.merk
+                                        }
+                                        type={"text"}
+                                        disabled
+                                        name={"merk"}
+                                        autofocus={false}
+                                        placeholder={"Nama Merek"}
+                                    />
+
+                                    <Input
+                                        label={"Deskripsi Obat"}
+                                        value={
+                                            value.outputMedicines[activeIndex]
+                                                .medicine.description
+                                        }
+                                        type={"text"}
+                                        disabled
+                                        name={"description"}
+                                        autofocus={false}
+                                        placeholder={"Deskripsi Obat"}
+                                    />
+
+                                    <Input
+                                        label={"Efek Samping"}
+                                        value={
+                                            value.outputMedicines[activeIndex]
+                                                .medicine.sideEffect
+                                        }
+                                        type={"text"}
+                                        disabled
+                                        name={"sideEffect"}
+                                        autofocus={false}
+                                        placeholder={"Efek Samping"}
+                                    />
+
+                                    <Input
+                                        label={"Harga Obat"}
+                                        value={
+                                            value.outputMedicines[activeIndex]
+                                                .medicine.price
+                                        }
+                                        type={"text"}
+                                        currency={true}
+                                        disabled
+                                        name={"price"}
+                                        autofocus={false}
+                                        placeholder={"Harga Obat"}
+                                    />
+
+                                    <div className="flex gap-x-5">
+                                        <Input
+                                            label={"Satuan Ukuran"}
+                                            value={
+                                                value.outputMedicines[
+                                                    activeIndex
+                                                ].medicine.unitOfMeasure
+                                            }
+                                            type={"text"}
+                                            disabled
+                                            name={"unitOfMeasure"}
+                                            autofocus={false}
+                                            placeholder={"Satuan Ukuran"}
+                                        />
+                                        <Input
+                                            label={"Tanggal Ekspired"}
+                                            value={
+                                                value.outputMedicines[
+                                                    activeIndex
+                                                ].medicine.expiredDate
+                                            }
+                                            type={"text"}
+                                            disabled
+                                            name={"expiredDate"}
+                                            autofocus={false}
+                                            placeholder={"Tanggal Ekspired"}
+                                        />
+                                    </div>
+                                </div>
+                            }
+                            onClick={() => {
+                                setShowReceiveMedicineDetail(false);
+                            }}
+                        />
+</>
+                ): null}
+
+                {value && value.receiveMedicines.length > 0 ? (
+                    <>
+                        <Toaster
+                            size="lg"
+                            type="primary"
+                            showBtn={false}
+                            title={"Detail Obat Masuk"}
+                            open={showReceiveMedicineDetail}
+                            onClose={() => setShowReceiveMedicineDetail(false)}
+                            body={
+                                <div className="sm:col-span-6 text-start">
+                                    <div className="flex gap-x-5">
+                                        <Input
+                                            label={"Nama Obat"}
+                                            value={
+                                                value.receiveMedicines[
+                                                    activeIndex
+                                                ].medicine.name
+                                            }
+                                            type={"text"}
+                                            disabled
+                                            name={"medicineName"}
+                                            autofocus={false}
+                                            placeholder={"Nama Obat"}
+                                        />
+
+                                        <Input
+                                            label={"Kode Batch"}
+                                            value={
+                                                value.receiveMedicines[
+                                                    activeIndex
+                                                ].medicine.batchCode
+                                            }
+                                            type={"text"}
+                                            disabled
+                                            name={"batchCode"}
+                                            autofocus={false}
+                                            placeholder={"Kode Batch"}
+                                        />
+                                    </div>
+
+                                    <Input
+                                        label={"Merek"}
+                                        value={
+                                            value.receiveMedicines[activeIndex]
+                                                .medicine.merk
+                                        }
+                                        type={"text"}
+                                        disabled
+                                        name={"merk"}
+                                        autofocus={false}
+                                        placeholder={"Nama Merek"}
+                                    />
+
+                                    <Input
+                                        label={"Deskripsi Obat"}
+                                        value={
+                                            value.receiveMedicines[activeIndex]
+                                                .medicine.description
+                                        }
+                                        type={"text"}
+                                        disabled
+                                        name={"description"}
+                                        autofocus={false}
+                                        placeholder={"Deskripsi Obat"}
+                                    />
+
+                                    <Input
+                                        label={"Efek Samping"}
+                                        value={
+                                            value.receiveMedicines[activeIndex]
+                                                .medicine.sideEffect
+                                        }
+                                        type={"text"}
+                                        disabled
+                                        name={"sideEffect"}
+                                        autofocus={false}
+                                        placeholder={"Efek Samping"}
+                                    />
+
+                                    <Input
+                                        label={"Harga Obat"}
+                                        value={
+                                            value.receiveMedicines[activeIndex]
+                                                .medicine.price
+                                        }
+                                        type={"text"}
+                                        currency={true}
+                                        disabled
+                                        name={"price"}
+                                        autofocus={false}
+                                        placeholder={"Harga Obat"}
+                                    />
+
+                                    <div className="flex gap-x-5">
+                                        <Input
+                                            label={"Satuan Ukuran"}
+                                            value={
+                                                value.receiveMedicines[
+                                                    activeIndex
+                                                ].medicine.unitOfMeasure
+                                            }
+                                            type={"text"}
+                                            disabled
+                                            name={"unitOfMeasure"}
+                                            autofocus={false}
+                                            placeholder={"Satuan Ukuran"}
+                                        />
+                                        <Input
+                                            label={"Tanggal Ekspired"}
+                                            value={
+                                                value.receiveMedicines[
+                                                    activeIndex
+                                                ].medicine.expiredDate
+                                            }
+                                            type={"text"}
+                                            disabled
+                                            name={"expiredDate"}
+                                            autofocus={false}
+                                            placeholder={"Tanggal Ekspired"}
+                                        />
+                                    </div>
+
+                                    <div className="flex gap-x-5">
+                                        <Input
+                                            label={"Nama Generik"}
+                                            value={
+                                                value.receiveMedicines[
+                                                    activeIndex
+                                                ].medicine.genericName.value
+                                            }
+                                            type={"text"}
+                                            disabled
+                                            name={"genericName"}
+                                            autofocus={false}
+                                            placeholder={"Nama Generik"}
+                                        />
+                                        <Input
+                                            label={"Nama Kemasan"}
+                                            value={
+                                                value.receiveMedicines[
+                                                    activeIndex
+                                                ].medicine.packaging.value
+                                            }
+                                            type={"text"}
+                                            disabled
+                                            name={"packaging"}
+                                            autofocus={false}
+                                            placeholder={"Nama Kemasan"}
+                                        />
+                                    </div>
+                                    <label
+                                        htmlFor="genericNameId"
+                                        className="block text-body font-medium leading-6 pt-2 text-dark mb-2"
+                                    >
+                                        Klasifikasi Obat
+                                    </label>
+
+                                    <div className="flex flex-col gap-y-5">
+                                        {value.receiveMedicines[
+                                            activeIndex
+                                        ].medicine.classifications.map(
+                                            (item) => {
+                                                return (
+                                                    <Input
+                                                        value={
+                                                            item.classification
+                                                                .value
+                                                        }
+                                                        type={"text"}
+                                                        disabled
+                                                        name={
+                                                            "classificationName"
+                                                        }
+                                                        autofocus={false}
+                                                        placeholder={
+                                                            "Nama Klasifikasi"
+                                                        }
+                                                    />
+                                                );
+                                            },
+                                        )}
+                                    </div>
+                                </div>
+                            }
+                            onClick={() => {
+                                setShowOuputMedicine(false);
+                            }}
+                        />
+
+                        <Toaster
+                            size="lg"
+                            type="primary"
+                            showBtn={false}
+                            title={"Detail Vendor"}
+                            open={showVendor}
+                            onClose={() => setShowVendor(false)}
+                            body={
+                                <div className="sm:col-span-6 text-start">
+                                    <Input
+                                        label={"Nama Vendor"}
+                                        value={
+                                            value.receiveMedicines[activeIndex]
+                                                .vendor.name
+                                        }
+                                        type={"text"}
+                                        disabled
+                                        name={"vendorName"}
+                                        autofocus={false}
+                                        placeholder={"Nama Vendor"}
+                                    />
+
+                                    <Input
+                                        label={"No Handphone"}
+                                        value={
+                                            value.receiveMedicines[activeIndex]
+                                                .vendor.phoneNum
+                                        }
+                                        type={"number"}
+                                        disabled
+                                        name={"phoneNum"}
+                                        autofocus={false}
+                                        placeholder={"No Handphone"}
+                                    />
+
+                                    <Input
+                                        label={"Alamat"}
+                                        value={
+                                            value.receiveMedicines[activeIndex]
+                                                .vendor.address
+                                        }
+                                        type={"text"}
+                                        disabled
+                                        name={"address"}
+                                        autofocus={false}
+                                        placeholder={"Alamat"}
+                                    />
+
+                                    <Input
+                                        label={"Kota"}
+                                        value={
+                                            value.receiveMedicines[activeIndex]
+                                                .vendor.city
+                                        }
+                                        type={"text"}
+                                        disabled
+                                        name={"city"}
+                                        autofocus={false}
+                                        placeholder={"city"}
+                                    />
+                                </div>
+                            }
+                            onClick={() => {
+                                setShowVendor(false);
+                            }}
+                        />
+                    </>
+                ) : null}
 
                 <Toaster
                     type={"primary"}
@@ -718,12 +1384,13 @@ export default function index() {
                         <>
                             {" "}
                             Beberapa obat sudah kadaluarsa dan belum
-                            dikeluarkan, silakan cek obat kadaluarsa hari ini terlebih dahulu{" "}
+                            dikeluarkan, silakan cek obat kadaluarsa hari ini
+                            terlebih dahulu{" "}
                         </>
                     }
                     onClick={() => {
                         setHasExpiredMedicine(false);
-                        handleFetchExpiredMedicine()
+                        handleFetchExpiredMedicine();
                     }}
                     title={"Konfirmasi"}
                     btnText="Lanjutkan"
@@ -796,7 +1463,6 @@ export default function index() {
                                     </HeaderCell>
                                     <Cell dataKey="reasonOfDispose" />
                                 </Column>
-
                             </Table>
                             {expiredMedicineList.length > 0 && (
                                 <div className="w-full my-6">
@@ -804,8 +1470,8 @@ export default function index() {
                                         isLoading={isLoading}
                                         formFields={formField}
                                         setFormFields={setFormField}
-                                    //setError={setErrors}
-                                    //error={errors["physicalReport"]}
+                                        //setError={{}}
+                                        //error={{}}
                                     />
                                 </div>
                             )}
