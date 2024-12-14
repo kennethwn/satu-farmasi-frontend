@@ -7,7 +7,7 @@ const instance = axios.create({
     headers: {
         "Accept": "application/json",
         "Content-Type": "application/json",
-        "X-Requested-With": "XMLHttpRequest",
+        // "X-Requested-With": "XMLHttpRequest",
     }
 })
 
