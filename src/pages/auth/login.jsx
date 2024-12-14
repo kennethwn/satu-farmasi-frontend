@@ -50,8 +50,8 @@ export default function Login() {
             console.log("success login")
             setTimeout(() => {
                 console.log("redirect ...")
-                //window.location.href = "/";
-                router.push("/");
+                window.location.href = "/";
+                // router.push("/");
             }, 2000)
         } catch (error) {
             console.log("error: ", error)
