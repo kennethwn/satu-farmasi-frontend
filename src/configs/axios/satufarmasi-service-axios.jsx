@@ -6,8 +6,7 @@ const instance = axios.create({
     withCredentials: true
 }, {
     headers: {
-        // "Access-Control-Allow-Origin": "http://localhost:8000",
-        "Access-Control-Allow-Origin": "https://satu-farmasi-backend.onrender.com",
+         "Access-Control-Allow-Origin": "http://localhost:8000",
         "Access-Control-Allow-Methods": "GET,PUT,POST,DELETE,PATCH,OPTIONS",
         "Accept": "application/json",
         "Content-Type": "application/json",
