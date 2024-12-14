@@ -129,7 +129,7 @@ export default function Index() {
         try {
             console.log("witnesses: ", formField);
             setErrors({});
-            medicineSchema.parse(formData);
+            // medicineSchema.parse(formData);
             let submitedForm = {...formData, oldQuantity: formData.oldMedicineId !== formData.medicineId ? 0 : formData.oldQuantity}
             submitedForm.physicalReport.data.witnesses = formField;
             const res = await EditMedicine(submitedForm);
