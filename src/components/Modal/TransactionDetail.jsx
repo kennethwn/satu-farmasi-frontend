@@ -28,6 +28,7 @@ export default function TransactionDetail(props) {
     const { getTransactionDetail, confirmPayment, publishNotification } = useTransaction();
     const [ paymentMethod, setPaymentMethod] = useState("")
     const [ open, setOpen ] = useState(false)
+    const [ hasSubmit, setHasSubmit ] = useState(false)
     const [errors, setErrors] = useState({})
     const paymentMethodOptions = [
         {label: "Debit Card", value: "DEBIT"},
@@ -81,6 +82,7 @@ export default function TransactionDetail(props) {
 
     const handleConfirmPayment = async () => {
         try {
+            setHasSubmit(true);
             const physicalReport = {
                 id: 0,
                 data: {
@@ -104,6 +106,7 @@ export default function TransactionDetail(props) {
             console.log(res)
             if (res.code !== 200) {
                 toast.error(res.message, { autoClose: 2000, position: "top-center" });
+                setHasSubmit(false);
                 return;
             } else {
                 toast.success(`Payment has been confirmed and status has been change to on progress`, { autoClose: 2000, position: "top-right" });
@@ -124,6 +127,7 @@ export default function TransactionDetail(props) {
             }
             handleFetchTransactionById(transactionId)
         } catch (error) {
+            setHasSubmit(false);
             console.error(error)
             if (error instanceof ZodError) {
                 const newErrors = { ...errors };
@@ -249,7 +253,7 @@ export default function TransactionDetail(props) {
                             />
                         </div>
                         <div className="flex flex-col justify-end items-end">
-                        <Button appearance="primary" onClick={() => setOpen(true)}>
+                        <Button appearance="primary" onClick={() => setOpen(true)} isDisabled={hasSubmit}>
                             Konfirmasi Pembayaran
                         </Button>
                         </div>
@@ -276,6 +280,7 @@ export default function TransactionDetail(props) {
                 }
                 title={"Konfirmasi Pembayaran"}
                 onClick={handleConfirmPayment}
+                isLoading={hasSubmit}
             />
         </Modal>
     )

@@ -52,6 +52,7 @@ export default function Index() {
     const [errors, setErrors] = useState({})
     const [description, setDescription] = useState("")
     const [existingPatient, setExistingPatient] = useState(true)
+    const [hasSubmit, setHasSubmit] = useState(false)
 
     const [formFields, setFormFields] = useState([
         {   
@@ -76,8 +77,9 @@ export default function Index() {
     const handleSubmitDiagnose = async (e) => {
         e.preventDefault()
         try {
+            setHasSubmit(true);
             let data = {
-                doctorId : user?.id || 1,
+                doctorId : user?.id,
                 title : "",
                 description : "",
                 prescription : {
@@ -117,6 +119,7 @@ export default function Index() {
             toast.success(res.message, { autoClose: 2000, position: "top-right" });
             router.push('/diagnose')
         } catch (error) {
+            setHasSubmit(true);
             console.log("error try catch: ", error)
             if (error instanceof ZodError) {
                 const newErrors = { ...errors };
@@ -194,7 +197,7 @@ export default function Index() {
                             placeholder="Deskripsi" error={errors["description"]} />
                     </div>
                     <div className="flex justify-center gap-2 my-6 lg:justify-end">
-                        <Button type="submit" appearance="primary">
+                        <Button type="submit" appearance="primary" isDisabled={hasSubmit}>
                             Simpan
                         </Button>
                     </div>

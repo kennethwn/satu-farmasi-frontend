@@ -6,6 +6,7 @@ import { DatePicker, Radio, RadioGroup } from "rsuite";
 import propTypes, { object } from "prop-types";
 import { formatCalendar } from "@/helpers/dayHelper";
 import Text from "../Text";
+import { formatRupiah } from "@/helpers/currency";
 
 const ReceiveMedicineForm = (props) => {
     const {
@@ -241,7 +242,7 @@ const ReceiveMedicineForm = (props) => {
                             placeholder="0"
                             label="Harga Jual Obat"
                             value={existingMedicine
-                                ? dataMedicines?.find(item => item?.id == input.medicineId)?.price || input?.medicineRequest?.price
+                                ? (dataMedicines?.find(item => item?.id == input.medicineId)?.price) || input?.medicineRequest?.price
                                 : input?.price || 0
                             }                            
                             currency={true}
@@ -807,34 +808,34 @@ const ReceiveMedicineForm = (props) => {
             </div>
             {/* isPaid Checkbox */}
             <div className="sm:col-span-6">
-                <label htmlFor="isPaid" className="block text-body font-medium leading-6 text-dark">
-                    Status Pembayaran
+                <label htmlFor="isArrived" className="block text-body font-medium leading-6 text-dark">
+                    Status Penerimaan
                 </label>
                 <div className="mt-2">
                     {isLoading ?
                         <RadioGroup
-                            id="isPaid"
-                            name="isPaid"
+                            id="isArrived"
+                            name="isArrived"
                             className="flex flex-row gap-10"
-                            value={input?.isPaid}
+                            value={input?.isArrived}
                             disabled
                         >
-                            <Radio value={true}>Lunas</Radio>
-                            <Radio value={false}>Belum Lunas</Radio>
+                            <Radio value={true}>Sudah</Radio>
+                            <Radio value={false}>Belum</Radio>
                         </RadioGroup>
                         :
                         <RadioGroup
-                            id="isPaid"
-                            name="isPaid"
+                            id="isArrived"
+                            name="isArrived"
                             className="flex flex-row gap-10"
                             onChange={(value) => {
-                                setInput({ ...input, isPaid: value })
-                                setErrors({ ...errors, "isPaid": "" });
+                                setInput({ ...input, isArrived: value })
+                                setErrors({ ...errors, "isArrived": "" });
                             }}
-                            value={input?.isPaid}
+                            value={input?.isArrived}
                         >
-                            <Radio value={true}>Lunas</Radio>
-                            <Radio value={false}>Belum Lunas</Radio>
+                            <Radio value={true}>Sudah</Radio>
+                            <Radio value={false}>Belum</Radio>
                         </RadioGroup>
                     }
                 </div>

@@ -14,6 +14,8 @@ const isRequiredOptions = () =>
         });
 const isRequiredString = () =>
     isString().min(1, { message: "Bidang ini harus diisi" });
+const isRequiredStringOptional = () =>
+    isString().optional()
 const isRequiredPhoneNumber = () =>
     z
         .coerce
@@ -57,4 +59,5 @@ export {
     isRequiredOptions,
     isRequiredPhoneNumber,
     isRequiredDate,
+    isRequiredStringOptional
 };
