@@ -40,6 +40,24 @@ export default function index() {
             ],
         },
     ]);
+    const [errors, setErrors] = useState({
+        medicineId: "",
+        quantity: "",
+        reasonOfDispose: "",
+        oldQuantity: "",
+        medicine: {
+            currstock: "",
+        },
+        physicalReport: {
+            data: {
+                pharmacist: "",
+                sipaNumber: "",
+                pharmacy: "",
+                addressPharmacy: "",
+                witnesses: [{ name: "", nip: "", role: "" }],
+            }
+        }
+    });
 
     const { user } = useUserContext();
     const [value, setValue] = useState({});
@@ -128,6 +146,10 @@ export default function index() {
             console.log(res.data);
         } catch (error) {
             console.error(error);
+            toast.error(error.message, {
+                autoClose: 3000,
+                position: "top-right",
+            })
             error.errors.forEach((errorObject) => {
                 Object.entries(errorObject).forEach(([field, details]) => {
                     if (field === "unFinalizedReport") {
@@ -396,7 +418,7 @@ export default function index() {
                                 <Column width={200} flexGrow={1}>
                                     <HeaderCell className="text-dark font-bold">
                                         {" "}
-                                        Nama Farmasi{" "}
+                                        Nama Apoteker{" "}
                                     </HeaderCell>
                                     <Cell dataKey="pharmacist.fullName" />
                                 </Column>
@@ -780,8 +802,8 @@ export default function index() {
                                         isLoading={isLoading}
                                         formFields={formField}
                                         setFormFields={setFormField}
-                                    //setError={setErrors}
-                                    //error={errors["physicalReport"]}
+                                        setErrors={setErrors}
+                                        errors={errors}
                                     />
                                 </div>
                             )}

@@ -77,7 +77,7 @@ export default function Index() {
         e.preventDefault()
         try {
             let data = {
-                doctorId : user?.id || 1,
+                doctorId : user?.id,
                 title : "",
                 description : "",
                 prescription : {
