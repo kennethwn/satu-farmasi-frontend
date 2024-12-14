@@ -133,7 +133,7 @@ export default function PrescriptionDetail(props) {
                 toast.error(res.message, { autoClose: 2000, position: "top-right" });
                 return;
             } else {
-                toast.success(`Status Change to Waiting for Payment`, { autoClose: 2000, position: "top-right" });
+                toast.success(`Status Change to Done`, { autoClose: 2000, position: "top-right" });
                 setStatusChanged({prescriptionId: prescriptionId, status: "DONE"})
                 setPrescriptionsData(prescriptionData => ({
                     ...prescriptionData,
