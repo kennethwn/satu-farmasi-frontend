@@ -112,11 +112,11 @@ export default function Index() {
             
             // binding payload
             formData.physicalReport.data.pharmacist = user.name;
-            formData.physicalReport.data.sipaNumber = user.sipaNumber || "0001";
+            formData.physicalReport.data.sipaNumber = user.sipaNumber;
             formData.physicalReport.data.witnesses = formField;
 
             setErrors({});
-            medicineSchema.parse(formData);
+            // medicineSchema.parse(formData);
 
             const res = await CreateMedicine(formData);
             if (res.code !== 200)

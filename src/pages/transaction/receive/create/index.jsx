@@ -37,7 +37,7 @@ const medicineRequestSchema = z.object({
     maxStock: isRequiredNumber(),
     packagingId: isRequiredNumber(),
     unitOfMeasure: isRequiredString().nullable().refine(value => value !== null, {
-        message: "This field is required",
+        message: "Bidang ini harus diisi",
     }),
     sideEffect: isRequiredString(),
     classificationList: z.array(classificationSchema),
@@ -50,8 +50,8 @@ const medicineSchema = z.object({
     quantity: isRequiredNumber(),
     vendorId: isRequiredNumber(),
     buyingPrice: isRequiredNumber(),
-    paymentMethod: z.array(paymentMethodSchema),
-    deadline: isRequiredDate(),
+    paymentMethod: isRequiredString(),
+    deadline: isRequiredString(),
     isPaid: z.boolean(),
     medicineRequest: medicineRequestSchema
 }).refine(data => data.minStock < data.maxStock, {
@@ -80,13 +80,37 @@ export default function Index() {
 
     const [existingMedicine, setExistingMedicine] = useState(false);
     const [input, setInput] = useState({});
-    const [errors, setErrors] = useState({});
     const [medicines, setMedicines] = useState([]);
     const [packagings, setPackagings] = useState([]);
     const [classifications, setClassifications] = useState([]);
     const [generics, setGenerics] = useState([]);
     const [vendors, setVendors] = useState([]);
     const [formFields, setFormFields] = useState([{ id: 0, label: '', value: '' }]);
+    const [errors, setErrors] = useState({
+        documentNumber: "",
+        batchCode: "",
+        quantity: "",
+        vendorId: "",
+        buyingPrice: "",
+        paymentMethod: "",
+        deadline: "",
+        isPaid: "",
+        medicineRequest: {
+            name: "",
+            genericNameId: "",
+            merk: "",
+            price: "",
+            description: "",
+            currStock: "",
+            minStock: "",
+            maxStock: "",
+            packagingId: "",
+            unitOfMeasure: "",
+            sideEffect: "",
+            // classificationList: [{ classificationId: "" }],
+            expiredDate: "",
+        }
+    });
 
     const handleFormFields = (value) => {
         setFormFields(value);
@@ -260,7 +284,7 @@ export default function Index() {
             }
 
             setErrors({});
-            medicineSchema.parse(payload);
+            // medicineSchema.parse(payload);
             const res = await CreateReceiveMedicine(payload);
             if (res.code !== 200) {
                 toast.error(res.response.data.message, { autoClose: 2000, position: "top-right" });
@@ -276,10 +300,13 @@ export default function Index() {
                 const newErrors = { ...errors };
                 error.issues.forEach((issue) => {
                     if (issue.path.length > 0) {
-                        if (issue.path[0] === "classificationList") {
-                            newErrors[`classificationList[${issue.path[1]}]`] = issue.message;
-                        }
-                        else {
+                        if (issue.path[0] === "medicineRequest") {
+                            if (issue.path[1] === "classificationList") {
+                                newErrors[`classificationList[${issue.path[2]}]`] = issue.message;
+                            } else {
+                                newErrors[`medicineRequest.${issue.path[1]}`] = issue.message;
+                            }
+                        } else {
                             const fieldName = issue.path[0];
                             newErrors[fieldName] = issue.message;
                         }

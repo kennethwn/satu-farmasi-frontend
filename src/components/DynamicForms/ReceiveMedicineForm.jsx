@@ -5,6 +5,7 @@ import MedicineClassificationForm from "@/components/DynamicForms/MedicineClassi
 import { DatePicker, Radio, RadioGroup } from "rsuite";
 import propTypes, { object } from "prop-types";
 import { formatCalendar } from "@/helpers/dayHelper";
+import Text from "../Text";
 
 const ReceiveMedicineForm = (props) => {
     const {
@@ -59,7 +60,7 @@ const ReceiveMedicineForm = (props) => {
                         />
                         :
                         <InputField
-                            type="text"
+                            // type="text"
                             id="document_number"
                             name="document_number"
                             onChange={e => {
@@ -142,13 +143,14 @@ const ReceiveMedicineForm = (props) => {
                                         }}
                                         data={dataMedicines}
                                         block
+                                        error={errors['medicineId']}
                                     />
-                                    <div style={{ minHeight: '22px' }}>
+                                    {/* <div style={{ minHeight: '22px' }}>
                                         {
                                             errors['medicineId'] &&
                                             <Text type="danger">{errors['medicineId']}</Text>
                                         }
-                                    </div>
+                                    </div> */}
                                 </>
                             }
                         </div>
@@ -214,10 +216,10 @@ const ReceiveMedicineForm = (props) => {
                             label="Merek"
                             onChange={e => {
                                 setInput({ ...input, merk: e.target.value });
-                                setErrors({ ...errors, "merk": "" });
+                                setErrors({ ...errors, "medicineRequest.merk": "" });
                             }}
                             placeholder="merek"
-                            error={errors['merk']}
+                            error={errors['medicineRequest.merk']}
                             value={existingMedicine 
                                 ? dataMedicines?.find(item => item?.id == input.medicineId)?.merk || input?.medicineRequest?.merk
                                 : input?.merk || ""
@@ -252,7 +254,7 @@ const ReceiveMedicineForm = (props) => {
                             name="price"
                             onChange={e => {
                                 setInput({ ...input, price: parseInt(e.target.value) })
-                                setErrors({ ...errors, "price": "" });
+                                setErrors({ ...errors, "medicineRequest.price": "" });
                             }}
                             placeholder="0"
                             label="Harga Jual Obat"
@@ -260,7 +262,7 @@ const ReceiveMedicineForm = (props) => {
                                 ? dataMedicines?.find(item => item?.id == input.medicineId)?.price || input?.medicineRequest?.price
                                 : input?.price || 0
                             }
-                            error={errors['price']}
+                            error={errors['medicineRequest.price']}
                             currency={true}
                             disabled={existingMedicine}
                         />
@@ -287,10 +289,10 @@ const ReceiveMedicineForm = (props) => {
                             placeholder="0"
                             label="Stok Baru"
                             value={input?.currStock || input?.quantity}
-                            error={errors['currStock']}
+                            error={errors['medicineRequest.currStock']}
                             onChange={e => {
                                 setInput({ ...input, currStock: parseInt(e.target.value), quantity: parseInt(e.target.value) })
-                                setErrors({ ...errors, "currStock": "" });
+                                setErrors({ ...errors, "medicineRequest.currStock": "" });
                             }}
                         />
                     }
@@ -318,14 +320,14 @@ const ReceiveMedicineForm = (props) => {
                             name="minStock"
                             placeholder="0"
                             label="Stok Minimum"
-                            error={errors['minStock']}
+                            error={errors['medicineRequest.minStock']}
                             value={existingMedicine
                                 ? dataMedicines?.find(item => item?.id == input?.medicineId)?.minStock || input?.medicineRequest?.minStock
                                 : input?.minStock || 0
                             }
                             onChange={e => {
                                 setInput({ ...input, minStock: parseInt(e.target.value) })
-                                setErrors({ ...errors, "minStock": "" });
+                                setErrors({ ...errors, "medicineRequest.minStock": "" });
                             }}
                             disabled={existingMedicine}
                         />
@@ -354,14 +356,14 @@ const ReceiveMedicineForm = (props) => {
                             name="maxStock"
                             placeholder="0"
                             label="Stok Maksimum"
-                            error={errors['maxStock']}
+                            error={errors['medicineRequest.maxStock']}
                             value={existingMedicine
                                 ? dataMedicines?.find(item => item?.id == input?.medicineId)?.maxStock || input?.medicineRequest?.maxStock
                                 : input?.maxStock || 0
                             }
                             onChange={e => {
                                 setInput({ ...input, maxStock: parseInt(e.target.value) })
-                                setErrors({ ...errors, "maxStock": "" });
+                                setErrors({ ...errors, "medicineRequest.maxStock": "" });
                             }}
                             disabled={existingMedicine}
                         />
@@ -391,34 +393,27 @@ const ReceiveMedicineForm = (props) => {
                             block
                         />
                         :
-                        <>
-                            <Dropdown
-                                id="genericNameId"
-                                name="genericNameId"
-                                placeholder={<span className="text-sm">generik</span>}
-                                size='lg'
-                                value={existingMedicine
-                                    ? dataMedicines?.find(item => item?.id == input?.medicineId)?.genericName.id || input?.medicineRequest?.genericNameId
-                                    : input?.genericNameId
-                                }
-                                valueKey="id"
-                                className="py-1.5"
-                                labelKey="label"
-                                onChange={value => {
-                                    setInput({ ...input, genericNameId: value })
-                                    setErrors({ ...errors, "genericNameId": "" });
-                                }}
-                                data={dataGenerics}
-                                disabled={existingMedicine}
-                                block
-                            />
-                            <div style={{ minHeight: '22px' }}>
-                                {
-                                    errors['genericNameId'] &&
-                                    <Text type="danger">{errors['genericNameId']}</Text>
-                                }
-                            </div>
-                        </>
+                        <Dropdown
+                            id="genericNameId"
+                            name="genericNameId"
+                            placeholder={<span className="text-sm">generik</span>}
+                            size='lg'
+                            value={existingMedicine
+                                ? dataMedicines?.find(item => item?.id == input?.medicineId)?.genericName.id || input?.medicineRequest?.genericNameId
+                                : input?.genericNameId
+                            }
+                            valueKey="id"
+                            className="py-1.5"
+                            labelKey="label"
+                            onChange={value => {
+                                setInput({ ...input, genericNameId: value })
+                                setErrors({ ...errors, "medicineRequest.genericNameId": "" });
+                            }}
+                            data={dataGenerics}
+                            disabled={existingMedicine}
+                            block
+                            error={errors["medicineRequest.genericNameId"]}
+                        />
                     }
                 </div>
             </div>
@@ -445,51 +440,42 @@ const ReceiveMedicineForm = (props) => {
                             block
                         />
                         :
-                        <>
-                            <Dropdown
-                                id="packagingId"
-                                name="packagingId"
-                                placeholder={<span className="text-sm">kemasan</span>}
-                                value={existingMedicine
-                                    ? dataMedicines?.find(item => item?.id == input?.medicineId)?.packaging.id || input?.medicineRequest?.packagingId
-                                    : input?.packagingId
-                                }
-                                labelKey="label"
-                                size='lg'
-                                className="py-1.5"
-                                valueKey="id"
-                                onChange={value => {
-                                    setInput({ ...input, packagingId: value })
-                                    setErrors({ ...errors, "packagingId": "" });
-                                }}
-                                data={dataPackagings}
-                                disabled={existingMedicine}
-                                block
-                            />
-                            <div style={{ minHeight: '22px' }}>
-                                {
-                                    errors['packagingId'] &&
-                                    <Text type="danger">{errors['packagingId']}</Text>
-                                }
-                            </div>
-                        </>
+                        <Dropdown
+                            id="packagingId"
+                            name="packagingId"
+                            placeholder={<span className="text-sm">kemasan</span>}
+                            value={existingMedicine
+                                ? dataMedicines?.find(item => item?.id == input?.medicineId)?.packaging.id || input?.medicineRequest?.packagingId
+                                : input?.packagingId
+                            }
+                            labelKey="label"
+                            size='lg'
+                            className="py-1.5"
+                            valueKey="id"
+                            onChange={value => {
+                                setInput({ ...input, packagingId: value })
+                                setErrors({ ...errors, "medicineRequest.packagingId": "" });
+                            }}
+                            error={errors["medicineRequest.packagingId"]}
+                            data={dataPackagings}
+                            disabled={existingMedicine}
+                            block
+                        />
                     }
                 </div>
             </div>
-            <div className="sm:col-span-6 max-lg:mb-12 mb-8">
+            <div className="sm:col-span-6 mb-6 lg:my-4">
                 {existingMedicine
                     ? <MedicineClassificationForm disabled={existingMedicine} errors={errors} setErrors={setErrors} classifications={dataClassifications} isLoading={isLoading} formFields={(dataMedicines?.find(item => item?.id == input?.medicineId)?.classifications)?.map(item => ({ id: item.id, label: item.label, value: item.value })) || formFields} setFormFields={setFormFields} />
                     : <MedicineClassificationForm disabled={existingMedicine} errors={errors} setErrors={setErrors} classifications={dataClassifications} isLoading={isLoading} formFields={formFields} setFormFields={setFormFields} />
                 }
             </div>
             <div className="sm:col-span-6">
-                <label htmlFor="unitOfMeasure" className="block text-body font-medium leading-6 text-dark">
-                    Satuan Ukuran
-                </label>
-                <div className="">
+                <div className="mt-2">
                     {isLoading ?
                         <Dropdown
                             id="unitOfMeasure"
+                            label="Satuan Ukuran"
                             name="unitOfMeasure"
                             placeholder={<span className="text-sm">satuan</span>}
                             disabled={true}
@@ -505,42 +491,36 @@ const ReceiveMedicineForm = (props) => {
                             labelKey="label"
                         />
                         :
-                        <>
-                            <Dropdown
-                                id="unitOfMeasure"
-                                name="unitOfMeasure"
-                                placeholder={<span className="text-sm">satuan</span>}
-                                size='lg'
-                                className="py-1.5"
-                                data={unitOfMeasure}
-                                block
-                                onChange={value => {
-                                    setInput({ ...input, unitOfMeasure: value })
-                                    setErrors({ ...errors, "unitOfMeasure": "" });
-                                }}
-                                value={existingMedicine
-                                    ? dataMedicines?.find(item => item?.id == input?.medicineId)?.unitOfMeasure || input?.medicineRequest?.unitOfMeasure
-                                    : input?.unitOfMeasure || ""
-                                }
-                                disabled={existingMedicine}
-                                valueKey="value"
-                                labelKey="label"
-                            />
-                            <div style={{ minHeight: '22px' }}>
-                                {
-                                    errors['unitOfMeasure'] &&
-                                    <Text type="danger">{errors['unitOfMeasure']}</Text>
-                                }
-                            </div>
-                        </>
+                        <Dropdown
+                            id="unitOfMeasure"
+                            name="unitOfMeasure"
+                            label="Satuan Ukuran"
+                            placeholder={<span className="text-sm">satuan</span>}
+                            size='lg'
+                            className="py-1.5"
+                            data={unitOfMeasure}
+                            block
+                            onChange={value => {
+                                setInput({ ...input, unitOfMeasure: value })
+                                setErrors({ ...errors, "medicineRequest.unitOfMeasure": "" });
+                            }}
+                            value={existingMedicine
+                                ? dataMedicines?.find(item => item?.id == input?.medicineId)?.unitOfMeasure || input?.medicineRequest?.unitOfMeasure
+                                : input?.unitOfMeasure || ""
+                            }
+                            disabled={existingMedicine}
+                            valueKey="value"
+                            labelKey="label"
+                            error={errors["medicineRequest.unitOfMeasure"]}
+                        />
                     }
                 </div>
             </div>
             <div className="sm:col-span-6">
-                <label htmlFor="expiredDate" className="block text-body font-medium leading-6 text-dark">
+                <label htmlFor="expiredDate" className="block text-body font-medium leading-6 text-dark mt-2">
                     Tanggal Expired
                 </label>
-                <div className="">
+                <div className="py-2">
                     {isLoading ?
                         <DatePicker
                             id="expiredDate"
@@ -569,22 +549,22 @@ const ReceiveMedicineForm = (props) => {
                                 labelKey="label"
                                 onChange={value => {
                                     setInput({ ...input, expiredDate: value })
-                                    setErrors({ ...errors, "expiredDate": "" });
+                                    setErrors({ ...errors, "medicineRequest.expiredDate": "" });
                                 }}
                                 block
                             />
-                            <div style={{ minHeight: '22px' }}>
-                                {
-                                    errors['expiredDate'] &&
-                                    <Text type="danger">{errors['expiredDate']}</Text>
-                                }
-                            </div>
+                            {
+                                errors['medicineRequest.expiredDate'] &&
+                                    <div style={{ minHeight: '22px' }}>
+                                        <Text type="danger">{errors['medicineRequest.expiredDate']}</Text>
+                                    </div>
+                            }
                         </>
                     }
                 </div>
             </div>
             <div className="sm:col-span-6">
-                <div className="mb-6">
+                <div className="mt-2">
                     {isLoading ?
                         <InputField
                             type="text"
@@ -609,10 +589,10 @@ const ReceiveMedicineForm = (props) => {
                                 ? dataMedicines?.find(item => item?.id == input?.medicineId)?.sideEffect || input?.medicineRequest?.sideEffect
                                 : input?.sideEffect || ""
                             }
-                            error={errors['sideEffect']}
+                            error={errors['medicineRequest.sideEffect']}
                             onChange={e => {
                                 setInput({ ...input, sideEffect: e.target.value })
-                                setErrors({ ...errors, "sideEffect": "" });
+                                setErrors({ ...errors, "medicineRequest.sideEffect": "" });
                             }}
                             disabled={existingMedicine}
                         />
@@ -620,7 +600,7 @@ const ReceiveMedicineForm = (props) => {
                 </div>
             </div>
             <div className="sm:col-span-6">
-                <div className="mb-6">
+                <div className="mt-2">
                     {isLoading ?
                         <InputField
                             type="text"
@@ -645,10 +625,10 @@ const ReceiveMedicineForm = (props) => {
                                 ? dataMedicines?.find(item => item?.id == input?.medicineId)?.description || input?.medicineRequest?.description
                                 : input?.description || ""
                             }
-                            error={errors['description']}
+                            error={errors['medicineRequest.description']}
                             onChange={e => {
                                 setInput({ ...input, description: e.target.value })
-                                setErrors({ ...errors, "description": "" });
+                                setErrors({ ...errors, "medicineRequest.description": "" });
                             }}
                             disabled={existingMedicine}
                         />
@@ -656,14 +636,12 @@ const ReceiveMedicineForm = (props) => {
                 </div>
             </div>
             <div className="sm:col-span-6">
-                <label htmlFor="vendorId" className="block text-body font-medium leading-6 text-dark">
-                    Vendor
-                </label>
-                <div className="">
+                <div className="mt-2">
                     {isLoading ?
                         <Dropdown
                             id="vendorId"
                             name="vendorId"
+                            label="Vendor"
                             className="py-1.5"
                             placeholder={<span className="text-sm">vendor</span>}
                             size='lg'
@@ -679,6 +657,7 @@ const ReceiveMedicineForm = (props) => {
                             <Dropdown
                                 id="vendorId"
                                 name="vendorId"
+                                label="Vendor"
                                 placeholder={<span className="text-sm">vendor</span>}
                                 size='lg'
                                 value={input?.vendorId || input?.medicineRequest?.vendorId}
@@ -692,18 +671,18 @@ const ReceiveMedicineForm = (props) => {
                                 data={dataVendors}
                                 block
                             />
-                            <div style={{ minHeight: '22px' }}>
-                                {
-                                    errors['vendorId'] &&
-                                    <Text type="danger">{errors['vendorId']}</Text>
-                                }
-                            </div>
+                            {
+                                errors['vendorId'] &&
+                                    <div style={{ minHeight: '22px' }}>
+                                        <Text type="danger">{errors['vendorId']}</Text>
+                                    </div>
+                            }
                         </>
                     }
                 </div>
             </div>
             <div className="sm:col-span-6">
-                <div className="">
+                <div className="mt-2">
                     {isLoading ?
                         <InputField
                             type="number"
@@ -716,40 +695,33 @@ const ReceiveMedicineForm = (props) => {
                             currency="true"
                         />
                         :
-                        <>
-                            <InputField
-                                type="number"
-                                id="buyingPrice"
-                                name="buyingPrice"
-                                label="Harga Beli Obat"
-                                placeholder="Rpxxx.xxx"
-                                value={input?.buyingPrice}
-                                error={errors['buyingPrice']}
-                                onChange={e => {
-                                    setInput({ ...input, buyingPrice: e.target.value })
-                                    setErrors({ ...errors, "buyingPrice": "" });
-                                }}
-                                currency="true"
-                            />
-                            <div style={{ minHeight: '22px' }}>
-                                {
-                                    errors['buyingPrice'] &&
-                                    <Text type="danger">{errors['buyingPrice']}</Text>
-                                }
-                            </div>
-                        </>
+                        <InputField
+                            type="number"
+                            id="buyingPrice"
+                            name="buyingPrice"
+                            label="Harga Beli Obat"
+                            placeholder="Rpxxx.xxx"
+                            value={input?.buyingPrice}
+                            error={errors['buyingPrice']}
+                            onChange={e => {
+                                setInput({ ...input, buyingPrice: e.target.value })
+                                setErrors({ ...errors, "buyingPrice": "" });
+                            }}
+                            currency="true"
+                        />
                     }
                 </div>
             </div>
             <div className="sm:col-span-6">
-                <label htmlFor="paymentMethod" className="block text-body font-medium leading-6 text-dark">
+                {/* <label htmlFor="paymentMethod" className="block text-body font-medium leading-6 text-dark">
                     Metode Pembayaran
-                </label>
-                <div className="">
+                </label> */}
+                <div className="mt-2">
                     {isLoading ?
                         <Dropdown
                             id="paymentMethod"
                             name="paymentMethod"
+                            label="Metode Pembayaran"
                             className="py-1.5"
                             placeholder={<span className="text-sm">metode pembayaran</span>}
                             size='lg'
@@ -765,6 +737,7 @@ const ReceiveMedicineForm = (props) => {
                             <Dropdown
                                 id="paymentMethod"
                                 name="paymentMethod"
+                                label="Metode Pembayaran"
                                 placeholder={<span className="text-sm">metode pembayaran</span>}
                                 size='lg'
                                 value={input?.paymentMethod}
@@ -777,19 +750,20 @@ const ReceiveMedicineForm = (props) => {
                                 }}
                                 data={paymentMethod}
                                 block
+                                error={errors["paymentMethod"]}
                             />
-                            <div style={{ minHeight: '22px' }}>
+                            {/* <div style={{ minHeight: '22px' }}>
                                 {
                                     errors['paymentMethod'] &&
                                     <Text type="danger">{errors['paymentMethod']}</Text>
                                 }
-                            </div>
+                            </div> */}
                         </>
                     }
                 </div>
             </div>
             <div className="sm:col-span-6">
-                <label htmlFor="deadline" className="block text-body font-medium leading-6 text-dark">
+                <label htmlFor="deadline" className="block text-body font-medium leading-6 text-dark mt-2">
                     Tenggat Waktu Pembayaran
                 </label>
                 <div className="">
