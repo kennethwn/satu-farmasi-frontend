@@ -107,7 +107,7 @@ export default function create() {
                         })}
                     </div>
 
-                    <div className="flex justify-center gap-2 my-6 lg:justify-end">
+                    <div className="flex max-md:flex-col gap-2 my-6 pb-4 md:justify-end">
                         {isSubmitted ? (
                             <Button
                                 appearance="primary"

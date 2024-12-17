@@ -45,6 +45,24 @@ export default function index() {
             ],
         },
     ]);
+    const [errors, setErrors] = useState({
+        medicineId: "",
+        quantity: "",
+        reasonOfDispose: "",
+        oldQuantity: "",
+        medicine: {
+            currstock: "",
+        },
+        physicalReport: {
+            data: {
+                pharmacist: "",
+                sipaNumber: "",
+                pharmacy: "",
+                addressPharmacy: "",
+                witnesses: [{ name: "", nip: "", role: "" }],
+            }
+        }
+    });
 
     const { user } = useUserContext();
     const [value, setValue] = useState({
@@ -241,6 +259,10 @@ export default function index() {
         } catch (error) {
             console.log("error finalizeReport: ", error);
             console.error(error);
+            toast.error(error.message, {
+                autoClose: 3000,
+                position: "top-right",
+            })
             error.errors.forEach((errorObject) => {
                 Object.entries(errorObject).forEach(([field, details]) => {
                     if (field === "unFinalizedReport") {
@@ -523,7 +545,7 @@ export default function index() {
                                 <Column width={200} flexGrow={1}>
                                     <HeaderCell className="text-dark font-bold">
                                         {" "}
-                                        Nama Farmasi{" "}
+                                        Nama Apoteker{" "}
                                     </HeaderCell>
                                     <Cell dataKey="pharmacist.fullName" />
                                 </Column>
@@ -540,7 +562,7 @@ export default function index() {
                                     <HeaderCell className="text-center text-dark font-bold">
                                         Detail Resep
                                     </HeaderCell>
-                                    <Cell className="text-center">
+                                    <Cell className="text-center" style={{ padding: '6px' }}>
                                         {(rowData, index) => {
                                             return (
                                                 <div className="flex justify-center flex-row gap-6">
@@ -555,7 +577,7 @@ export default function index() {
                                                             );
                                                         }}
                                                     >
-                                                        <PiListMagnifyingGlass />
+                                                        <PiListMagnifyingGlass size="1.5em" />
                                                     </button>
                                                 </div>
                                             );
@@ -651,7 +673,7 @@ export default function index() {
                                     <HeaderCell className="text-center text-dark font-bold">
                                         Detail Vendor
                                     </HeaderCell>
-                                    <Cell className="text-center">
+                                    <Cell className="text-center" style={{ padding: '6px' }}>
                                         {(rowData, index) => {
                                             return (
                                                 <div className="flex justify-center flex-row gap-6">
@@ -664,7 +686,7 @@ export default function index() {
                                                             );
                                                         }}
                                                     >
-                                                        <PiListMagnifyingGlass />
+                                                        <PiListMagnifyingGlass size="1.5em" />
                                                     </button>
                                                 </div>
                                             );
@@ -676,7 +698,7 @@ export default function index() {
                                     <HeaderCell className="text-center text-dark font-bold">
                                         Detail Obat
                                     </HeaderCell>
-                                    <Cell className="text-center">
+                                    <Cell className="text-center" style={{ padding: '6px' }}>
                                         {(rowData, index) => {
                                             return (
                                                 <div className="flex justify-center flex-row gap-6">
@@ -691,7 +713,7 @@ export default function index() {
                                                             );
                                                         }}
                                                     >
-                                                        <PiListMagnifyingGlass />
+                                                        <PiListMagnifyingGlass size="1.5em" />
                                                     </button>
                                                 </div>
                                             );
@@ -760,7 +782,7 @@ export default function index() {
                                     <HeaderCell className="text-center text-dark font-bold">
                                         Detail Obat
                                     </HeaderCell>
-                                    <Cell className="text-center">
+                                    <Cell className="text-center" style={{ padding: '6px' }}>
                                         {(rowData, index) => {
                                             return (
                                                 <div className="flex justify-center flex-row gap-6">
@@ -771,7 +793,7 @@ export default function index() {
                                                             setActiveIndex(index)
                                                         }}
                                                     >
-                                                        <PiListMagnifyingGlass />
+                                                        <PiListMagnifyingGlass size="1.5em" />
                                                     </button>
                                                 </div>
                                             );
@@ -783,7 +805,7 @@ export default function index() {
                                     <HeaderCell className="text-center text-dark font-bold">
                                         Export PDF
                                     </HeaderCell>
-                                    <Cell className="text-center">
+                                    <Cell className="text-center" style={{ padding: '6px' }}>
                                         {(rowData, index) => {
                                             return (
                                                 <div className="flex justify-center flex-row gap-6">
@@ -795,7 +817,7 @@ export default function index() {
                                                             )
                                                         }
                                                     >
-                                                        <PiListMagnifyingGlass />
+                                                        <PiListMagnifyingGlass size="1.5em" />
                                                     </button>
                                                 </div>
                                             );
@@ -807,7 +829,7 @@ export default function index() {
                     </div>
                 </div>
                 {!value.isFinalized && (
-                    <div className="flex justify-center gap-2 my-6 lg:justify-end">
+                    <div className="flex justify-center gap-2 my-6 py-4 lg:justify-end">
                         <Button
                             type="button"
                             appearance="primary"
@@ -1127,8 +1149,8 @@ export default function index() {
                             open={showReceiveMedicineDetail}
                             onClose={() => setShowReceiveMedicineDetail(false)}
                             body={
-                                <div className="sm:col-span-6 text-start">
-                                    <div className="flex gap-x-5">
+                                <div className="flex flex-col sm:col-span-6 text-start gap-2">
+                                    <div className="flex flex-row gap-x-5">
                                         <Input
                                             label={"Nama Obat"}
                                             value={
@@ -1470,8 +1492,8 @@ export default function index() {
                                         isLoading={isLoading}
                                         formFields={formField}
                                         setFormFields={setFormField}
-                                        //setError={{}}
-                                        //error={{}}
+                                        setErrors={setErrors}
+                                        errors={errors}
                                     />
                                 </div>
                             )}
@@ -1532,7 +1554,7 @@ export default function index() {
                                     <HeaderCell className="text-center text-dark font-bold">
                                         Detail Obat
                                     </HeaderCell>
-                                    <Cell className="text-center">
+                                    <Cell className="text-center" style={{ padding: '6px' }}>
                                         {(rowData, index) => {
                                             return (
                                                 <div className="flex justify-center flex-row gap-6">
@@ -1545,7 +1567,7 @@ export default function index() {
                                                             );
                                                         }}
                                                     >
-                                                        <PiListMagnifyingGlass />
+                                                        <PiListMagnifyingGlass size="1.5em" />
                                                     </button>
                                                 </div>
                                             );

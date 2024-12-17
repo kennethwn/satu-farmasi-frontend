@@ -540,7 +540,8 @@ export const generateOutputMedicine = (input, formField, reasonOfDispose) => {
             ...witnessesSignatures
           ],
         },
-        layout: 'noBorders'
+        layout: 'noBorders',
+        pageBreak: 'after'
       },
       { text: 'DAFTAR OBAT YANG DIMUSNAHKAN', style: 'header'},
       {

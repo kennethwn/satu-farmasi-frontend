@@ -141,7 +141,7 @@ const [filterStatus, setFilterStatus] = useState("")
   return (
     <Layout active="transaction-dashboard" user={user}>
       <ContentLayout title="Riwayat Transaksi">
-        <div className="flex flex-row justify-end items-center w-full pb-6">
+        <div className="flex flex-row justify-end items-center w-full pb-6 gap-4">
         <SelectPicker
             style={{
                 color: '#DDDDDD',       

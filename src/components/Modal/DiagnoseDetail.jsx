@@ -51,7 +51,9 @@ export default function DiagnoseDetail(props) {
 
     useEffect(() => {
         async function fetchData() {
-            await handleFetchDiagnoseById();
+            if (diagnoseId !== 0) {
+                await handleFetchDiagnoseById();
+            }
         }
         fetchData();
     }, [diagnoseId]);

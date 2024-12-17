@@ -8,7 +8,7 @@ import { toast } from "react-toastify";
 import { z, ZodError } from "zod";
 import useOutputMedicineAPI from "@/pages/api/transaction/outputMedicine";
 import Dropdown from "@/components/SelectPicker/Dropdown";
-import { isRequiredNumber, isRequiredString } from "@/helpers/validation";
+import { isRequiredNumber, isRequiredString, isRequiredStringOptional} from "@/helpers/validation";
 import useMedicineDropdownOption from "@/pages/api/medicineDropdownOption";
 import { useUserContext } from "@/pages/api/context/UserContext";
 import { ErrorForm } from "@/helpers/errorForm";
@@ -16,9 +16,9 @@ import OutputMedicineWitnessForm from "@/components/DynamicForms/OuputMedicineWi
 import usePharmacy from "@/pages/api/pharmacy";
 
 const witnessesSchema = z.object({
-    name: isRequiredString(),
-    nip: isRequiredString(),
-    role: isRequiredString()
+    name: isRequiredStringOptional(),
+    nip: isRequiredStringOptional(),
+    role: isRequiredStringOptional()
 })
 
 const physicalReportSchema = z.object({
@@ -112,11 +112,11 @@ export default function Index() {
             
             // binding payload
             formData.physicalReport.data.pharmacist = user.name;
-            formData.physicalReport.data.sipaNumber = user.sipaNumber || "0001";
+            formData.physicalReport.data.sipaNumber = user.sipaNumber;
             formData.physicalReport.data.witnesses = formField;
 
             setErrors({});
-            medicineSchema.parse(formData);
+            // medicineSchema.parse(formData);
 
             const res = await CreateMedicine(formData);
             if (res.code !== 200)
@@ -280,7 +280,7 @@ export default function Index() {
                                             id={index}
                                             name={input.name}
                                             label={input.label}
-                                            data={Object.entries(medicineDropdownOptions).map(([key, item]) => ({ label: item.name, value: key, }))}
+                                            data={Object.entries(medicineDropdownOptions).map(([key, item]) => ({ label: item.name + " #" + item.id, value: key, }))}
                                             onChange={e => inputOnChangeHandler(e, input.name)}
                                             placeholder="Select Medicine Name"
                                             error={errors[input.name]}

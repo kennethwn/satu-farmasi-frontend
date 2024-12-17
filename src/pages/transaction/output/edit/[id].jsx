@@ -13,6 +13,7 @@ import useMedicineDropdownOption from "@/pages/api/medicineDropdownOption";
 import { useUserContext } from "@/pages/api/context/UserContext";
 import { ErrorForm } from "@/helpers/errorForm";
 import OutputMedicineWitnessForm from "@/components/DynamicForms/OuputMedicineWitnessForm";
+import usePharmacy from "@/pages/api/pharmacy";
 
 const witnessesSchema = z.object({
     name: isRequiredString(),
@@ -59,6 +60,7 @@ export default function Index() {
     const { user } = useUserContext();
     const id = router.query.id;
     const { isLoading, GetMedicineById, EditMedicine, GetOutputMedicineById } = useOutputMedicineAPI();
+    const { getPharmacyInfo } = usePharmacy();
     const [ medicineData, setMedicineData ] = useState({})
     const [formData, setFormData] = useState({
         medicineId: 0,
@@ -125,9 +127,11 @@ export default function Index() {
     const editHandler = async (e) => {
         e.preventDefault();
         try {
+            console.log("witnesses: ", formField);
             setErrors({});
-            medicineSchema.parse(formData);
-            const submitedForm = {...formData, oldQuantity: formData.oldMedicineId !== formData.medicineId ? 0 : formData.oldQuantity}
+            // medicineSchema.parse(formData);
+            let submitedForm = {...formData, oldQuantity: formData.oldMedicineId !== formData.medicineId ? 0 : formData.oldQuantity}
+            submitedForm.physicalReport.data.witnesses = formField;
             const res = await EditMedicine(submitedForm);
             if (res.code !== 200)
                 return toast.error(res.message, {
@@ -214,6 +218,35 @@ export default function Index() {
             handleFetchCurrentMedicineStock();
         }
     }, [formData.medicineId])
+
+    const handleFetchPharmacyInfo = async () => {
+        try {
+            const res = await getPharmacyInfo();
+            if (res.code !== 200)
+                return toast.error(res.message, {
+                    autoClose: 2000,
+                    position: "top-right",
+            });
+            setFormData({
+                ...formData,
+                physicalReport: {
+                    data: {
+                        pharmacy: res.data.name,
+                        addressPharmacy: res.data.address
+                    }
+                }
+            })
+        } catch (error) {
+            console.error(error);
+        }
+    }
+
+    useEffect(() => {
+        async function fetchData() {
+            await handleFetchPharmacyInfo();
+        }
+        fetchData();
+    }, [router]);
 
     return (
         <Layout active="transaction-output" user={user}>
@@ -303,7 +336,7 @@ export default function Index() {
                         }
                     </div>
 
-                    <div className="flex justify-center gap-2 my-6 lg:justify-end">
+                    <div className="flex justify-center gap-2 my-6 py-4 lg:justify-end">
                         {isLoading ? (
                             <Button
                                 appearance="primary"

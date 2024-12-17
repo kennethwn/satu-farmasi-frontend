@@ -106,6 +106,23 @@ export default function useReceiveMedicineAPI() {
             console.error(error);
         }
     }
+
+    const SaveReceiveMedicine = async (data) => {
+        try {
+            const response = await axios.post(`/api/v1/receiveMedicines/_save`, data)
+            .then((response) => {
+                setIsLoading(false);
+                return response;
+            })
+            .catch((error) => {
+                setIsLoading(false);
+                return error;
+            })
+            return response
+        } catch (error) {
+            console.error(error);
+        }
+    }
     
     return {
         isLoading,
@@ -114,6 +131,7 @@ export default function useReceiveMedicineAPI() {
         SearchReceiveMedicine,
         CreateReceiveMedicine,
         ConfirmReceiveMedicine,
-        DeleteReceiveMedicine
+        DeleteReceiveMedicine,
+        SaveReceiveMedicine,
     }
 }
