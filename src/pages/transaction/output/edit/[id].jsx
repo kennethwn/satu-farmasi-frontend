@@ -9,7 +9,6 @@ import { z, ZodError } from "zod";
 import useOutputMedicineAPI from "@/pages/api/transaction/outputMedicine";
 import Dropdown from "@/components/SelectPicker/Dropdown";
 import { isRequiredNumber, isRequiredString } from "@/helpers/validation";
-import useMedicineDropdownOption from "@/pages/api/medicineDropdownOption";
 import { useUserContext } from "@/pages/api/context/UserContext";
 import { ErrorForm } from "@/helpers/errorForm";
 import OutputMedicineWitnessForm from "@/components/DynamicForms/OuputMedicineWitnessForm";
@@ -27,7 +26,13 @@ const physicalReportSchema = z.object({
     }),
 });
 
-export const medicineSchema = z.object({
+const medicineSchema = z.object({
+    medicineId: isRequiredNumber(),
+    quantity: isRequiredNumber(),
+    reasonOfDispose: isRequiredString(),
+});
+
+const medicineSchemaWithPhysicalReport = z.object({
     medicineId: isRequiredNumber(),
     quantity: isRequiredNumber(),
     reasonOfDispose: isRequiredString(),
@@ -59,12 +64,10 @@ export default function Index() {
     const router = useRouter();
     const { user } = useUserContext();
     const id = router.query.id;
-    const { isLoading, GetMedicineById, EditMedicine, GetOutputMedicineById } = useOutputMedicineAPI();
+    const { isLoading, EditMedicine, GetOutputMedicineById } = useOutputMedicineAPI();
     const { getPharmacyInfo } = usePharmacy();
-    const [ medicineData, setMedicineData ] = useState({})
+    const [pharmacyInfo, setPharmacyInfo] = useState({});
     const [formData, setFormData] = useState({
-        medicineId: 0,
-        quantity: 0,
         reasonOfDispose: "",
         oldMedicineId: 0,
         oldQuantity: 0,
@@ -114,7 +117,10 @@ export default function Index() {
                 medicineId: res.data.medicine.id,
                 oldMedicineId: res.data.medicine.id,
                 oldQuantity: parseInt(res.data.quantity),
+                reasonOfDispose: res.data.reasonOfDispose,
+                reasonOfDispose: res.data.reasonOfDispose,
                 medicine: {
+                    ...res.data.medicine,
                     currstock: res.data.medicine.currStock,
                 },
             })
@@ -127,11 +133,14 @@ export default function Index() {
     const editHandler = async (e) => {
         e.preventDefault();
         try {
-            console.log("witnesses: ", formField);
-            setErrors({});
-            // medicineSchema.parse(formData);
-            let submitedForm = {...formData, oldQuantity: formData.oldMedicineId !== formData.medicineId ? 0 : formData.oldQuantity}
+            let submitedForm = {...formData,  ...pharmacyInfo, oldQuantity: formData.oldMedicineId !== formData.medicineId ? 0 : formData.oldQuantity}
             submitedForm.physicalReport.data.witnesses = formField;
+            setErrors({});
+            if (submitedForm.reasonOfDispose === "BROKEN" || submitedForm.reasonOfDispose === "EXPIRED") {
+                medicineSchemaWithPhysicalReport.parse(submitedForm);
+            } else {
+                medicineSchema.parse(submitedForm);
+            }
             const res = await EditMedicine(submitedForm);
             if (res.code !== 200)
                 return toast.error(res.message, {
@@ -146,7 +155,6 @@ export default function Index() {
             if (error instanceof ZodError) {
                 const newErrors = { ...errors };
                 error.issues.forEach((issue) => {
-                    console.log("error zod: ", issue);
                     if (issue.path.length > 0) {
                         if (issue.path[0] === "physicalReport") {
                             const path = issue.path.join('.')
@@ -169,12 +177,12 @@ export default function Index() {
         }
     };
 
-    const reasonOfDisposeListData = ["Broken", "Lost", "Expired"]
-        .map(item => ({ label: item, value: item.toUpperCase() }));
-
     useEffect(() => {
-        const fetchData = async () => await handleFetchMedicineById();
-        if (router.isReady) fetchData();
+        const fetchData = async () => {
+            await handleFetchMedicineById();
+            await handleFetchPharmacyInfo();
+        }
+        if (id) fetchData()
     }, [id]);
 
     const inputOnChangeHandler = (e, name) => {
@@ -187,38 +195,6 @@ export default function Index() {
         }
     };
 
-    const handleFetchCurrentMedicineStock = async () => {
-        try {
-            const currMedicineId = formData.medicineId;
-            const res = await GetMedicineById(currMedicineId);
-            if (res.code !== 200)
-                return toast.error(res.message, {
-                    autoClose: 2000,
-                    position: "top-right",
-                });
-            setFormData({
-                ...formData,
-                medicine: {
-                    currStock: res.data.currStock
-                }
-            })
-            setMedicineData(res.data)
-            if (res.data.quantity === 0) {
-                const newErrors = { ...errors };
-                newErrors["currStock"] = "Current Medicine Stock is empty";
-                setErrors(newErrors);
-            }
-        } catch (error) {
-            console.error(error);
-        }
-    }
-
-    useEffect(() => {
-        if (formData.medicineId !== 0) {
-            handleFetchCurrentMedicineStock();
-        }
-    }, [formData.medicineId])
-
     const handleFetchPharmacyInfo = async () => {
         try {
             const res = await getPharmacyInfo();
@@ -227,9 +203,10 @@ export default function Index() {
                     autoClose: 2000,
                     position: "top-right",
             });
-            setFormData({
-                ...formData,
+            setPharmacyInfo({
+                ...res.data,
                 physicalReport: {
+                    id: res.data.id,
                     data: {
                         pharmacy: res.data.name,
                         addressPharmacy: res.data.address
@@ -240,13 +217,6 @@ export default function Index() {
             console.error(error);
         }
     }
-
-    useEffect(() => {
-        async function fetchData() {
-            await handleFetchPharmacyInfo();
-        }
-        fetchData();
-    }, [router]);
 
     return (
         <Layout active="transaction-output" user={user}>
@@ -268,6 +238,7 @@ export default function Index() {
                                             label={input.label}
                                             data={["Broken", "Lost", "Expired"]
                                                 .map(item => ({ label: item, value: item.toUpperCase() }))}
+                                            //value={formData.reasonOfDispose.toUpperCase()}
                                             value={formData.reasonOfDispose.toUpperCase()}
                                             onChange={e => inputOnChangeHandler(e, input.name)}
                                             searchable={false}
@@ -281,7 +252,7 @@ export default function Index() {
                                             id={index}
                                             name={input.name}
                                             label={input.label}
-                                            value={medicineData.name}
+                                            value={formData.medicine.name}
                                             placeholder="Select Medicine Name"
                                             error={errors[input.name]}
                                             disabled="true"

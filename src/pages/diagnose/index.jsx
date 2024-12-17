@@ -61,7 +61,7 @@ export default function Index() {
             await handleFetchDiagnose();
         }
         fetchData();
-    }, []);
+    }, [search]);
 
     return (
         <Layout active="diagnose" user={user} >
