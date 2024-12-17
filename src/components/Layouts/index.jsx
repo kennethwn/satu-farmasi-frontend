@@ -149,25 +149,27 @@ export default function Layout(props) {
                 >
                     <Sidenav.Body>
                         <Nav defaultActiveKey="dashboard">
-                            <Nav.Item
-                                eventKey="dashboard"
-                                icon={renderIcon(
-                                    "dashboard",
-                                    activeKey === "dashboard",
-                                )}
-                                onClick={() => {
-                                    router.push("/", undefined, {
-                                        shallow: true,
-                                    });
-                                    setActiveKey("dashboard");
-                                }}
-                            >
-                                {renderTitle(
-                                    "Dashboard",
-                                    "parent",
-                                    activeKey === "dashboard",
-                                )}
-                            </Nav.Item>
+                            {userRole !== "doctor" && (
+                                <Nav.Item
+                                    eventKey="dashboard"
+                                    icon={renderIcon(
+                                        "dashboard",
+                                        activeKey === "dashboard",
+                                    )}
+                                    onClick={() => {
+                                        router.push("/", undefined, {
+                                            shallow: true,
+                                        });
+                                        setActiveKey("dashboard");
+                                    }}
+                                >
+                                    {renderTitle(
+                                        "Dashboard",
+                                        "parent",
+                                        activeKey === "dashboard",
+                                    )}
+                                </Nav.Item>
+                            )}
                             {userRole === "doctor" && (
                                 <Nav.Item
                                     eventKey="diagnosis"
