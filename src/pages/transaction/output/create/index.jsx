@@ -27,10 +27,13 @@ const physicalReportSchema = z.object({
     }),
 });
 
-// FIX: Zod isn't working currently
-// HACK: how do I choice the specific medicine ID?
-// TODO: Add reserveStock column or  addjust the currStock
 const medicineSchema = z.object({
+    medicineId: isRequiredNumber(),
+    quantity: isRequiredNumber(),
+    reasonOfDispose: isRequiredString(),
+});
+
+const medicineSchemaWithPhysicalReport = z.object({
     medicineId: isRequiredNumber(),
     quantity: isRequiredNumber(),
     reasonOfDispose: isRequiredString(),
@@ -86,37 +89,23 @@ export default function Index() {
         }
     });
     const [formField, setFormField] = useState([{ name: "", nip: "", role: "" }]);
-    const [errors, setErrors] = useState({
-        medicineId: "",
-        quantity: "",
-        reasonOfDispose: "",
-        oldQuantity: "",
-        medicine: {
-            currstock: "",
-        },
-        physicalReport: {
-            data: {
-                pharmacist: "",
-                sipaNumber: "",
-                pharmacy: "",
-                addressPharmacy: "",
-                witnesses: [{ name: "", nip: "", role: "" }],
-            }
-        }
-    });
+    const [errors, setErrors] = useState({});
 
     const createHandler = async (e) => {
         e.preventDefault();
         try {
-            console.log("form data: ", formData);
-            
             // binding payload
             formData.physicalReport.data.pharmacist = user.name;
             formData.physicalReport.data.sipaNumber = user.sipaNumber;
             formData.physicalReport.data.witnesses = formField;
 
             setErrors({});
-            // medicineSchema.parse(formData);
+            console.log("form data: ", formData);
+            if (formData.reasonOfDispose === "BROKEN" || formField.reasonOfDispose === "EXPIRED") {
+                medicineSchemaWithPhysicalReport.parse(formData);
+            } else {
+                medicineSchema.parse(formData);
+            }
 
             const res = await CreateMedicine(formData);
             if (res.code !== 200)
