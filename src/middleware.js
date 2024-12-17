@@ -18,9 +18,24 @@ const roleBasedAccess = {
 export const middleware = async (req) => {
     const path = req.nextUrl.pathname;
     const isPublicUrl = path === "/auth/login" || path === "/auth/register";
-    const cookieStore = cookies();
-    const token = cookieStore.get("token")?.value;
     let userCurrentRole = "anonymous";
+    
+    let token;
+    try {
+        // Use req.cookies instead of cookies()
+        token = req.cookies.get('token')?.value;
+        
+        // Fallback method
+        if (!token) {
+            const cookieStore = cookies();
+            token = cookieStore.get("token")?.value;
+        }
+        
+        console.log("Middleware Token:", token);
+    } catch (error) {
+        console.error("Cookie retrieval error:", error);
+        token = null;
+    }
 
     // Authenticated user
     if (isPublicUrl && token) {

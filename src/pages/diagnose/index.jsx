@@ -58,10 +58,12 @@ export default function Index() {
 
     useEffect(() => {
         async function fetchData() {
-            await handleFetchDiagnose();
+            if (user) {
+                await handleFetchDiagnose();
+            }
         }
         fetchData();
-    }, []);
+    }, [user]);
 
     return (
         <Layout active="diagnose" user={user} >
