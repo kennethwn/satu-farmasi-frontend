@@ -165,7 +165,7 @@ export default function create() {
                         value="Submit Prescription"
                     /> */}
 
-                    <div className="flex justify-center gap-2 mt-6 lg:justify-end">
+                    <div className="flex max-md:flex-col py-4 gap-2 mt-6 md:justify-end">
                         {isLoading ? (
                             <Button
                                 appearance="primary"

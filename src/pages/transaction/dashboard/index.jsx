@@ -67,7 +67,7 @@ const [filterStatus, setFilterStatus] = useState("")
   useEffect( () => {
     let newEvent
     if (!isListening) {
-        newEvent = new EventSource('http://localhost:8000/api/v1/transactions/_subscribe',  {withCredentials: true});
+        newEvent = new EventSource(process.env.NEXT_PUBLIC_SATUFARMASI_EVENT_SOURCE_URL,  {withCredentials: true});
         console.log("subscribing")
         console.log(newEvent)
 
@@ -141,7 +141,7 @@ const [filterStatus, setFilterStatus] = useState("")
   return (
     <Layout active="transaction-dashboard" user={user}>
       <ContentLayout title="Riwayat Transaksi">
-        <div className="flex flex-row justify-end items-center w-full pb-6">
+        <div className="flex flex-row justify-end items-center w-full pb-6 gap-4">
         <SelectPicker
             style={{
                 color: '#DDDDDD',       

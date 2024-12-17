@@ -58,7 +58,9 @@ export default function Index() {
 
     useEffect(() => {
         async function fetchData() {
-            await handleFetchDiagnose();
+            if (user) {
+                await handleFetchDiagnose();
+            }
         }
         fetchData();
     }, [search]);

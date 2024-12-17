@@ -171,7 +171,7 @@ export default function Index() {
                         setErrors={setErrors}
                     />
                 </div>
-                <div className="flex w-full pb-4 justify-end">
+                <div className="flex max-md:flex-col pb-4 md:justify-end">
                     {(type == 0 || type == 1 || type == 2) &&
                         <Button onClick={() => handleGenerateForm(type)}>Cetak Surat</Button>
                     }

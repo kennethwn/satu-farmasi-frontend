@@ -17,6 +17,7 @@ export default function PrescriptionDetail(props) {
     const router = useRouter();
     const { createTransaction, finishTransaction, publishNotification } = useTransaction();
     const [isListening, setIsListening] = useState(false)
+    const [hasSubmit, setHasSubmit] = useState(false);
 
     const { getPharmacyInfo } = usePharmacy();
 
@@ -69,6 +70,7 @@ export default function PrescriptionDetail(props) {
 
     const handleCancelProcess = async () => {
         try {
+            setHasSubmit(true);
             const res = await cancelPrescription(prescriptionId);
             console.log("cancel: ", res)
             if (res.code !== 200) {
@@ -84,11 +86,13 @@ export default function PrescriptionDetail(props) {
                 setOpen({ ...open, canceled: false })
             }
         } catch (error) {
+            setHasSubmit(false);
             console.error(error)
         }
     }
     const handleProcess = async () => {
         try {
+            setHasSubmit(true);
             const data = {
                 patientId: prescriptionData.patient.id,
                 prescriptionId: prescriptionData.id,
@@ -116,12 +120,14 @@ export default function PrescriptionDetail(props) {
                 setOpen({ ...open, proceedToPayment: false })
             }
         } catch (error) {
+            setHasSubmit(false);
             console.error(error)
         }
     }
 
     const handleMarkAsDone = async () => {
         try {
+            setHasSubmit(true);
             const data = {
                 transactionId: null,
                 prescriptionId: parseInt(prescriptionData.id),
@@ -148,6 +154,7 @@ export default function PrescriptionDetail(props) {
                 setOpen({ ...open, markAsDone: false })
             }
         } catch (error) {
+            setHasSubmit(false);
             console.error(error)
         }
     }
@@ -170,7 +177,7 @@ export default function PrescriptionDetail(props) {
     useEffect( () => {
         let newEvent
         if (!isListening) {
-            newEvent = new EventSource('http://localhost:8000/api/v1/transactions/_subscribe',  {withCredentials: true});
+            newEvent = new EventSource(process.env.NEXT_PUBLIC_SATUFARMASI_EVENT_SOURCE_URL,  {withCredentials: true});
             console.log("subscribing")
             console.log(newEvent)
             
@@ -247,14 +254,14 @@ export default function PrescriptionDetail(props) {
                 {
                     prescriptionData?.status === "UNPROCESSED" && 
                     <>
-                        <Button appearance="danger" onClick={() => setOpen({...open, canceled: true})}>
+                        <Button appearance="danger" onClick={() => setOpen({...open, canceled: true})} isDisabled={hasSubmit}>
                             Batalkan
                         </Button>
                         <div className="flex flex-row gap-4">
-                            <Button appearance="primary" onClick={() => router.push(`/prescription/edit/` + prescriptionData.id)}>
+                            <Button appearance="primary" onClick={() => router.push(`/prescription/edit/` + prescriptionData.id)} isDisabled={hasSubmit}>
                                 Ubah
                             </Button>
-                            <Button appearance="primary" onClick={() => setOpen({...open, proceedToPayment: true})}>
+                            <Button appearance="primary" onClick={() => setOpen({...open, proceedToPayment: true})} isDisabled={hasSubmit}>
                                 Proses Pembayaran
                             </Button>
                         </div>
@@ -263,7 +270,7 @@ export default function PrescriptionDetail(props) {
                 {
                     prescriptionData?.status === "ON_PROGRESS" &&
                     <div className="w-full flex justify-end">
-                        <Button appearance="primary" onClick={() => setOpen({...open, markAsDone: true})}>
+                        <Button appearance="primary" onClick={() => setOpen({...open, markAsDone: true})} isDisabled={hasSubmit}>
                             Mark as Done
                         </Button>
                     </div>
@@ -282,6 +289,7 @@ export default function PrescriptionDetail(props) {
                 }
                 btnText="Konfirmasi"
                 onClick={handleProcess}
+                isLoading={hasSubmit}
             />
 
             <Toaster
@@ -297,6 +305,7 @@ export default function PrescriptionDetail(props) {
 
                 title={"Mark Prescription as Done"}
                 onClick={handleMarkAsDone}
+                isLoading={hasSubmit}
             />
 
             <Toaster
@@ -311,6 +320,7 @@ export default function PrescriptionDetail(props) {
                 }
                 btnText="Confirm"
                 onClick={handleCancelProcess}
+                isLoading={hasSubmit}
             />
         </Modal>
     )

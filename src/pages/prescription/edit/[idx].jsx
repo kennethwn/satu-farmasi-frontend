@@ -237,7 +237,7 @@ export default function Page() {
                         setErrors={setErrors}
                         setAvailableStock={setMedicineWithCurrStock}
                     />
-                    <div className="flex justify-center gap-2 mt-6 lg:justify-end">
+                    <div className="flex max-md:flex-col gap-2 my-6 pb-4 md:justify-end">
                         {isLoading ? (
                             <Button
                                 appearance="primary"

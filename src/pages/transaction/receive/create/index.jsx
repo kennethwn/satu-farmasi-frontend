@@ -97,7 +97,7 @@ export default function Index() {
         buyingPrice: "",
         paymentMethod: "",
         deadline: "",
-        isPaid: "",
+        isArrived: "",
         medicineRequest: {
             name: "",
             genericNameId: "",
@@ -130,7 +130,7 @@ export default function Index() {
                 buyingPrice: 0,
                 paymentMethod: "",
                 deadline: "",
-                isPaid: null,
+                isArrived: null,
                 medicineRequest: {
                     code: "",
                     name: "",
@@ -238,6 +238,7 @@ export default function Index() {
 
     const handleSubmit = async () => {
         try {
+            setIsLoading(true);
             let classifications = [];
             input.classifications = [];
             formFields.forEach((item, index) => {
@@ -301,6 +302,7 @@ export default function Index() {
                 router.push("/transaction/receive");
             }, 2000)
         } catch (error) {
+            setIsLoading(false);
             console.log("error receive medicine: ", error)
             if (error instanceof ZodError) {
                 const newErrors = { ...errors };
@@ -368,7 +370,7 @@ export default function Index() {
                         existingMedicine={existingMedicine}
                     />
 
-                    <div className="flex justify-center gap-2 my-6 pb-4 lg:justify-end">
+                    <div className="flex max-md:flex-col gap-2 my-6 pb-4 md:justify-end">
                         {isLoading ?
                             <Button
                                 appearance="primary"

@@ -46,9 +46,8 @@ export default function Index() {
     const { GetGenericDropdown } = useGenericAPI();
     const { GetMedicineDropdownList } = useMedicineAPI();
     const { GetAllActiveVendor } = useVendorAPI();
-    const { GetReceiveMedicinesById, ConfirmReceiveMedicine } = useReceiveMedicineAPI();
+    const { GetReceiveMedicinesById, ConfirmReceiveMedicine, SaveReceiveMedicine } = useReceiveMedicineAPI();
 
-    const [existingMedicine, setExistingMedicine] = useState(false);
     const [modal, setModal] = useState(false);
     const [input, setInput] = useState({});
     const [errors, setErrors] = useState({});
@@ -74,7 +73,7 @@ export default function Index() {
                 buyingPrice: 0,
                 paymentMethod: "",
                 deadline: "",
-                isPaid: null,
+                isArrived: null,
                 medicineRequest: {
                     code: "",
                     name: "",
@@ -179,8 +178,61 @@ export default function Index() {
         }
     }
 
+    const handleSave = async () => {
+        try {
+            setIsLoading(true);
+            const payload = {
+                id: input.id,
+                documentNumber: input.documentNumber,
+                batchCode: input.batchCode,
+                medicineId: parseInt(input.medicineId),
+                quantity: parseInt(input.quantity),
+                vendorId: parseInt(input.vendorId),
+                buyingPrice: parseFloat(input.buyingPrice),
+                paymentMethod: input.paymentMethod,
+                deadline: input.deadline,
+                is_active: false,
+                isArrived: input.isArrived,
+                reportId: null,
+                expiredDate: new Date(input.expiredDate)
+            }
+
+            setErrors({});
+            // medicineSchema.parse(payload);
+
+            const res = await SaveReceiveMedicine(payload);
+            if (res.code !== 200) {
+                toast.error(res.response.data.message, { autoClose: 2000, position: "top-right" });
+                setModal(false);
+                return;
+            }
+            toast.success(res.message, { autoClose: 2000, position: "top-right" });
+            setTimeout(() => {
+                router.push("/transaction/receive");
+            }, 2000)
+        } catch (error) {
+            setIsLoading(false);
+            if (error instanceof ZodError) {
+                const newErrors = { ...errors };
+                error.issues.forEach((issue) => {
+                    if (issue.path.length > 0) {
+                        if (issue.path[0] === "classificationList") {
+                            newErrors[`classificationList[${issue.path[1]}]`] = issue.message;
+                        }
+                        else {
+                            const fieldName = issue.path[0];
+                            newErrors[fieldName] = issue.message;
+                        }
+                    }
+                });
+                setErrors(newErrors);
+            }
+        }
+    }
+
     const handleConfirm = async () => {
         try {
+            setIsLoading(true);
             const payload = {
                 id: input.id,
                 documentNumber: input.documentNumber,
@@ -192,7 +244,7 @@ export default function Index() {
                 paymentMethod: input.paymentMethod ? input.paymentMethod : "",
                 deadline: input.deadline ? new Date(input.deadline) : "",
                 is_active: true,
-                isPaid: input.isPaid,
+                isArrived: input.isArrived,
                 reportId: 0,
                 expiredDate: new Date(input.expiredDate) || ""
             }
@@ -219,7 +271,8 @@ export default function Index() {
             }, 2000)
         } catch (error) {
             console.log("erorr: ", error)
-                    if (error instanceof ZodError) {
+            setIsLoading(false);
+            if (error instanceof ZodError) {
                 const newErrors = { ...errors };
                 error.issues.forEach((issue) => {
                     if (issue.path.length > 0) {
@@ -328,26 +381,45 @@ export default function Index() {
                         isEdit={true}
                     />
 
-                    <div className="flex justify-center gap-2 my-6 pb-4 lg:justify-end">
+                    <div className="flex gap-2 my-6 pb-4">
                         {isLoading ?
-                            <Button
-                                appearance="primary"
-                                isDisabled={true}
-                                isLoading={isLoading}
-                            >
-                                Konfirmasi
-                            </Button>
+                            <div className="flex flex-col w-full md:flex-row gap-4 md:justify-end">
+                                <Button
+                                    appearance="subtle"
+                                    isDisabled={true}
+                                    isLoading={isLoading}
+                                >
+                                    Simpan
+                                </Button>
+                                <Button
+                                    appearance="primary"
+                                    isDisabled={true}
+                                    isLoading={isLoading}
+                                >
+                                    Konfirmasi
+                                </Button>
+                            </div>
                             :
-                            <Button
-                                isLoading={isLoading}
-                                type="button"
-                                appearance="primary"
-                                onClick={() => {
-                                    setModal(true)
-                                }}
-                            >
-                                Konfirmasi
-                            </Button>
+                            <div className="flex max-md:flex-col gap-2 my-6 pb-4 md:justify-end">
+                                <Button
+                                    isLoading={isLoading}
+                                    type="button"
+                                    appearance="subtle"
+                                    onClick={handleSave}
+                                >
+                                    Simpan
+                                </Button>
+                                <Button
+                                    isLoading={isLoading}
+                                    type="button"
+                                    appearance="primary"
+                                    onClick={() => {
+                                        setModal(true)
+                                    }}
+                                >
+                                    Konfirmasi
+                                </Button>
+                            </div>
                         }
                     </div>
                 </form>

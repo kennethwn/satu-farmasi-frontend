@@ -133,7 +133,7 @@ export default function Login() {
     return (
         <form onSubmit={handleSubmit(RegisterHandler)} className="h-screen flex justify-center items-center flex-col py-16" ref={formRef}>
             <section ref={credentialsRef}>
-                <div className="flex justify-center items-center flex-col gap-3 p-8 rounded bg-background-light border border-border-auth">
+                <div className="flex justify-center items-center flex-col gap-3 p-8 rounded bg-background-light border border-border-auth w-[400px]">
                     <div className="text-center mb-4">
                         <Text type="heading_4">Buat Akun Anda</Text>
                     </div>
