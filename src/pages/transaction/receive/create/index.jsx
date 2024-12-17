@@ -1,7 +1,5 @@
 import Layout from "@/components/Layouts";
 import ContentLayout from "@/components/Layouts/Content";
-import Dropdown from "@/components/SelectPicker/Dropdown";
-import Text from "@/components/Text";
 import { useUserContext } from "@/pages/api/context/UserContext";
 import { useRouter } from "next/router";
 import { useState, useEffect } from "react";
@@ -10,9 +8,9 @@ import useGenericAPI from "@/pages/api/master/generic";
 import useMedicineAPI from "@/pages/api/master/medicine";
 import usePackagingAPI from "@/pages/api/master/packaging";
 import { toast } from "react-toastify";
-import { DatePicker, SelectPicker, Toggle } from "rsuite";
+import {  Toggle } from "rsuite";
 import { z, ZodError } from "zod";
-import { isRequiredNumber, isRequiredString, isRequiredDate } from "@/helpers/validation";
+import { isRequiredNumber, isRequiredString, isRequiredDate, isRequiredOptions } from "@/helpers/validation";
 import useClassificationsAPI from "@/pages/api/master/classification";
 import ReceiveMedicineForm from "@/components/DynamicForms/ReceiveMedicineForm";
 import useVendorAPI from "@/pages/api/master/vendor";
@@ -21,10 +19,6 @@ import useReceiveMedicineAPI from "@/pages/api/transaction/receiveMedicine";
 const classificationSchema = z.object({
     classificationId: isRequiredNumber(),
 });
-
-const paymentMethodSchema = z.object({
-    paymentMethod: isRequiredString(),
-})
 
 const medicineRequestSchema = z.object({
     name: isRequiredString(),
@@ -44,6 +38,10 @@ const medicineRequestSchema = z.object({
     expiredDate: isRequiredDate(),
 })
 
+const newMedicineSchema = z.object({
+    medicineId: isRequiredNumber(),
+})
+
 const medicineSchema = z.object({
     documentNumber: isRequiredString(),
     batchCode: isRequiredString(),
@@ -51,19 +49,24 @@ const medicineSchema = z.object({
     vendorId: isRequiredNumber(),
     buyingPrice: isRequiredNumber(),
     paymentMethod: isRequiredString(),
-    deadline: isRequiredString(),
-    isPaid: z.boolean(),
-    medicineRequest: medicineRequestSchema
-}).refine(data => data.minStock < data.maxStock, {
-    message: "Minimum stock must be less than maximum stock",
-    path: ["minStock"],
-}).refine(data => data.maxStock > data.minStock, {
-    message: "Maximum stock must be greater than minimum stock",
-    path: ["maxStock"],
-}).refine(data => data.currStock <= data.maxStock, {
-    message: "Current stock cannot be greater than maximum stock",
-    path: ["currStock"],
+    deadline: isRequiredDate(),
+    isPaid: z.boolean().nullable().refine(value => value !== null, {
+        message: "Bidang ini harus diisi",
+    }),
+    medicineRequest: medicineRequestSchema,
+    quantity: isRequiredNumber(),
+    vendorId: isRequiredNumber(),
 })
+//.refine(data => data.minStock < data.maxStock, {
+//    message: "Jumlah obat minimum harus kurang dari jumlah maksimum",
+//    path: ["minStock"],
+//}).refine(data => data.maxStock > data.minStock, {
+//    message: "Jumlah obat maksimum harus lebih besar dari jumlah minimum",
+//    path: ["maxStock"],
+//}).refine(data => data.currStock <= data.maxStock, {
+//    message: "Jumlah obat tidak boleh melebihi batas maksimum obat",
+//    path: ["currStock"],
+//})
 
 export default function Index() {
     const { user } = useUserContext();
@@ -254,37 +257,40 @@ export default function Index() {
             
             const medicineRequest = {
                 code: input.code || medicines?.find(item => item.id == input.medicineId)?.code || "",
-                name: input.name || medicines?.find(item => item.id == input.medicineId)?.name,
-                genericNameId: parseInt(input.genericNameId) || parseInt(medicines?.find(item => item.id == input.medicineId)?.genericName.id),
-                merk: input.merk || medicines?.find(item => item.id == input.medicineId)?.merk,
+                name: input.name || medicines?.find(item => item.id == input.medicineId)?.name || "",
+                genericNameId: parseInt(input.genericNameId) || parseInt(medicines?.find(item => item.id == input.medicineId)?.genericName.id) || 0,
+                merk: input.merk || medicines?.find(item => item.id == input.medicineId)?.merk || "",
                 description: input.description || medicines?.find(item => item.id == input.medicineId)?.description || "",
-                unitOfMeasure: input.unitOfMeasure || medicines?.find(item => item.id == input.medicineId)?.unitOfMeasure,
-                price: parseFloat(input.price) || parseFloat(medicines?.find(item => item.id == input.medicineId)?.price),
-                expiredDate: new Date(input.expiredDate || medicines?.find(item => item.id == input.medicineId)?.expiredDate),
-                currStock: parseInt(input.currStock) || medicines?.find(item => item.id == input.medicineId)?.currStock,
-                minStock: parseInt(input.minStock) || medicines?.find(item => item.id == input.medicineId)?.minStock,
-                maxStock: parseInt(input.maxStock) || medicines?.find(item => item.id == input.medicineId)?.maxStock,
-                packagingId: parseInt(input.packagingId) || medicines?.find(item => item.id == input.medicineId)?.packaging.id,
-                sideEffect: input.sideEffect || medicines?.find(item => item.id == input.medicineId)?.sideEffect,
+                unitOfMeasure: input.unitOfMeasure || medicines?.find(item => item.id == input.medicineId)?.unitOfMeasure || "",
+                price: parseFloat(input.price) || parseFloat(medicines?.find(item => item.id == input.medicineId)?.price) || 0,
+                expiredDate: input.expiredDate ? new Date(input.expiredDate || medicines?.find(item => item.id == input.medicineId)?.expiredDate) : "",
+                currStock: parseInt(input.currStock) || medicines?.find(item => item.id == input.medicineId)?.currStock || 0,
+                minStock: parseInt(input.minStock) || medicines?.find(item => item.id == input.medicineId)?.minStock || 0,
+                maxStock: parseInt(input.maxStock) || medicines?.find(item => item.id == input.medicineId)?.maxStock || 0,
+                packagingId: parseInt(input.packagingId) || medicines?.find(item => item.id == input.medicineId)?.packaging.id || 0,
+                sideEffect: input.sideEffect || medicines?.find(item => item.id == input.medicineId)?.sideEffect || "",
                 classificationList: !existingMedicine ? classifications :  (medicines?.find(item => item.id == input?.medicineId)?.classifications?.map(item => ({ medicineId: input.medicineId, classificationId: item.id }))),
             }
 
             const payload = {
-                documentNumber: input.documentNumber,
-                batchCode: input.batchCode,
+                documentNumber: input.documentNumber || "",
+                batchCode: input.batchCode || "",
                 medicineId: parseInt(input.medicineId) || 0,
-                quantity: parseInt(input.quantity) || parseInt(input.currStock),
-                vendorId: parseInt(input.vendorId),
-                buyingPrice: parseFloat(input.buyingPrice),
-                paymentMethod: input.paymentMethod,
-                deadline: input.deadline,
-                isPaid: input.isPaid,
+                quantity: parseInt(input.quantity) || parseInt(input.currStock) || 0,
+                vendorId: parseInt(input.vendorId) || 0,
+                buyingPrice: parseFloat(input.buyingPrice) || 0,
+                paymentMethod: input.paymentMethod || "",
+                deadline: input.deadline || "",
+                isPaid: input.isPaid || null,
                 medicineRequest: medicineRequest,
                 reportId: 0
             }
 
             setErrors({});
-            // medicineSchema.parse(payload);
+            console.log("payload: ", payload)
+            medicineSchema.parse(payload);
+            if (existingMedicine)  newMedicineSchema.parse(payload)
+
             const res = await CreateReceiveMedicine(payload);
             if (res.code !== 200) {
                 toast.error(res.response.data.message, { autoClose: 2000, position: "top-right" });
@@ -338,8 +344,8 @@ export default function Index() {
                     <div className="my-2">
                         <Toggle 
                         size="lg" 
-                        checkedChildren="Existing Medicine" 
-                        unCheckedChildren="New Medicine" 
+                        checkedChildren="Obat Lama" 
+                        unCheckedChildren="Obat Baru" 
                         defaultChecked={false} onChange={e => {
                             handleClearInput();
                             setExistingMedicine(e)

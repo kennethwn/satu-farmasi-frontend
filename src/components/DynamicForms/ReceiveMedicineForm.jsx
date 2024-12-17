@@ -179,11 +179,11 @@ const ReceiveMedicineForm = (props) => {
                             name="medicine_name"
                             onChange={e => {
                                 setInput({ ...input, name: e.target.value });
-                                setErrors({ ...errors, "name": "" });
+                                setErrors({ ...errors, "medicineRequest.name": "" });
                             }}
                             label="Nama Obat"
                             placeholder="nama obat"
-                            error={errors['name']}
+                            error={errors['medicineRequest.name']}
                             value={existingMedicine 
                                 ? dataMedicines?.find(item => item?.id == input.medicineId)?.name || input?.medicineRequest?.name
                                 : input?.name || ""
@@ -542,10 +542,10 @@ const ReceiveMedicineForm = (props) => {
                                 name="expiredDate"
                                 placement="topStart"
                                 cleanable={false}
+                                className={"py-1.5" + errors['medicineRequest.expiredDate'] ? "error-field" : ""}
                                 size='lg'
                                 value={input?.expiredDate || input?.medicineRequest?.expiredDate}
                                 valueKey="id"
-                                className="py-1.5"
                                 labelKey="label"
                                 onChange={value => {
                                     setInput({ ...input, expiredDate: value })
@@ -555,7 +555,7 @@ const ReceiveMedicineForm = (props) => {
                             />
                             {
                                 errors['medicineRequest.expiredDate'] &&
-                                    <div style={{ minHeight: '22px' }}>
+                                    <div style={{ marginTop: '8px', minHeight: '22px' }}>
                                         <Text type="danger">{errors['medicineRequest.expiredDate']}</Text>
                                     </div>
                             }
@@ -837,6 +837,12 @@ const ReceiveMedicineForm = (props) => {
                             <Radio value={false}>Belum Lunas</Radio>
                         </RadioGroup>
                     }
+                    <div style={{ minHeight: '22px' }}>
+                    {
+                        errors['isPaid'] &&
+                        <Text type="danger">{errors['isPaid']}</Text>
+                    }
+                    </div>
                 </div>
             </div>
         </div>
