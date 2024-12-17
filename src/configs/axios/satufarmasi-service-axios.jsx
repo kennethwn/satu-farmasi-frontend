@@ -9,7 +9,7 @@ const instance = axios.create({
         "Access-Control-Allow-Methods": "GET,PUT,POST,DELETE,PATCH,OPTIONS",
         "Accept": "application/json",
         "Content-Type": "application/json",
-        // "X-Requested-With": "XMLHttpRequest",
+        "X-Requested-With": "XMLHttpRequest",
     }
 })
 
