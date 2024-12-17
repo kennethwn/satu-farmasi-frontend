@@ -67,7 +67,7 @@ const [filterStatus, setFilterStatus] = useState("")
   useEffect( () => {
     let newEvent
     if (!isListening) {
-        newEvent = new EventSource('http://localhost:8000/api/v1/transactions/_subscribe',  {withCredentials: true});
+        newEvent = new EventSource(process.env.NEXT_PUBLIC_SATUFARMASI_EVENT_SOURCE_URL,  {withCredentials: true});
         console.log("subscribing")
         console.log(newEvent)
 

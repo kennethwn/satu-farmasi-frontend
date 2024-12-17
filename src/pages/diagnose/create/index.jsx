@@ -48,7 +48,6 @@ export default function Index() {
     const router = useRouter();
     const { user } = useUserContext();
     const { submitDiagnose } = useDiagnose();
-    const [title, setTitle] = useState("")
     const [errors, setErrors] = useState({})
     const [description, setDescription] = useState("")
     const [existingPatient, setExistingPatient] = useState(true)
@@ -73,6 +72,14 @@ export default function Index() {
             phoneNum: ""
         }
     )
+
+    const constructTitle = () => {
+        const obj = new Date();
+        const day = obj.getUTCDate();
+        const month = obj.getUTCMonth() + 1;
+        const year = obj.getUTCFullYear();
+        return `Diagnosis a/n ${selectedPatient.patientName} ${day}/${month}/${year}`
+    }
 
     const handleSubmitDiagnose = async (e) => {
         e.preventDefault()
@@ -100,7 +107,7 @@ export default function Index() {
             }
 
             data.doctorId = user?.id || 1,
-            data.title = title
+            data.title = constructTitle()
             data.description = description
             data.prescription.patient = selectedPatient
             data.prescription.medicineList.pop()
@@ -142,19 +149,6 @@ export default function Index() {
             <ContentLayout title="Tambah Diagnosis" type="child" backpageUrl="/diagnose">
                 <form onSubmit={handleSubmitDiagnose} className="flex flex-col gap-6">
                     <div className="flex flex-col gap-2">
-                        <p> Judul </p>
-                        <Input 
-                            type="text" 
-                            id="title" name="title" 
-                            onChange={(e) => {
-                                setTitle(e.target.value)
-                                setErrors({ ...errors, "title": "" });
-                            }} 
-                            placeholder="Judul" 
-                            error={errors["title"]} 
-                        />
-                    </div>
-                    <div className="flex flex-col gap-2">
                         <Toggle 
                             size="lg" 
                             checkedChildren="Pasien Lama" 
@@ -178,14 +172,8 @@ export default function Index() {
                             setErrors = {setErrors}
                         />
                     </div>
-                    <PrescriptionForm 
-                        formFields={formFields} 
-                        setFormFields={setFormFields}
-                        errors={errors}
-                        setErrors={setErrors}
-                    />
                     <div className="flex flex-col gap-2">
-                        <p> Deskripsi </p>
+                        <p> Deskripsi Keluhan </p>
                         <Input 
                             type="text" 
                             id="description" 
@@ -194,8 +182,14 @@ export default function Index() {
                                 setDescription(e.target.value)
                                 setErrors({ ...errors, "description": "" });
                             }} 
-                            placeholder="Deskripsi" error={errors["description"]} />
+                            placeholder="Deskripsi keluhan" error={errors["description"]} />
                     </div>
+                    <PrescriptionForm 
+                        formFields={formFields} 
+                        setFormFields={setFormFields}
+                        errors={errors}
+                        setErrors={setErrors}
+                    />
                     <div className="flex justify-center gap-2 my-6 lg:justify-end">
                         <Button type="submit" appearance="primary" isDisabled={hasSubmit}>
                             Simpan

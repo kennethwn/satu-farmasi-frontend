@@ -5,7 +5,7 @@ const instance = axios.create({
     baseURL: `${process.env.NEXT_PUBLIC_SATUFARMASI_API_URL}`,
     withCredentials: true,
     headers: {
-        "Access-Control-Allow-Origin": "https://api.satu-farmasi.my.id",
+        "Access-Control-Allow-Origin": process.env.NEXT_PUBLIC_SATUFARMASI_API_URL,
         "Access-Control-Allow-Methods": "GET,PUT,POST,DELETE,PATCH,OPTIONS",
         "Accept": "application/json",
         "Content-Type": "application/json",
