@@ -63,7 +63,7 @@ export default function Index() {
             }
         }
         fetchData();
-    }, [user]);
+    }, [search]);
 
     return (
         <Layout active="diagnose" user={user} >

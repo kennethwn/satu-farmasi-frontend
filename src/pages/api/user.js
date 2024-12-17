@@ -24,7 +24,7 @@ export default function useUser() {
             setUser({ id: response.data.id, name: fullName, email: response.data.email, role: response.data.role, sipaNumber: response.data.sipaNumber });
             return response;
         } catch (error) {
-            throw error.response.data;
+             throw error.response.data;
         }
     };
 

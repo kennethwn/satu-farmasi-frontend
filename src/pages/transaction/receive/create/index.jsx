@@ -37,7 +37,7 @@ const medicineRequestSchema = z.object({
     maxStock: isRequiredNumber(),
     packagingId: isRequiredNumber(),
     unitOfMeasure: isRequiredString().nullable().refine(value => value !== null, {
-        message: "This field is required",
+        message: "Bidang ini harus diisi",
     }),
     sideEffect: isRequiredString(),
     classificationList: z.array(classificationSchema),
@@ -50,9 +50,9 @@ const medicineSchema = z.object({
     quantity: isRequiredNumber(),
     vendorId: isRequiredNumber(),
     buyingPrice: isRequiredNumber(),
-    paymentMethod: z.array(paymentMethodSchema),
-    deadline: isRequiredDate(),
-    isPaid: z.boolean(),
+    paymentMethod: isRequiredString(),
+    deadline: isRequiredString(),
+    isArrived: z.boolean(),
     medicineRequest: medicineRequestSchema
 }).refine(data => data.minStock < data.maxStock, {
     message: "Minimum stock must be less than maximum stock",
@@ -80,13 +80,37 @@ export default function Index() {
 
     const [existingMedicine, setExistingMedicine] = useState(false);
     const [input, setInput] = useState({});
-    const [errors, setErrors] = useState({});
     const [medicines, setMedicines] = useState([]);
     const [packagings, setPackagings] = useState([]);
     const [classifications, setClassifications] = useState([]);
     const [generics, setGenerics] = useState([]);
     const [vendors, setVendors] = useState([]);
     const [formFields, setFormFields] = useState([{ id: 0, label: '', value: '' }]);
+    const [errors, setErrors] = useState({
+        documentNumber: "",
+        batchCode: "",
+        quantity: "",
+        vendorId: "",
+        buyingPrice: "",
+        paymentMethod: "",
+        deadline: "",
+        isArrived: "",
+        medicineRequest: {
+            name: "",
+            genericNameId: "",
+            merk: "",
+            price: "",
+            description: "",
+            currStock: "",
+            minStock: "",
+            maxStock: "",
+            packagingId: "",
+            unitOfMeasure: "",
+            sideEffect: "",
+            // classificationList: [{ classificationId: "" }],
+            expiredDate: "",
+        }
+    });
 
     const handleFormFields = (value) => {
         setFormFields(value);
@@ -103,7 +127,7 @@ export default function Index() {
                 buyingPrice: 0,
                 paymentMethod: "",
                 deadline: "",
-                isPaid: null,
+                isArrived: null,
                 medicineRequest: {
                     code: "",
                     name: "",
@@ -211,6 +235,7 @@ export default function Index() {
 
     const handleSubmit = async () => {
         try {
+            setIsLoading(true);
             let classifications = [];
             input.classifications = [];
             formFields.forEach((item, index) => {
@@ -254,7 +279,7 @@ export default function Index() {
                 buyingPrice: parseFloat(input.buyingPrice),
                 paymentMethod: input.paymentMethod,
                 deadline: input.deadline,
-                isPaid: input.isPaid,
+                isArrived: input.isArrived,
                 medicineRequest: medicineRequest,
                 reportId: 0
             }
@@ -271,15 +296,19 @@ export default function Index() {
                 router.push("/transaction/receive");
             }, 2000)
         } catch (error) {
+            setIsLoading(false);
             console.log("error receive medicine: ", error)
             if (error instanceof ZodError) {
                 const newErrors = { ...errors };
                 error.issues.forEach((issue) => {
                     if (issue.path.length > 0) {
-                        if (issue.path[0] === "classificationList") {
-                            newErrors[`classificationList[${issue.path[1]}]`] = issue.message;
-                        }
-                        else {
+                        if (issue.path[0] === "medicineRequest") {
+                            if (issue.path[1] === "classificationList") {
+                                newErrors[`classificationList[${issue.path[2]}]`] = issue.message;
+                            } else {
+                                newErrors[`medicineRequest.${issue.path[1]}`] = issue.message;
+                            }
+                        } else {
                             const fieldName = issue.path[0];
                             newErrors[fieldName] = issue.message;
                         }
@@ -335,7 +364,7 @@ export default function Index() {
                         existingMedicine={existingMedicine}
                     />
 
-                    <div className="flex justify-center gap-2 my-6 pb-4 lg:justify-end">
+                    <div className="flex max-md:flex-col gap-2 my-6 pb-4 md:justify-end">
                         {isLoading ?
                             <Button
                                 appearance="primary"

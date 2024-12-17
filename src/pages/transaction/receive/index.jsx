@@ -4,7 +4,7 @@ import ContentLayout from "@/components/Layouts/Content";
 import SearchBar from "@/components/SearchBar";
 import { formatRupiah } from "@/helpers/currency";
 import formatDate from "@/helpers/dayHelper";
-import { resolveIsPaidStatus } from "@/helpers/resolveStatus";
+import { resolveisArrivedStatus } from "@/helpers/resolveStatus";
 import { useUserContext } from "@/pages/api/context/UserContext";
 import useReceiveMedicineAPI from "@/pages/api/transaction/receiveMedicine";
 import { useEffect, useState } from "react";
@@ -199,8 +199,8 @@ export default function Index() {
 
                     <Column width={150} fixed="right">
                         <HeaderCell className="text-dark font-bold">Status Pembayaran</HeaderCell>
-                        <Cell dataKey='isPaid'>
-                            {rowData => resolveIsPaidStatus(rowData?.isPaid)}
+                        <Cell dataKey='isArrived'>
+                            {rowData => resolveisArrivedStatus(rowData?.isArrived)}
                         </Cell>
                     </Column>
 
@@ -211,7 +211,7 @@ export default function Index() {
                                 rowData => {
                                     return (
                                         <div className="flex justify-center flex-row gap-6">
-                                            {!rowData?.is_active || !rowData?.isPaid ?
+                                            {!rowData?.is_active || !rowData?.isArrived ?
                                                 <Whisper speaker={renderTooltip("Konfirmasi")} placement="top" controlId="control-id-hover" trigger="hover">
                                                     <button
                                                         className="inline-flex items-center justify-center w-8 h-8 text-center bg-transparent border-0 rounded-lg"
@@ -225,7 +225,7 @@ export default function Index() {
                                                 </Whisper>
                                                 : null       
                                             }
-                                            {!rowData?.is_active || !rowData?.isPaid ?
+                                            {!rowData?.is_active || !rowData?.isArrived ?
                                                 <Whisper speaker={renderTooltip("Hapus")} placement="top" controlId="control-id-hover" trigger="hover">
                                                     <button
                                                         className="inline-flex items-center justify-center w-8 h-8 text-center bg-transparent border-0 rounded-lg"
