@@ -149,7 +149,7 @@ export default function Layout(props) {
                 >
                     <Sidenav.Body>
                         <Nav defaultActiveKey="dashboard">
-                            {userRole !== "doctor" && (
+                            {userRole === "pharmacist" && (
                                 <Nav.Item
                                     eventKey="dashboard"
                                     icon={renderIcon(
@@ -329,19 +329,19 @@ export default function Layout(props) {
                                                 </Nav.Item>
                                                 <Nav.Item
                                                     onClick={() => {
-                                                        setActiveKey("master-pharmacy");
+                                                        setActiveKey("pharmacy");
                                                         router.push(
                                                             "/pharmacy",
                                                             undefined,
                                                             { shallow: true },
                                                         );
                                                     }}
-                                                    eventKey="master-pharmacy"
+                                                    eventKey="pharmacy"
                                                 >
                                                     {renderTitle(
                                                         "Apotek",
                                                         "parent",
-                                                        activeKey === "master-pharmacy",
+                                                        activeKey === "pharmacy",
                                                     )}
                                                 </Nav.Item>
                                             </>

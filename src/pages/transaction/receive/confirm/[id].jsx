@@ -27,7 +27,7 @@ const medicineSchema = z.object({
     buyingPrice: isRequiredNumber(),
     paymentMethod: isRequiredString(),
     deadline: isRequiredDate(),
-    isPaid: z.boolean().nullable().refine(value => value !== null, {
+    isArrived: z.boolean().nullable().refine(value => value !== null, {
         message: "Bidang ini harus diisi",
     }),
     medicineRequest: medicineRequestSchema,
@@ -186,19 +186,26 @@ export default function Index() {
                 documentNumber: input.documentNumber,
                 batchCode: input.batchCode,
                 medicineId: parseInt(input.medicineId),
-                quantity: parseInt(input.quantity),
+                quantity: input.quantity ? parseInt(input.quantity) : 0,
                 vendorId: parseInt(input.vendorId),
                 buyingPrice: parseFloat(input.buyingPrice),
-                paymentMethod: input.paymentMethod,
-                deadline: input.deadline,
+                paymentMethod: input.paymentMethod ? input.paymentMethod : "",
+                deadline: input.deadline ? new Date(input.deadline) : "",
                 is_active: false,
-                isArrived: input.isArrived,
+                isArrived: input.isArrived !== null ? input.isArrived : null,
                 reportId: null,
-                expiredDate: new Date(input.expiredDate)
+                expiredDate: new Date(input.expiredDate) || ""
             }
 
             setErrors({});
-            // medicineSchema.parse(payload);
+            console.log("payload: ", payload);
+            const validatedData = {
+                ...payload, 
+                medicineRequest: {
+                    currStock: payload.quantity
+                }
+            }
+             medicineSchema.parse(validatedData);
 
             const res = await SaveReceiveMedicine(payload);
             if (res.code !== 200) {
@@ -227,6 +234,8 @@ export default function Index() {
                 });
                 setErrors(newErrors);
             }
+        } finally {
+            setIsLoading(false);
         }
     }
 
@@ -244,7 +253,7 @@ export default function Index() {
                 paymentMethod: input.paymentMethod ? input.paymentMethod : "",
                 deadline: input.deadline ? new Date(input.deadline) : "",
                 is_active: true,
-                isArrived: input.isArrived,
+                isArrived: input.isArrived !== null ? input.isArrived : null,
                 reportId: 0,
                 expiredDate: new Date(input.expiredDate) || ""
             }
@@ -291,6 +300,8 @@ export default function Index() {
                 console.log("new error: ", newErrors)
                 setErrors(newErrors);
             }
+        } finally {
+            setIsLoading(false);
         }
     }
 
@@ -312,6 +323,7 @@ export default function Index() {
                     batchCode: data.batchCode,
                     medicineId: data.medicine.id,
                     quantity: parseInt(data.quantity),
+                    isArrived: data.isArrived,
                     vendorId: data.vendor.id,
                     buyingPrice: parseFloat(data.buyingPrice),
                     paymentMethod: data.paymentMethod || "",

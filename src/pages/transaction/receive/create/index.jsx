@@ -50,7 +50,7 @@ const medicineSchema = z.object({
     buyingPrice: isRequiredNumber(),
     paymentMethod: isRequiredString(),
     deadline: isRequiredDate(),
-    isPaid: z.boolean().nullable().refine(value => value !== null, {
+    isArrived: z.boolean().nullable().refine(value => value !== null, {
         message: "Bidang ini harus diisi",
     }),
     medicineRequest: medicineRequestSchema,
@@ -273,6 +273,7 @@ export default function Index() {
                 classificationList: !existingMedicine ? classifications :  (medicines?.find(item => item.id == input?.medicineId)?.classifications?.map(item => ({ medicineId: input.medicineId, classificationId: item.id }))),
             }
 
+            console.log("isArrived: ", input.isArrived)
             const payload = {
                 documentNumber: input.documentNumber || "",
                 batchCode: input.batchCode || "",
@@ -280,6 +281,7 @@ export default function Index() {
                 quantity: parseInt(input.quantity) || parseInt(input.currStock) || 0,
                 vendorId: parseInt(input.vendorId) || 0,
                 buyingPrice: parseFloat(input.buyingPrice) || 0,
+                isArrived: input.isArrived !== null ? input.isArrived : null,
                 paymentMethod: input.paymentMethod || "",
                 deadline: input.deadline || "",
                 isPaid: input.isPaid || null,
@@ -323,6 +325,8 @@ export default function Index() {
                 console.log("new error: ", newErrors)
                 setErrors(newErrors);
             }
+        } finally {
+            setIsLoading(false)
         }
     }
 

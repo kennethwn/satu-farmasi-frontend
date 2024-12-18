@@ -840,8 +840,8 @@ const ReceiveMedicineForm = (props) => {
                     }
                     <div style={{ minHeight: '22px' }}>
                     {
-                        errors['isPaid'] &&
-                        <Text type="danger">{errors['isPaid']}</Text>
+                        errors['isArrived'] &&
+                        <Text type="danger">{errors['isArrived']}</Text>
                     }
                     </div>
                 </div>
