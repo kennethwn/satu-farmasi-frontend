@@ -121,7 +121,11 @@ export default function Home() {
       const payload = {year: currentYear}
       const response = await getAnnualTransactionRecap(payload);
       if (response.code != 200) return;
-      setAnnualReport(response.data);
+      setAnnualReport(response.data?.map(item => ({
+        month: parseInt(item.month),
+        sales: item.sales,
+        revenue: item.revenue
+      })));
     } catch (error) {
       console.error(error);
     }
