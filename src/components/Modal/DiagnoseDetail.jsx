@@ -88,10 +88,10 @@ export default function DiagnoseDetail(props) {
 
                     <Input
                         type="text"
-                        label="Deskripsi"
+                        label="Deskripsi Keluhan"
                         disabled={true}
                         name="name"
-                        placeholder="Deskripsi"
+                        placeholder="Deskripsi Keluhan"
                         value={diagnoseData?.description}
                     />
                 </div>

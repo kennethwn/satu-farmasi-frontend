@@ -16,9 +16,7 @@ export default function DashboardView(props) {
         dataMonthlyReport, 
         dataAnnualReport,
         setCurrentMonth, 
-        setCurrentYear, 
-        onChangeMonthlyReport, 
-        linkTransaction,
+        setCurrentYear,
     } = props;
     const highestSales = Math.max(...dataAnnualReport?.map(item => parseInt(item?.sales))) + 100
     const highestRevenue = Math.max(...dataAnnualReport?.map(item => parseInt(item?.revenue))) + 1000000
@@ -70,6 +68,10 @@ export default function DashboardView(props) {
     )
 
     // bar chart
+    const categories = dataAnnualReport
+    ?.map(item => month.find(m => m.id === parseInt(item.month))?.label) // Cari label berdasarkan ID bulan
+    ?.filter(Boolean);
+
     const options = {
         chart: {
           type: "bar"
@@ -146,7 +148,8 @@ export default function DashboardView(props) {
             type: "donut"
         },
         series: dataMonthlyReport?.map(item => item?.quantity),
-        labels: dataMonthlyReport?.map(item => item?.medicineName)
+        labels: dataMonthlyReport?.map(item => item?.medicineName),
+        colors: ["#008FFB", "#00E396", "#FEB019", "#D3D3D3"]
     }
 
     return (

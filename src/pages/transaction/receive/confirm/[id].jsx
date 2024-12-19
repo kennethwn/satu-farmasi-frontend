@@ -228,6 +228,7 @@ export default function Index() {
             if (res.code !== 200) {
                 toast.error(res.response.data.message, { autoClose: 2000, position: "top-right" });
                 setModal(false);
+                setIsLoading(false);
                 return;
             }
             toast.success(res.message, { autoClose: 2000, position: "top-right" });
@@ -235,7 +236,6 @@ export default function Index() {
                 router.push("/transaction/receive");
             }, 2000)
         } catch (error) {
-            setIsLoading(false);
             if (error instanceof ZodError) {
                 const newErrors = { ...errors };
                 error.issues.forEach((issue) => {
@@ -279,6 +279,7 @@ export default function Index() {
             if (res.code !== 200) {
                 toast.error(res.response.data.message, { autoClose: 2000, position: "top-right" });
                 setModal(false);
+                setIsLoading(false);
                 return;
             }
             toast.success(res.message, { autoClose: 2000, position: "top-right" });
@@ -286,7 +287,6 @@ export default function Index() {
                 router.push("/transaction/receive");
             }, 2000)
         } catch (error) {
-            setIsLoading(false);
             if (error instanceof ZodError) {
                 const newErrors = { ...errors };
                 error.issues.forEach((issue) => {
@@ -407,7 +407,7 @@ export default function Index() {
                                 </Button>
                             </div>
                             :
-                            <div className="flex max-md:flex-col gap-2 my-6 pb-4 md:justify-end">
+                            <div className="flex flex-col w-full md:flex-row gap-4 md:justify-end">
                                 <Button
                                     isLoading={isLoading}
                                     type="button"
