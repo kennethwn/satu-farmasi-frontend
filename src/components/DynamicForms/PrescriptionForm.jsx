@@ -21,7 +21,7 @@ function PrescriptionForm(props) {
   useEffect(() => {
     async function fetchMedicineDropdownOptionsData(){
         try {
-            const response = await getMedicineDropdownOptions()
+            const response = await getMedicineDropdownOptions(true, true)
             setAvailableStock(response.data)
             setMedicineDropdownOptions(response.data)
         } catch (error) {
@@ -42,6 +42,7 @@ function PrescriptionForm(props) {
       quantity: 0,
       price: medicineDropdownOptions[code]?.price,
       currStock: medicineDropdownOptions[code]?.currStock,
+      reservedStock: medicineDropdownOptions[code]?.reservedStock,
       totalPrice: 0,
       insufficientStock: checkIfStockIsInsufficient(medicineDropdownOptions[code], quantity)
     };
@@ -52,6 +53,7 @@ function PrescriptionForm(props) {
         item.code = updatedData.code;
         item.medicineName = updatedData.medicineName;
         item.currStock = updatedData.currStock;
+        item.reservedStock = updatedData.reservedStock;
         item.quantity = 0;
         item.price = updatedData.price;
         item.totalPrice = 0;
@@ -77,7 +79,7 @@ function PrescriptionForm(props) {
   const handleMedicineQuantity = (formFieldId, quantity) => {
     const code = formFields[formFieldId].code;
     const checkIfStockIsInsufficient = (medicineDropdownOption, quantity) => {
-      return medicineDropdownOption.currStock - quantity < 0
+      return medicineDropdownOption.currStock - medicineDropdownOption.reservedStock - quantity < 0
     }
 
     let updatedData = {
@@ -214,7 +216,7 @@ function PrescriptionForm(props) {
                                     id="currStock"
                                     name="currStock"
                                     placeholder="Stock Obat"
-                                    value={formField.currStock}
+                                    value={formField.currStock - formField.reservedStock}
                                     disabled={true}
                                 />
                             </div>

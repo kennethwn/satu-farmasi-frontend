@@ -132,7 +132,7 @@ export default function index() {
                         bordered
                         cellBordered
                         shouldUpdateScroll={false}
-                        fillHeight
+                        height={400}
                         affixHorizontalScrollbar
                         loading={loading}
                     >

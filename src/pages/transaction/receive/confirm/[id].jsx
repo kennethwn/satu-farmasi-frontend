@@ -395,7 +395,7 @@ export default function Index() {
 
                     <div className="flex gap-2 my-6 pb-4">
                         {isLoading ?
-                            <div className="flex flex-col w-full md:flex-row gap-4 md:justify-end">
+                            <div className="flex flex-col w-full md:flex-row gap-4 md:justify-end w-full">
                                 <Button
                                     appearance="subtle"
                                     isDisabled={true}
@@ -412,7 +412,7 @@ export default function Index() {
                                 </Button>
                             </div>
                             :
-                            <div className="flex max-md:flex-col gap-2 my-6 pb-4 md:justify-end">
+                            <div className="flex max-md:flex-col gap-2 my-6 pb-4 md:justify-end w-full">
                                 <Button
                                     isLoading={isLoading}
                                     type="button"

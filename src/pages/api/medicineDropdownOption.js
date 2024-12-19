@@ -4,11 +4,11 @@ import { useState } from 'react'
 export default function useMedicineDropdownOption() {
     const [isLoading, setIsLoading] = useState(null);
 
-    const getMedicineDropdownOptions = async() => {
+    const getMedicineDropdownOptions = async(is_active, is_prescription) => {
         setIsLoading(true)
         try {
             console.log("getting medicine dropdown")
-            const response = await api.get('/api/v1/medicines/dropdownOptions')
+            const response = await api.get('/api/v1/medicines/dropdownOptions?is_active=' + is_active + '&is_prescription=' + is_prescription)
             .then((response) => {
                 setIsLoading(false);
                 return response;
