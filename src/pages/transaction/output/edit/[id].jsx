@@ -64,7 +64,8 @@ export default function Index() {
     const router = useRouter();
     const { user } = useUserContext();
     const id = router.query.id;
-    const { isLoading, EditMedicine, GetOutputMedicineById } = useOutputMedicineAPI();
+    const {  EditMedicine, GetOutputMedicineById } = useOutputMedicineAPI();
+    const [ isLoading, setIsloading ] = useState(false);
     const { getPharmacyInfo } = usePharmacy();
     const [pharmacyInfo, setPharmacyInfo] = useState({});
     const [formData, setFormData] = useState({
@@ -133,6 +134,7 @@ export default function Index() {
     const editHandler = async (e) => {
         e.preventDefault();
         try {
+            setIsloading(true)
             let submitedForm = {...formData,  ...pharmacyInfo, oldQuantity: formData.oldMedicineId !== formData.medicineId ? 0 : formData.oldQuantity}
             submitedForm.physicalReport.data.witnesses = formField;
             setErrors({});
@@ -152,6 +154,7 @@ export default function Index() {
                 router.push("/transaction/output");
             }, 2000)
         } catch (error) {
+            setIsloading(false)
             if (error instanceof ZodError) {
                 const newErrors = { ...errors };
                 error.issues.forEach((issue) => {

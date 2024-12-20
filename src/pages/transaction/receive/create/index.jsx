@@ -305,6 +305,7 @@ export default function Index() {
                 router.push("/transaction/receive");
             }, 2000)
         } catch (error) {
+            setIsLoading(false)
             console.log("error receive medicine: ", error)
             if (error instanceof ZodError) {
                 const newErrors = { ...errors };
@@ -325,9 +326,7 @@ export default function Index() {
                 console.log("new error: ", newErrors)
                 setErrors(newErrors);
             }
-        } finally {
-            setIsLoading(false)
-        }
+        } 
     }
 
     useEffect(() => {
