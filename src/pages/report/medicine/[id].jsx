@@ -815,7 +815,7 @@ export default function index() {
                                                                 rowData?.id,
                                                             )
                                                         }
-                                                        disabled={rowData?.reasonOfDispose !== "BROKEN" || rowData?.reasonOfDispose !== "EXPIRED" ? true : false}
+                                                        disabled={rowData?.reasonOfDispose === "LOST" ? true : false}
                                                     >
                                                         <PiListMagnifyingGlass size="1.5em" />
                                                     </button>
