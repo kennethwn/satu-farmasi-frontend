@@ -211,7 +211,7 @@ export default function DashboardView(props) {
                 })}
             </div>
             <div className="flex flex-col max-lg:gap-y-4 lg:flex-row gap-x-4 w-full">
-                <TableLayout title="List kadaluwarsa" link="/master/medicine">
+                <TableLayout title="List Kedaluwarsa" link="/master/medicine">
                     <TableExpired data={dataExpired} loading={loading?.medicine} />
                 </TableLayout>
                 <TableLayout title="Sisa Transaksi" link="/transaction/dashboard">

@@ -94,9 +94,12 @@ export default function Card(props) {
                     link &&
                         <Button onClick={() => handleRoute(link)} style={{padding: 0}} appearance="link" color="green" className="max-lg:hidden items-start">Lihat Detail</Button>
                 }
-                <div className="lg:hidden flex w-full justify-end">
-                    <FaArrowRight size={24} />
-                </div>
+                {
+                    link &&
+                        <div className="lg:hidden flex w-full justify-end">
+                            <FaArrowRight size={24} />
+                        </div>
+                }
             </div>
         </Panel>
     )
