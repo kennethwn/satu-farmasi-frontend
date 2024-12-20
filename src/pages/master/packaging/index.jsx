@@ -169,6 +169,10 @@ export default function index(props) {
     const submitcreateform = () => createFormRef.current.requestSubmit();
     const submitEditForm = () => editFormRef.current.requestSubmit();
 
+    useEffect(() => {
+        setPage(1)
+    }, [search, limit])
+
     return (
         <Layout active="master-packaging" user={user}>
             <ContentLayout title="List Kemasan">

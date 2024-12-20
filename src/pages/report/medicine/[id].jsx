@@ -283,11 +283,10 @@ export default function index() {
         try {
             const res = await checkExpiredMedicine();
             setShowExpiredMedicine(true);
-            // TODO: Fix the date formating
-            const temp = [...res.data];
-            temp.map((item) => ({
+            let temp = [...res.data];
+            temp = temp.map((item) => ({
                 ...item,
-                expiredDate: formatDate(item.expiredDate),
+                expiredDate: formatCalendar(item.expiredDate),
             }));
             setExpiredMedicineList(temp);
         } catch (error) {
@@ -816,6 +815,7 @@ export default function index() {
                                                                 rowData?.id,
                                                             )
                                                         }
+                                                        disabled={rowData?.reasonOfDispose !== "BROKEN" || rowData?.reasonOfDispose !== "EXPIRED" ? true : false}
                                                     >
                                                         <PiListMagnifyingGlass size="1.5em" />
                                                     </button>
@@ -1020,6 +1020,7 @@ export default function index() {
                             body={
                                 <div className="sm:col-span-6 text-start">
                                     <div className="flex gap-x-5">
+                                            {/*  TODO: medicine.name is undefined */}
                                         <Input
                                             label={"Nama Obat"}
                                             value={
@@ -1117,7 +1118,7 @@ export default function index() {
                                             placeholder={"Satuan Ukuran"}
                                         />
                                         <Input
-                                            label={"Tanggal Ekspired"}
+                                            label={"Tanggal Kedaluwarsa"}
                                             value={
                                                 value.outputMedicines[
                                                     activeIndex
@@ -1127,7 +1128,7 @@ export default function index() {
                                             disabled
                                             name={"expiredDate"}
                                             autofocus={false}
-                                            placeholder={"Tanggal Ekspired"}
+                                            placeholder={"Tanggal Kedaluwarsa"}
                                         />
                                     </div>
                                 </div>
@@ -1248,7 +1249,7 @@ export default function index() {
                                             placeholder={"Satuan Ukuran"}
                                         />
                                         <Input
-                                            label={"Tanggal Ekspired"}
+                                            label={"Tanggal Kedaluwarsa"}
                                             value={
                                                 value.receiveMedicines[
                                                     activeIndex
@@ -1258,7 +1259,7 @@ export default function index() {
                                             disabled
                                             name={"expiredDate"}
                                             autofocus={false}
-                                            placeholder={"Tanggal Ekspired"}
+                                            placeholder={"Tanggal Kedaluwarsa"}
                                         />
                                     </div>
 
@@ -1463,6 +1464,14 @@ export default function index() {
                                         Kode Batch
                                     </HeaderCell>
                                     <Cell dataKey="batchCode" />
+                                </Column>
+
+                                <Column width={200} resizable>
+                                    <HeaderCell className="text-dark font-bold">
+                                        {" "}
+                                        Tanggal Kedaluwarsa{" "}
+                                    </HeaderCell>
+                                    <Cell dataKey="expiredDate" />
                                 </Column>
 
                                 <Column width={100}>

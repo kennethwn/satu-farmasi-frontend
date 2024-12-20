@@ -10,7 +10,7 @@ import { Pagination, Table, Tooltip, Whisper } from "rsuite";
 import { PiListMagnifyingGlass } from "react-icons/pi";
 import useDiagnose from "../api/diagnose";
 import { toast } from "react-toastify";
-import formatDate from "@/helpers/dayHelper";
+import formatDate, { formatDateWithTime } from "@/helpers/dayHelper";
 import prescriptionStatusMapped from "@/helpers/prescriptionStatusMap";
 import DiagnoseDetail from "@/components/Modal/DiagnoseDetail";
 
@@ -121,14 +121,7 @@ export default function Index() {
                         <Column width={250} fullText resizable>
                             <HeaderCell className="text-dark font-bold">Timestamp</HeaderCell>
                             <Cell dataKey='created_at'>
-                                {rowData => formatDate(rowData?.created_at)}
-                            </Cell>
-                        </Column>
-
-                        <Column width={250} fullText resizable>
-                            <HeaderCell className="text-dark font-bold">Timestamp</HeaderCell>
-                            <Cell dataKey='created_at'>
-                                {rowData => formatDate(rowData?.created_at)}
+                                {rowData => formatDateWithTime(rowData?.created_at)}
                             </Cell>
                         </Column>
 

@@ -145,7 +145,7 @@ export default function Login() {
                         })
                     }
                     <Button type="button" onClick={nextDataHandler} className='w-full'>Selanjutnya</Button>
-                    <Text type="body">Sudah punya akun? <Link href="/auth/login">Masuk</Link> di sini</Text>
+                    <Text type="body">Sudah punya akun? <Link className="font-semibold" href="/auth/login">Masuk</Link> di sini</Text>
                 </div>
             </section>
             <section ref={biodataRef}>

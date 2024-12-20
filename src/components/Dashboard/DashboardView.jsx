@@ -9,16 +9,17 @@ import { formatRupiah } from "@/helpers/currency";
 
 export default function DashboardView(props) {
     const {Column, Cell, HeaderCell} = Table;
-    const { 
+    const {
+        loading,
+        dataPharmacy,
         dataCard, 
+        dataProfit,
         dataExpired, 
         dataTransaction, 
         dataMonthlyReport, 
         dataAnnualReport,
         setCurrentMonth, 
-        setCurrentYear, 
-        onChangeMonthlyReport, 
-        linkTransaction,
+        setCurrentYear,
     } = props;
     const highestSales = Math.max(...dataAnnualReport?.map(item => parseInt(item?.sales))) + 100
     const highestRevenue = Math.max(...dataAnnualReport?.map(item => parseInt(item?.revenue))) + 1000000
@@ -70,6 +71,10 @@ export default function DashboardView(props) {
     )
 
     // bar chart
+    const categories = dataAnnualReport
+    ?.map(item => month.find(m => m.id === parseInt(item.month))?.label) // Cari label berdasarkan ID bulan
+    ?.filter(Boolean);
+
     const options = {
         chart: {
           type: "bar"
@@ -146,16 +151,53 @@ export default function DashboardView(props) {
             type: "donut"
         },
         series: dataMonthlyReport?.map(item => item?.quantity),
-        labels: dataMonthlyReport?.map(item => item?.medicineName)
+        labels: dataMonthlyReport?.map(item => item?.medicineName),
+        colors: ["#008FFB", "#00E396", "#FEB019", "#D3D3D3"]
+    }
+
+    const resolveLoading = (type) => {
+        switch (type) {
+            case "person":
+                return loading?.totalPatient;
+            case "profit":
+                return loading?.dailyProfit;
+            case "medicine":
+                return loading?.totalMedicine;
+            case "stock":
+                return loading?.needToRestock;
+        }
     }
 
     return (
         <div className="flex flex-col gap-y-8">
             {/* Card */}
+            <div className="flex flex-col max-lg:gap-y-4 lg:flex-row gap-x-4 w-full">
+                <Card 
+                    type="pharmacy"
+                    key="Data Farmasi"
+                    colorbackground={dataProfit.colorBackground}
+                    label="Data Farmasi"
+                    valueObj={dataPharmacy}
+                    className="w-full py-4"
+                />
+                <Card 
+                    type={dataProfit.type}
+                    key={dataProfit.label}
+                    colorbackground={dataProfit.colorBackground}
+                    label={dataProfit.label}
+                    value={dataProfit.value}
+                    icon={dataProfit.icon}
+                    link={dataProfit.link}
+                    status={dataProfit.status}
+                    className="w-full py-4"
+                />
+            </div>
             <div className="flex flex-col max-lg:gap-y-4 lg:flex-row gap-x-4 justify-between w-full">
                 {dataCard?.map(item => {
                     return (
                         <Card
+                            // loading={() => resolveLoading(item.type)}
+                            type={item.type}
                             key={item.label}
                             colorbackground={item.colorBackground}
                             label={item.label}
@@ -163,16 +205,17 @@ export default function DashboardView(props) {
                             icon={item.icon}
                             link={item.link}
                             status={item.status}
+                            className="w-full"
                         />
                     )
                 })}
             </div>
             <div className="flex flex-col max-lg:gap-y-4 lg:flex-row gap-x-4 w-full">
-                <TableLayout title="Expiring List" link="/master/medicine">
-                    <TableExpired data={dataExpired} />
+                <TableLayout title="List kadaluwarsa" link="/master/medicine">
+                    <TableExpired data={dataExpired} loading={loading?.medicine} />
                 </TableLayout>
                 <TableLayout title="Sisa Transaksi" link="/transaction/dashboard">
-                    <TableMedicineOrder data={dataTransaction}/>
+                    <TableMedicineOrder data={dataTransaction} loading={loading?.transaction} />
                 </TableLayout>
             </div>
             <div className="flex pb-6 flex-col max-lg:gap-y-4 lg:flex-row gap-x-4 w-full">
@@ -184,7 +227,10 @@ export default function DashboardView(props) {
 }
 
 DashboardView.propTypes = {
+    loading: propTypes.object,
     dataCard: propTypes.array,
+    dataPharmacy: propTypes.object,
+    dataProfit: propTypes.object,
     dataExpired: propTypes.array,
     setCurrentYear: propTypes.func,
     setCurrentMonth: propTypes.func,

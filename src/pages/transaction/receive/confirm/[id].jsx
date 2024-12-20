@@ -16,46 +16,22 @@ import Button from "@/components/Button";
 import { Modal } from "rsuite";
 import { toast } from "react-toastify";
 
-const classificationSchema = z.object({
-    classificationId: isRequiredNumber(),
-});
-
-const paymentMethodSchema = z.object({
-    paymentMethod: isRequiredString(),
+const medicineRequestSchema = z.object({
+    currStock: isRequiredNumber(),
 })
 
 const medicineSchema = z.object({
     documentNumber: isRequiredString(),
-    batchNumber: isRequiredString(),
-    medicineId: isRequiredNumber(),
-    name: isRequiredString(),
-    merk: isRequiredString(),
-    price: isRequiredNumber(),
-    currStock: isRequiredNumber(),
-    minStock: isRequiredNumber(),
-    maxStock: isRequiredNumber(),
-    genericNameId: isRequiredNumber(),
-    packagingId: isRequiredNumber(),
-    unitOfMeasure: isRequiredString().nullable().refine(value => value !== null, {
-        message: "This field is required",
-    }),
-    classificationList: z.array(classificationSchema),
-    sideEffect: isRequiredString(),
-    expiredDate: isRequiredDate(),
-    description: isRequiredString(),
+    batchCode: isRequiredString(),
     vendorId: isRequiredNumber(),
     buyingPrice: isRequiredNumber(),
-    paymentMethod: z.array(paymentMethodSchema),
-    isArrived: z.boolean(),
-}).refine(data => data.minStock < data.maxStock, {
-    message: "Minimum stock must be less than maximum stock",
-    path: ["minStock"],
-}).refine(data => data.maxStock > data.minStock, {
-    message: "Maximum stock must be greater than minimum stock",
-    path: ["maxStock"],
-}).refine(data => data.currStock <= data.maxStock, {
-    message: "Current stock cannot be greater than maximum stock",
-    path: ["currStock"],
+    paymentMethod: isRequiredString(),
+    deadline: isRequiredDate(),
+    isArrived: z.boolean().nullable().refine(value => value !== null, {
+        message: "Bidang ini harus diisi",
+    }),
+    medicineRequest: medicineRequestSchema,
+    vendorId: isRequiredNumber(),
 })
 
 export default function Index() {
@@ -210,24 +186,32 @@ export default function Index() {
                 documentNumber: input.documentNumber,
                 batchCode: input.batchCode,
                 medicineId: parseInt(input.medicineId),
-                quantity: parseInt(input.quantity),
+                quantity: input.quantity ? parseInt(input.quantity) : 0,
                 vendorId: parseInt(input.vendorId),
                 buyingPrice: parseFloat(input.buyingPrice),
-                paymentMethod: input.paymentMethod,
-                deadline: input.deadline,
+                paymentMethod: input.paymentMethod ? input.paymentMethod : "",
+                deadline: input.deadline ? new Date(input.deadline) : "",
                 is_active: false,
-                isArrived: input.isArrived,
+                isArrived: input.isArrived !== null ? input.isArrived : null,
                 reportId: null,
-                expiredDate: new Date(input.expiredDate)
+                expiredDate: new Date(input.expiredDate) || ""
             }
 
             setErrors({});
-            // medicineSchema.parse(payload);
+            console.log("payload: ", payload);
+            const validatedData = {
+                ...payload, 
+                medicineRequest: {
+                    currStock: payload.quantity
+                }
+            }
+             medicineSchema.parse(validatedData);
 
             const res = await SaveReceiveMedicine(payload);
             if (res.code !== 200) {
                 toast.error(res.response.data.message, { autoClose: 2000, position: "top-right" });
                 setModal(false);
+                setIsLoading(false);
                 return;
             }
             toast.success(res.message, { autoClose: 2000, position: "top-right" });
@@ -235,7 +219,6 @@ export default function Index() {
                 router.push("/transaction/receive");
             }, 2000)
         } catch (error) {
-            setIsLoading(false);
             if (error instanceof ZodError) {
                 const newErrors = { ...errors };
                 error.issues.forEach((issue) => {
@@ -251,6 +234,8 @@ export default function Index() {
                 });
                 setErrors(newErrors);
             }
+        } finally {
+            setIsLoading(false);
         }
     }
 
@@ -262,23 +247,32 @@ export default function Index() {
                 documentNumber: input.documentNumber,
                 batchCode: input.batchCode,
                 medicineId: parseInt(input.medicineId),
-                quantity: parseInt(input.quantity),
+                quantity: input.quantity ? parseInt(input.quantity) : 0,
                 vendorId: parseInt(input.vendorId),
                 buyingPrice: parseFloat(input.buyingPrice),
-                paymentMethod: input.paymentMethod,
-                deadline: input.deadline,
+                paymentMethod: input.paymentMethod ? input.paymentMethod : "",
+                deadline: input.deadline ? new Date(input.deadline) : "",
                 is_active: true,
-                isArrived: input.isArrived,
+                isArrived: input.isArrived !== null ? input.isArrived : null,
                 reportId: 0,
-                expiredDate: new Date(input.expiredDate)
+                expiredDate: new Date(input.expiredDate) || ""
             }
 
             setErrors({});
-            // medicineSchema.parse(payload);
+            const validatedData = {
+                ...payload, 
+                medicineRequest: {
+                    currStock: payload.quantity
+                }
+            }
+            console.log("payload: ", payload);
+            console.log("validatedData", validatedData);
+             medicineSchema.parse(validatedData);
             const res = await ConfirmReceiveMedicine(payload);
             if (res.code !== 200) {
                 toast.error(res.response.data.message, { autoClose: 2000, position: "top-right" });
                 setModal(false);
+                setIsLoading(false);
                 return;
             }
             toast.success(res.message, { autoClose: 2000, position: "top-right" });
@@ -286,22 +280,29 @@ export default function Index() {
                 router.push("/transaction/receive");
             }, 2000)
         } catch (error) {
+            console.log("erorr: ", error)
             setIsLoading(false);
             if (error instanceof ZodError) {
                 const newErrors = { ...errors };
                 error.issues.forEach((issue) => {
                     if (issue.path.length > 0) {
-                        if (issue.path[0] === "classificationList") {
-                            newErrors[`classificationList[${issue.path[1]}]`] = issue.message;
-                        }
-                        else {
+                        if (issue.path[0] === "medicineRequest") {
+                            if (issue.path[1] === "classificationList") {
+                                newErrors[`classificationList[${issue.path[2]}]`] = issue.message;
+                            } else {
+                                newErrors[`medicineRequest.${issue.path[1]}`] = issue.message;
+                            }
+                        } else {
                             const fieldName = issue.path[0];
                             newErrors[fieldName] = issue.message;
                         }
                     }
                 });
+                console.log("new error: ", newErrors)
                 setErrors(newErrors);
             }
+        } finally {
+            setIsLoading(false);
         }
     }
 
@@ -323,11 +324,12 @@ export default function Index() {
                     batchCode: data.batchCode,
                     medicineId: data.medicine.id,
                     quantity: parseInt(data.quantity),
+                    isArrived: data.isArrived,
                     vendorId: data.vendor.id,
                     buyingPrice: parseFloat(data.buyingPrice),
-                    paymentMethod: data.paymentMethod,
-                    deadline: new Date(data.deadline),
-                    isArrived: data.isArrived,
+                    paymentMethod: data.paymentMethod || "",
+                    deadline: new Date(data.deadline) || "",
+                    isPaid: data.isPaid,
                     expiredDate: new Date(data.medicine.expiredDate),
                     medicineRequest: {
                         code: data.medicine.code,
@@ -367,6 +369,10 @@ export default function Index() {
         }
     }, [id, router]);
 
+    useEffect(() => {
+        console.log("errors zod: ", errors);
+    }, [errors])
+
     return (
         <Layout active="transaction-receive" user={user}>
             <ContentLayout title="Konfirmasi Penerimaan Obat" type="child" backpageUrl="/transaction/receive">
@@ -390,7 +396,7 @@ export default function Index() {
 
                     <div className="flex gap-2 my-6 pb-4">
                         {isLoading ?
-                            <div className="flex flex-col w-full md:flex-row gap-4 md:justify-end">
+                            <div className="flex flex-col w-full md:flex-row gap-4 md:justify-end w-full">
                                 <Button
                                     appearance="subtle"
                                     isDisabled={true}
@@ -407,7 +413,7 @@ export default function Index() {
                                 </Button>
                             </div>
                             :
-                            <div className="flex max-md:flex-col gap-2 my-6 pb-4 md:justify-end">
+                            <div className="flex max-md:flex-col gap-2 my-6 pb-4 md:justify-end w-full">
                                 <Button
                                     isLoading={isLoading}
                                     type="button"
@@ -441,7 +447,10 @@ export default function Index() {
                     </div>
                 </Modal.Body>
                 <Modal.Footer>
-                    <Button isLoading={isLoading} appearance="primary" type="button" onClick={() => handleConfirm()}>Konfirmasi</Button>
+                    <Button isLoading={isLoading} appearance="primary" type="button" onClick={() => {
+                        handleConfirm()
+                        setModal(false)
+                    }}>Konfirmasi</Button>
                 </Modal.Footer>
             </Modal>
         </Layout>
