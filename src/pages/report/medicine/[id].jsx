@@ -20,6 +20,7 @@ import formatDate, { formatCalendar } from "@/helpers/dayHelper";
 import usePharmacy from "@/pages/api/pharmacy";
 import Text from "@/components/Text";
 import prescriptionStatusMapped from "@/helpers/prescriptionStatusMap";
+import { FaFilePdf } from "react-icons/fa";
 
 export default function index() {
     const router = useRouter();
@@ -817,7 +818,7 @@ export default function index() {
                                                         }
                                                         disabled={rowData?.reasonOfDispose === "LOST" ? true : false}
                                                     >
-                                                        <PiListMagnifyingGlass size="1.5em" />
+                                                        <FaFilePdf size="1.5em" />
                                                     </button>
                                                 </div>
                                             );
@@ -1424,9 +1425,12 @@ export default function index() {
                     type={"primary"}
                     showBtn={expiredMedicineList.length > 0}
                     open={showExpiredMedicine}
-                    onClose={() => setShowExpiredMedicine(false)}
+                    onClose={() => {
+                        setShowExpiredMedicine(false)
+                        setExpiredMedicineList([]);
+                    }}
                     body={
-                        <>
+                        <div>
                             <Table
                                 data={expiredMedicineList || []}
                                 bordered
@@ -1506,7 +1510,7 @@ export default function index() {
                                     />
                                 </div>
                             )}
-                        </>
+                        </div>
                     }
                     onClick={handleBulkMedicine}
                     title={"List Obat Expired"}
