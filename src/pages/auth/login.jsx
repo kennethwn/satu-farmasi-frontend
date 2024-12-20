@@ -46,12 +46,11 @@ export default function Login() {
     const LoginHandler = async (data) => {
         try {
             setIsLoading(true);
-            await getUser(data);
-            console.log("success login")
+            const response = await getUser(data);
+            const { role } = response.data
+            const pathDestination = getPathDestination(role.toLowerCase())
             setTimeout(() => {
-                console.log("redirect ...")
-                window.location.href = "/";
-                // router.push("/");
+                 router.push(pathDestination);
             }, 2000)
         } catch (error) {
             console.log("error: ", error)
@@ -59,6 +58,15 @@ export default function Login() {
             setCustomError({ custom: error.message });
         }
     };
+
+    const getPathDestination = (role) => {
+        const pathList = {
+            "admin": "/master/staff",
+            "doctor": "/diagnose",
+            "pharmacist": "/",
+        }
+        return pathList[role]
+    }
 
     useEffect(() => {
         if (Object.keys(customError).length > 0) {
@@ -117,7 +125,7 @@ export default function Login() {
                         }
                         <div className="mt-4">
                             <Text type="body">
-                                Sudah punya akun? <Link href="/auth/register">Registrasi</Link>{" "}
+                                Sudah punya akun? <Link className="font-semibold" href="/auth/register">Registrasi</Link>{" "}
                                 di sini
                             </Text>
                         </div>
