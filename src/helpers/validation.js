@@ -9,7 +9,7 @@ const isEmail = () => isString().email({ message: "Email tidak valid" });
 const isRequiredOptions = () =>
     isString()
         .nullable()
-        .refine((val) => val !== null, {
+        .refine((val) => val !== null && val !== undefined, {
             message: "Silahkan pilih opsi",
         });
 const isRequiredString = () =>
@@ -17,8 +17,7 @@ const isRequiredString = () =>
 const isRequiredStringOptional = () =>
     isString().optional()
 const isRequiredPhoneNumber = () =>
-    z
-        .coerce
+    z.coerce
         .number({ message: "Bidang isi harus diisi" })
         .min(1, { message: "Bidang isi harus diisi" })
         .refine(
@@ -33,7 +32,11 @@ const isRequiredNumber = () =>
         .int({ message: "Angka tidak boelh desimal" })
         .positive()
         .min(1, { message: "Bidang isi harus diisi" });
-
+const isRequiredNumberStartsFromZero = () =>
+    z
+        .number({ message: "Bidang isi harus diisi" })
+        .int({ message: "Angka tidak boelh desimal" })
+        .positive();
 const isOptionalBoolean = () => isBoolean().optional();
 const isOptionalString = () => isString().optional().nullable();
 const isRequiredEmail = () =>
@@ -42,9 +45,16 @@ const isRequiredEmail = () =>
         .email({ message: "Email tidak valid" });
 
 const isRequiredDate = () =>
-    z.date().refine((val) => val instanceof Date && !isNaN(val.getTime()), {
-        message: "Bidang isi harus diisi dan harus tanggal yang valid",
-    });
+    z
+        .date({
+            errorMap: (issue, { defaultError }) => ({
+                message:
+                    issue.code === "invalid_date"
+                        ? "Bidang ini harus diisi"
+                        : defaultError,
+            }),
+        })
+    .or(isRequiredString())
 
 export {
     isString,
@@ -59,5 +69,6 @@ export {
     isRequiredOptions,
     isRequiredPhoneNumber,
     isRequiredDate,
+    isRequiredNumberStartsFromZero,
     isRequiredStringOptional
 };

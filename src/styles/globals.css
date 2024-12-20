@@ -114,9 +114,9 @@ input:active {
     transition: none !important;
 }
 
-.rs-panel-body {
-    height: 100%
-}
+/*.rs-panel-body {*/
+/*    height: 100%*/
+/*}*/
 
 .rs-toggle-checked .rs-toggle-presentation, .rs-toggle-checked .rs-toggle-presentation:hover {
     background-color: #2f4852

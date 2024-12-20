@@ -101,6 +101,11 @@ export default function index() {
         fetchData();
     }, [page, limit, search]);
 
+
+    useEffect(() => {
+        setPage(1)
+    }, [search, limit])
+
     return (
         <Layout active="master-vendor" user={user}>
             <ContentLayout title="List Vendor">

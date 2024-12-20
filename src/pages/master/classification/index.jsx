@@ -99,7 +99,7 @@ export default function index() {
 				return;
 			}
 			setData(res?.data.results);
-			setTotalPage(res.total);
+			setTotalPage(res.data.total);
 		} catch (error) {
 			console.error(error);
 		}
@@ -190,6 +190,10 @@ export default function index() {
 
 	const submitcreateform = () => createFormRef.current.requestSubmit();
 	const submitEditForm = () => editFormRef.current.requestSubmit();
+
+    useEffect(() => {
+        setPage(1)
+    }, [search, limit])
 
 	return (
 		<Layout active="master-classification" user={user}>

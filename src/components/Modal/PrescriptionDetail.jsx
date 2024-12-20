@@ -160,6 +160,8 @@ export default function PrescriptionDetail(props) {
         } catch (error) {
             setHasSubmit(false);
             console.error(error)
+        } finally {
+            setHasSubmit(false);
         }
     }
 

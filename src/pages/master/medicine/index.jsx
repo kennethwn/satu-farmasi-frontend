@@ -82,6 +82,14 @@ export default function index() {
         fetchData();
     }, [page, limit, search, type, sortBy, sortMode]);
 
+    useEffect(() => {
+        setPage(1)
+    }, [search, limit, type])
+
+    useEffect(() => {
+        setSearch('')
+    }, [type])
+
     return (
         <Layout active="master-medicine" user={user}>
             <ContentLayout title="List Obat">
