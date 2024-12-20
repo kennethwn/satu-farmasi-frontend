@@ -1,11 +1,14 @@
 import { FaArrowRight, FaBox, FaSyringe, FaUser, FaWallet } from "react-icons/fa";
 import { IoMdPeople } from "react-icons/io";
-import { Button, Panel } from "rsuite";
+import { Button, Loader, Panel } from "rsuite";
 import propTypes from 'prop-types'
 import { useRouter } from "next/router";
 
 export default function Card(props) {
     const {
+        loading,
+        type,
+        valueObj,
         colorbackground,
         icon,
         link,
@@ -46,26 +49,51 @@ export default function Card(props) {
             case 'stock':
                 return <FaBox color="white" size={24} />
             default:
-                return <IoMdPeople color="white" size={36} />
+                return null
         }
     }
 
     return (
-        <Panel {...props} shaded className="w-full" bordered>
+        <Panel {...props} shaded bordered>
             <div className="w-full gap-y-8 max-lg:min-h-28 flex flex-col items-start justify-between">
                 <div className="flex flex-row w-full gap-x-4 items-center">
-                    <div className={`border p-1 rounded-full`}>
-                        <div className={`${getColorBackground()} p-3 rounded-full`}>
-                            {resolveIcon()}
+                    {icon &&
+                        <div className={`border p-1 rounded-full`}>
+                            <div className={`${getColorBackground()} p-3 rounded-full`}>
+                                {resolveIcon()}
+                            </div>
                         </div>
-                    </div>
-                    <div className="flex flex-col w-full justify-start items-start">
+                    }
+                    <div className="flex flex-col w-full justify-start truncate items-start">
                         <span className="font-bold text-dark text-lg">{label}</span>
                         { status && <span className="text-green-500">{status}</span> }
-                        <span className="font-extrabold text-dark text-3xl">{value}</span>
+                        {
+                            !valueObj
+                                ? <p className="font-extrabold text-dark truncate text-3xl">{value}</p>
+                                :
+                                    <div className="grid grid-cols-2 justify-evenly w-full">
+                                        <div className="font-extrabold pt-2 text-md">
+                                            <p>Nama</p>
+                                            <p>Nomor SIA</p>
+                                            <p>Alamat</p>
+                                            <p>No. Telp</p>
+                                            <p>Email</p>
+                                        </div>
+                                        <div className="">
+                                            <p>: {valueObj?.name}</p>
+                                            <p>: {valueObj?.pharmacyNum}</p>
+                                            <p>: {valueObj?.address}</p>
+                                            <p>: {valueObj?.phoneNum}</p>
+                                            <p>: {valueObj?.email}</p>
+                                        </div>
+                                    </div>
+                        }
                     </div>
                 </div>
-                <Button onClick={() => handleRoute(link)} style={{padding: 0}} appearance="link" color="green" className="max-lg:hidden items-start">Lihat Detail</Button>
+                {
+                    link &&
+                        <Button onClick={() => handleRoute(link)} style={{padding: 0}} appearance="link" color="green" className="max-lg:hidden items-start">Lihat Detail</Button>
+                }
                 <div className="lg:hidden flex w-full justify-end">
                     <FaArrowRight size={24} />
                 </div>
@@ -75,10 +103,13 @@ export default function Card(props) {
 }
 
 Card.propTypes = {
+    loading: propTypes.bool,
+    type: propTypes.string,
     colorbackground: propTypes.string,
     icon: propTypes.string,
     link: propTypes.string,
     label: propTypes.string,
     value: propTypes.number,
-    status: propTypes.string
+    status: propTypes.string,
+    valueObj: propTypes.object,
 }
