@@ -296,6 +296,7 @@ export default function Index() {
 
             const res = await CreateReceiveMedicine(payload);
             if (res.code !== 200) {
+                setIsLoading(false);
                 toast.error(res.response.data.message, { autoClose: 2000, position: "top-right" });
                 return;
             }
@@ -304,7 +305,6 @@ export default function Index() {
                 router.push("/transaction/receive");
             }, 2000)
         } catch (error) {
-            setIsLoading(false);
             console.log("error receive medicine: ", error)
             if (error instanceof ZodError) {
                 const newErrors = { ...errors };

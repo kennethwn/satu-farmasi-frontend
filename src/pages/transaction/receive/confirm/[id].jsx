@@ -211,6 +211,7 @@ export default function Index() {
             if (res.code !== 200) {
                 toast.error(res.response.data.message, { autoClose: 2000, position: "top-right" });
                 setModal(false);
+                setIsLoading(false);
                 return;
             }
             toast.success(res.message, { autoClose: 2000, position: "top-right" });
@@ -218,7 +219,6 @@ export default function Index() {
                 router.push("/transaction/receive");
             }, 2000)
         } catch (error) {
-            setIsLoading(false);
             if (error instanceof ZodError) {
                 const newErrors = { ...errors };
                 error.issues.forEach((issue) => {
@@ -272,6 +272,7 @@ export default function Index() {
             if (res.code !== 200) {
                 toast.error(res.response.data.message, { autoClose: 2000, position: "top-right" });
                 setModal(false);
+                setIsLoading(false);
                 return;
             }
             toast.success(res.message, { autoClose: 2000, position: "top-right" });
