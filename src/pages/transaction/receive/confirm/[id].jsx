@@ -219,6 +219,7 @@ export default function Index() {
                 router.push("/transaction/receive");
             }, 2000)
         } catch (error) {
+            setIsLoading(false);
             if (error instanceof ZodError) {
                 const newErrors = { ...errors };
                 error.issues.forEach((issue) => {
@@ -234,9 +235,7 @@ export default function Index() {
                 });
                 setErrors(newErrors);
             }
-        } finally {
-            setIsLoading(false);
-        }
+        } 
     }
 
     const handleConfirm = async () => {
