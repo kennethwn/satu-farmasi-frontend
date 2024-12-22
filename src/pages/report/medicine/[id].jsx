@@ -21,6 +21,7 @@ import usePharmacy from "@/pages/api/pharmacy";
 import Text from "@/components/Text";
 import prescriptionStatusMapped from "@/helpers/prescriptionStatusMap";
 import { FaFilePdf } from "react-icons/fa";
+import MedicineList from "@/components/MedicineLIst/MedicineList";
 
 export default function index() {
     const router = useRouter();
@@ -936,8 +937,10 @@ export default function index() {
                                 <Text type={"title"} className="mb-3">
                                     List Obat
                                 </Text>
-
-                                {value.transactions[
+                                <MedicineList 
+                                    medicineList = {value.transactions[activeIndex].prescription.medicineList}
+                                />
+                                {/* {value.transactions[
                                     activeIndex
                                 ].prescription.medicineList.map((item) => {
                                     return (
@@ -998,8 +1001,9 @@ export default function index() {
                                                 placeholder={"Kode Obat"}
                                             />
                                         </>
+                                        
                                     );
-                                })}
+                                })} */}
                             </div>
                         }
                         onClick={() => {
