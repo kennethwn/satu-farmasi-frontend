@@ -12,7 +12,7 @@ import usePharmacy from "@/pages/api/pharmacy";
 
 export default function PrescriptionDetail(props) {
     const { setStatusChanged, prescriptionId, openModal, setOpenModal, user } = props
-    console.log("user: ", user)
+    // console.log("user: ", user)
     const { Header, Body, Footer } = Modal;
     const router = useRouter();
     const { createTransaction, finishTransaction, publishNotification } = useTransaction();
@@ -72,12 +72,12 @@ export default function PrescriptionDetail(props) {
         try {
             setHasSubmit(true);
             const res = await cancelPrescription(prescriptionId);
-            console.log("cancel: ", res)
+            // console.log("cancel: ", res)
             if (res.code !== 200) {
                 toast.error(res.message, { autoClose: 2000, position: "top-right" });
                 return;
             } else {
-                toast.success(`Status Change to Canceled`, { autoClose: 2000, position: "top-right" });
+                toast.success(`Status berubah menjadi Canceled`, { autoClose: 2000, position: "top-right" });
                 setStatusChanged({prescriptionId: prescriptionId, status: "CANCELED"})
                 setPrescriptionsData(prescriptionData => ({
                     ...prescriptionData,
@@ -100,14 +100,14 @@ export default function PrescriptionDetail(props) {
                 prescriptionId: prescriptionData.id,
                 pharmacistId: user.id
             }
-            console.log("data create transaction: ", data)
+            // console.log("data create transaction: ", data)
             const res = await createTransaction(data);
-            console.log(res)
+            // console.log(res)
             if (res.code !== 200) {
                 toast.error(res.message, { autoClose: 2000, position: "top-right" });
                 return;
             } else {
-                toast.success(`Status Change to Waiting for Payment`, { autoClose: 2000, position: "top-right" });
+                toast.success(`Status berubah menjadi Waiting for Payment`, { autoClose: 2000, position: "top-right" });
                 setStatusChanged({prescriptionId: prescriptionId, status: "WAITING_FOR_PAYMENT"})
                 setPrescriptionsData(prescriptionData => ({
                     ...prescriptionData,
@@ -138,12 +138,12 @@ export default function PrescriptionDetail(props) {
                 status: "DONE"
             }
             const res = await finishTransaction(data);
-            console.log(res)
+            // console.log(res)
             if (res.code !== 200) {
                 toast.error(res.message, { autoClose: 2000, position: "top-right" });
                 return;
             } else {
-                toast.success(`Status Change to Done`, { autoClose: 2000, position: "top-right" });
+                toast.success(`Status berubah menjadi Done`, { autoClose: 2000, position: "top-right" });
                 setStatusChanged({prescriptionId: prescriptionId, status: "DONE"})
                 setPrescriptionsData(prescriptionData => ({
                     ...prescriptionData,
@@ -170,7 +170,7 @@ export default function PrescriptionDetail(props) {
             try {
                 if (prescriptionId !== -1) {
                     const response = await getPrescriptionDetail(prescriptionId)
-                    console.log("prescription response: ", response)
+                    // console.log("prescription response: ", response)
                     setPrescriptionsData(response.data)
                 }
             } catch (error) {
@@ -184,8 +184,8 @@ export default function PrescriptionDetail(props) {
         let newEvent
         if (!isListening) {
             newEvent = new EventSource(process.env.NEXT_PUBLIC_SATUFARMASI_EVENT_SOURCE_URL,  {withCredentials: true});
-            console.log("subscribing")
-            console.log(newEvent)
+            // console.log("subscribing")
+            // console.log(newEvent)
             
             newEvent.onmessage = (event) => {
                 try {
@@ -212,7 +212,7 @@ export default function PrescriptionDetail(props) {
     
         return () => {
             if (newEvent) {
-                console.log("Closing connection");
+                // console.log("Closing connection");
                 newEvent.close();
             }
         };
@@ -320,11 +320,11 @@ export default function PrescriptionDetail(props) {
                 onClose={() => setOpen({ ...open, canceled: false })}
                 body={
                     <>
-                        Are you sure you want to cancel this prescription,
-                        <b> after confirmation prescription cannot be updated and these changes cannot be revert</b>
+                        Apakah anda yakin ingin membatalkan preskripsi ini,
+                        setelah konfirmasi maka <span className="font-bold text-danger">perubahan ini tidak dapat dikembalikan</span>
                     </>
                 }
-                btnText="Confirm"
+                btnText="Konfirmasi"
                 onClick={handleCancelProcess}
                 isLoading={hasSubmit}
             />

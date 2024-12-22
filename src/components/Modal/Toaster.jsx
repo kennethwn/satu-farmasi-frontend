@@ -15,7 +15,6 @@ export default function Toaster({
     btnAppearance = 'danger',
     ...props
 }) {
-    console.log("size: ", size)
 
     const renderTitle = () => {
         switch (type) {
@@ -35,7 +34,7 @@ export default function Toaster({
             case 'warning':
                 return (
                     <div className="w-full flex flex-row items-center gap-4 justify-between">
-                        <Button className="w-full" onClick={() => props.onClose()} isDisabled={isLoading}>Batalkan</Button>
+                        <Button className="w-full" onClick={() => props.onClose()} isDisabled={isLoading} appearance="subtle">Batalkan</Button>
                         <Button className="w-full" isLoading={isLoading} appearance={btnAppearance} onClick={() => onClick()} isDisabled={isLoading}>{btnText}</Button>
                     </div>
                 )

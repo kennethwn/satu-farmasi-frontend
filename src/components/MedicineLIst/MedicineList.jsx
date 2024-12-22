@@ -1,14 +1,10 @@
 import { Grid, Row, Table } from "rsuite";
 import { Cell, Column, HeaderCell } from "rsuite-table";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { formatRupiah } from "@/helpers/currency";
 
 export default function MedicineList(props) {
     const {status, medicineList, isReport} = props;
-
-    const getData = () => {
-        console.log("getData: ", medicineList)
-    }
 
     return (<div className="flex flex-col gap-4">
         <Table
@@ -46,14 +42,15 @@ export default function MedicineList(props) {
             <Column flexGrow={2}>
                 <HeaderCell className="text-dark">Harga Per Obat (Rp.)</HeaderCell>
                 <Cell dataKey='medicine.price'>
-                    {rowData => formatRupiah(isReport ? rowData?.price : rowData?.medicine?.price || rowData?.totalPrice/rowData?.quantity)}
+                    {rowData => isReport ? rowData?.medicine?.price : 
+                        formatRupiah(rowData?.medicine?.price || rowData?.totalPrice/rowData?.quantity)}
                 </Cell>
             </Column>
 
             <Column flexGrow={2} fixed="right">
                 <HeaderCell className="text-dark">Total Sub Harga (Rp.)</HeaderCell>
                 <Cell dataKey='totalPrice'>
-                    {rowData => formatRupiah(isReport ? rowData?.price * rowData?.quantity : rowData?.totalPrice)}
+                    {rowData => isReport ? rowData?.totalPrice : formatRupiah(rowData?.totalPrice)}
                 </Cell>
             </Column>
         </Table>

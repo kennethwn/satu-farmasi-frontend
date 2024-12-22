@@ -216,7 +216,9 @@ function PrescriptionForm(props) {
                                     id="currStock"
                                     name="currStock"
                                     placeholder="Stock Obat"
-                                    value={formField.currStock - formField.reservedStock}
+                                    value={formField.currStock - formField.reservedStock ||
+                                        formField.currStock - formField.quantity
+                                    }
                                     disabled={true}
                                 />
                             </div>
