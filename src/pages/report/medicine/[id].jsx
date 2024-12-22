@@ -941,6 +941,7 @@ export default function index() {
                                 </Text>
                                 <MedicineList 
                                     medicineList = {value.transactions[activeIndex].prescription.medicineList}
+                                    isReport = {true}
                                 />
                                 {/* {value.transactions[
                                     activeIndex
