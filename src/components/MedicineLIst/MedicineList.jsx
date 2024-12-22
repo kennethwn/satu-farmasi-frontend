@@ -4,7 +4,7 @@ import { useState } from "react";
 import { formatRupiah } from "@/helpers/currency";
 
 export default function MedicineList(props) {
-    const {status, medicineList} = props;
+    const {status, medicineList, isReport} = props;
 
     const getData = () => {
         console.log("getData: ", medicineList)
@@ -18,7 +18,6 @@ export default function MedicineList(props) {
             shouldUpdateScroll={false}
             autoHeight={true}
             wordWrap="break-word"
-            // height={400}
             affixHorizontalScrollbar
         >
             <Column width={50} fixed="left">
@@ -35,14 +34,6 @@ export default function MedicineList(props) {
                         return (<div className="flex flex-col h-full">
                             <p>{rowData?.medicineName  ? rowData?.medicineName : rowData?.medicine?.name} <br /> <span className="text-gray-500">{rowData.instruction}</span></p>
                         </div>)
-                        // <Grid>
-                        //     <Row>
-                        //         {rowData.medicine.name}
-                        //     </Row>
-                        //     <Row className="text-gray-500">
-                        //         {rowData.instruction}
-                        //     </Row>
-                        // </Grid>
                     }}
                 </Cell>
             </Column>
@@ -55,21 +46,16 @@ export default function MedicineList(props) {
             <Column flexGrow={2}>
                 <HeaderCell className="text-dark">Harga Per Obat (Rp.)</HeaderCell>
                 <Cell dataKey='medicine.price'>
-                    {rowData => formatRupiah(rowData?.medicine?.price || rowData?.totalPrice/rowData?.quantity)}
+                    {rowData => formatRupiah(isReport ? rowData?.price : rowData?.medicine?.price || rowData?.totalPrice/rowData?.quantity)}
                 </Cell>
             </Column>
 
             <Column flexGrow={2} fixed="right">
                 <HeaderCell className="text-dark">Total Sub Harga (Rp.)</HeaderCell>
                 <Cell dataKey='totalPrice'>
-                    {rowData => formatRupiah(rowData?.totalPrice)}
+                    {rowData => formatRupiah(isReport ? rowData?.price * rowData?.quantity : rowData?.totalPrice)}
                 </Cell>
             </Column>
-
-            {/* <Column width={225} fixed="right">
-                <HeaderCell className="text-center text-dark">Instruction</HeaderCell>
-                <Cell dataKey='instruction'/>
-            </Column> */}
         </Table>
     </div>
     )

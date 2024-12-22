@@ -17,7 +17,7 @@ export default function index() {
   const { HeaderCell, Cell, Column } = Table;
   const { isLoading, getAllTransaction } = useTransaction();
   const { getPharmacyInfo } = usePharmacy();
-  const prescriptionStatusMap = prescriptionStatusMapped
+  const prescriptionStatusMap = new Map(prescriptionStatusMapped)
   prescriptionStatusMap.delete("UNPROCESSED")
   prescriptionStatusMap.delete("CANCELED")
   const [statusUpdated, setStatusUpdated] = useState({})
