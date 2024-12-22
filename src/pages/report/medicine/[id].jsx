@@ -731,9 +731,11 @@ export default function index() {
                                 id="outputMedicines"
                                 label={`Total Obat Keluar ${value.outputMedicines?.length || 0}`}
                             />
-                            <Button onClick={handleFetchExpiredMedicine}>
-                                Cek Obat Expired
-                            </Button>
+                            { !value.isFinalized &&
+                                <Button onClick={handleFetchExpiredMedicine}>
+                                    Cek Obat Kadaluwarsa
+                                </Button>
+                            }
                         </div>
                         <Accordion header="List Obat Keluar">
                             <Table
