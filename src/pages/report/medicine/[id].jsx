@@ -303,6 +303,7 @@ export default function index() {
     const handleFetchExpiredMedicine = async () => {
         try {
             const res = await checkExpiredMedicine();
+            console.log("list obat ekspired", res.data)
             setShowExpiredMedicine(true);
             let temp = [...res.data];
             temp = temp.map((item) => ({
@@ -441,18 +442,28 @@ export default function index() {
                     },
                 },
             };
-            console.log("submitedData: ", submitedData);
             medicineSchemaWithPhysicalReport.parse(submitedData)
             const res = await bulkCreate(submitedData);
             toast.success(res.message, {
                 autoClose: 2000,
                 position: "top-right",
             });
-            console.log("expired medicine: ", expiredMedicineList);
             setValue({
                 ...value,
                 outputMedicine: value.outputMedicines.push(
-                    ...expiredMedicineList,
+                    ...expiredMedicineList.map(item => ({
+                        ...item,
+                        medicine: {
+                            name: item.medicineName,
+                            batchCode: item.batchCode,
+                            merk: item.merk,
+                            description: item.description,
+                            sideEffect: item.sideEffect,
+                            price: item.price,
+                            unitOfMeasure: item.unitOfMeasure,
+                            expiredDate: formatCalendar(item.expiredDate),
+                        }
+                    }))
                 ),
             });
             setShowExpiredMedicine(false);
@@ -493,15 +504,6 @@ export default function index() {
             console.error(error);
         }
     };
-
-    useEffect(() => {
-        console.log("errors from parent: ", errors);
-    }, [errors])
-
-    useEffect(() => {
-        console.log("active index: ", activeIndex);
-        console.log("outputMedicine: ", value.outputMedicines[activeIndex]);
-    }, [activeIndex])
 
     return (
         <Layout active="master-report" user={user}>
@@ -718,8 +720,6 @@ export default function index() {
                                                         className="inline-flex items-center justify-center w-8 h-8 text-center bg-transparent border-0 rounded-lg"
                                                         onClick={() => {
                                                             setShowVendor(true);
-                                                            console.log("index detail obat: ", index);
-                                                            console.log("receiveMediicne", value.receiveMedicines);
                                                             setActiveIndex(
                                                                 index,
                                                             );
@@ -831,8 +831,6 @@ export default function index() {
                                                         className="inline-flex items-center justify-center w-8 h-8 text-center bg-transparent border-0 rounded-lg"
                                                         onClick={() => {
                                                             setShowOuputMedicine(true)
-                                                            console.log("index detail obat: ", index);
-                                                            console.log("outputMedicine: ", value.outputMedicines);
                                                             setActiveIndex(index)
                                                         }}
                                                     >
