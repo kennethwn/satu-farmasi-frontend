@@ -32,8 +32,8 @@ export default function MasterMedicineList(props) {
     const { Column, HeaderCell, Cell } = Table;
 
     const handleSortColumn = (sortColumn, sortType) => {
-        console.log("sort column", sortColumn);
-        console.log("sort type", sortType);
+        // console.log("sort column", sortColumn);
+        // console.log("sort type", sortType);
         setSortBy(sortColumn);
         setSortMode(sortType);
     };
@@ -196,7 +196,7 @@ export default function MasterMedicineList(props) {
                                                         <button
                                                             className="inline-flex items-center justify-center w-8 h-8 text-center bg-transparent border-0 rounded-lg"
                                                             onClick={() => {
-                                                                console.log(rowData);
+                                                                // console.log(rowData);
                                                                 router.push(`/master/medicine/edit/${rowData?.code}`)
                                                             }}
                                                         >
@@ -210,7 +210,7 @@ export default function MasterMedicineList(props) {
                                                         <button
                                                             className="inline-flex items-center justify-center w-8 h-8 text-center bg-transparent border-0 rounded-lg"
                                                             onClick={() => {
-                                                                console.log(rowData);
+                                                                // console.log(rowData);
                                                                 setSelectedMedicine(rowData);
                                                                 setModalDelete(true);
                                                             }}

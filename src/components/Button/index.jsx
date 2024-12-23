@@ -24,7 +24,6 @@ export default function Button(props) {
     // WHY THIS BUTTON IS NOT WORKING!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
     const onClick = () => {
         if (props.onClick && !isLoading) {
-            console.log("hello")
             props.onClick()
         }     
     }

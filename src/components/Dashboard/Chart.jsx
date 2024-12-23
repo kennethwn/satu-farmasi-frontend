@@ -36,7 +36,6 @@ export default function Chart({
 
     const getYearList = () => {
         const list = generateYearList(2000, new Date().getFullYear());
-        console.log(list);
         setYearList(list);
     }
 

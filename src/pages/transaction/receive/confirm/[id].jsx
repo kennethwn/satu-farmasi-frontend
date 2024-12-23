@@ -308,8 +308,6 @@ export default function Index() {
                 console.log("new error: ", newErrors)
                 setErrors(newErrors);
             }
-        } finally {
-            setIsLoading(false);
         }
     }
 

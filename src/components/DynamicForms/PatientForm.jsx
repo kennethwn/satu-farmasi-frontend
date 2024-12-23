@@ -14,12 +14,12 @@ function PatientForm(props) {
         disabled = false,
     } = props;
 
-    if (errors) {
-        console.log(
-            "erros in patient: ",
-            errors["prescription.patient.patientId"],
-        );
-    }
+    // if (errors) {
+    //     console.log(
+    //         "erros in patient: ",
+    //         errors["prescription.patient.patientId"],
+    //     );
+    // }
 
     const { getPatientDropdownOptions } = usePatientAPI();
     const [patientDropdownOptions, setPatientDropdownOptions] = useState([]);
@@ -43,9 +43,9 @@ function PatientForm(props) {
         fetchPatientDropdownOptionsData();
     }, []);
 
-    useEffect(() => {
-        console.log(selectedPatient);
-    }, [selectedPatient]);
+    // useEffect(() => {
+    //     console.log(selectedPatient);
+    // }, [selectedPatient]);
 
     const handlePatientChange = (patientId) => {
         setSelectedPatient({
@@ -94,9 +94,9 @@ function PatientForm(props) {
         });
     }, [existingPatient]);
 
-    useEffect(() => {
-        console.log("erros here:", errors);
-    }, [errors]);
+    // useEffect(() => {
+    //     console.log("erros here:", errors);
+    // }, [errors]);
 
     return (
         <>

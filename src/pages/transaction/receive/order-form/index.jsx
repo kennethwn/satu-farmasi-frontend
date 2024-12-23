@@ -59,14 +59,6 @@ export default function Index() {
         }
     }
 
-    const handleFetchPharmacist = async () => {
-        try {
-            console.log("user: ", user);
-        } catch (error) {
-            console.error(error);
-        }
-    }
-
     const handleSwitchForm = (typeState) => {
         setVendor([]);
         setFormFields([{ medicine: "", quantity: 0, remark: "" }]);
@@ -144,7 +136,6 @@ export default function Index() {
         async function fetchData() {
             await handleFetchVendor();
             await handleFetchPharmacy();
-            await handleFetchPharmacist();
         }
         fetchData();
         setInput({});

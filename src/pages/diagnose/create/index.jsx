@@ -123,10 +123,11 @@ export default function Index() {
             if (existingPatient) diagnoseSchemaWithExistingPatient.parse(data);
             else diagnoseSchemaNewPatient.parse(data)
             const res = await submitDiagnose(data)
+            if (res.code !== 200) setHasSubmit(false);
             toast.success(res.message, { autoClose: 2000, position: "top-right" });
             router.push('/diagnose')
         } catch (error) {
-            setHasSubmit(true);
+            setHasSubmit(false);
             console.log("error try catch: ", error)
             if (error instanceof ZodError) {
                 const newErrors = { ...errors };

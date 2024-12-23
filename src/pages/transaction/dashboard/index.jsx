@@ -17,9 +17,9 @@ export default function index() {
   const { HeaderCell, Cell, Column } = Table;
   const { isLoading, getAllTransaction } = useTransaction();
   const { getPharmacyInfo } = usePharmacy();
-  prescriptionStatusMapped.delete("UNPROCESSED")
-  prescriptionStatusMapped.delete("CANCELED")
-  const prescriptionStatusMap = prescriptionStatusMapped
+  const prescriptionStatusMap = new Map(prescriptionStatusMapped)
+  prescriptionStatusMap.delete("UNPROCESSED")
+  prescriptionStatusMap.delete("CANCELED")
   const [statusUpdated, setStatusUpdated] = useState({})
   const [data, setData] = useState([]);
   const [search, setSearch] = useState("");
@@ -30,7 +30,7 @@ export default function index() {
   const [openModal, setOpenModal] = useState(false)
   const [selectedTransactionId, setSelectedTransactionId] = useState(-1);
   const [pharmacy, setPharmacy] = useState({});
-const [filterStatus, setFilterStatus] = useState("")
+  const [filterStatus, setFilterStatus] = useState("")
 
   const handleFetchTransactionData = async () => {
     try {

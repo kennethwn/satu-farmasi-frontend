@@ -767,9 +767,11 @@ export default function index() {
                                 id="outputMedicines"
                                 label={`Total Obat Keluar ${value.outputMedicines?.length || 0}`}
                             />
-                            <Button onClick={handleFetchExpiredMedicine}>
-                                Cek Obat Expired
-                            </Button>
+                            { !value.isFinalized &&
+                                <Button onClick={handleFetchExpiredMedicine}>
+                                    Cek Obat Kadaluwarsa
+                                </Button>
+                            }
                         </div>
                         <Accordion header="List Obat Keluar">
                             <Table
@@ -855,8 +857,9 @@ export default function index() {
                                                                 rowData?.id,
                                                             )
                                                         }
+                                                        disabled={rowData?.reasonOfDispose === "LOST" ? true : false}
                                                     >
-                                                        <PiListMagnifyingGlass size="1.5em" />
+                                                        <FaFilePdf size="1.5em" />
                                                     </button>
                                                 </div>
                                             );
@@ -974,8 +977,11 @@ export default function index() {
                                 <Text type={"title"} className="mb-3">
                                     List Obat
                                 </Text>
-
-                                {value.transactions[
+                                <MedicineList 
+                                    medicineList = {value.transactions[activeIndex].prescription.medicineList}
+                                    isReport = {true}
+                                />
+                                {/* {value.transactions[
                                     activeIndex
                                 ].prescription.medicineList.map((item) => {
                                     return (
@@ -1036,8 +1042,9 @@ export default function index() {
                                                 placeholder={"Kode Obat"}
                                             />
                                         </>
+                                        
                                     );
-                                })}
+                                })} */}
                             </div>
                         }
                         onClick={() => {
@@ -1463,9 +1470,12 @@ export default function index() {
                     type={"primary"}
                     showBtn={expiredMedicineList.length > 0}
                     open={showExpiredMedicine}
-                    onClose={() => setShowExpiredMedicine(false)}
+                    onClose={() => {
+                        setShowExpiredMedicine(false)
+                        setExpiredMedicineList([]);
+                    }}
                     body={
-                        <>
+                        <div>
                             <Table
                                 data={expiredMedicineList || []}
                                 bordered
@@ -1545,7 +1555,7 @@ export default function index() {
                                     />
                                 </div>
                             )}
-                        </>
+                        </div>
                     }
                     onClick={handleBulkMedicine}
                     title={"List Obat Expired"}

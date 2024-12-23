@@ -55,7 +55,7 @@ export default function index() {
     }, [page, limit, search]);
 
     return (
-        <Layout active="report-dashboard" user={user}>
+        <Layout active="report-medicine" user={user}>
             <ContentLayout title="List Laporan Obat">
                 <div className="w-full h-[500px]">
                     <div className="flex flex-row justify-end items-center w-full pb-6">
