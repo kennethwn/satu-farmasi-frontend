@@ -8,7 +8,7 @@ import { toast } from "react-toastify";
 import { z, ZodError } from "zod";
 import useOutputMedicineAPI from "@/pages/api/transaction/outputMedicine";
 import Dropdown from "@/components/SelectPicker/Dropdown";
-import { isRequiredNumber, isRequiredString, isRequiredStringOptional} from "@/helpers/validation";
+import { isRequiredNumber, isRequiredString } from "@/helpers/validation";
 import useMedicineDropdownOption from "@/pages/api/medicineDropdownOption";
 import { useUserContext } from "@/pages/api/context/UserContext";
 import { ErrorForm } from "@/helpers/errorForm";
@@ -16,9 +16,9 @@ import OutputMedicineWitnessForm from "@/components/DynamicForms/OuputMedicineWi
 import usePharmacy from "@/pages/api/pharmacy";
 
 const witnessesSchema = z.object({
-    name: isRequiredStringOptional(),
-    nip: isRequiredStringOptional(),
-    role: isRequiredStringOptional()
+    name: isRequiredString(),
+    nip: isRequiredString(),
+    role: isRequiredString()
 })
 
 const physicalReportSchema = z.object({
@@ -101,7 +101,7 @@ export default function Index() {
 
             setErrors({});
             console.log("form data: ", formData);
-            if (formData.reasonOfDispose === "BROKEN" || formField.reasonOfDispose === "EXPIRED") {
+            if (formData.reasonOfDispose.toLowerCase() === "broken" || formData.reasonOfDispose.toLowerCase() === "expired") {
                 medicineSchemaWithPhysicalReport.parse(formData);
             } else {
                 medicineSchema.parse(formData);
@@ -144,12 +144,6 @@ export default function Index() {
             }
         }
     };
-
-    useEffect(() => {
-        console.log("error zod useeffect: ", JSON.stringify(errors));
-    }, [errors]);
-
-    const reasonOfDisposeListData = ["Broken", "Lost", "Expired"].map(item => ({ label: item, value: item.toUpperCase() }));
 
     useEffect(() => {
         setData(Object.entries(medicineDropdownOptions)

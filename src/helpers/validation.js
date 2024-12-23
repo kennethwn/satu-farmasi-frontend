@@ -7,7 +7,8 @@ const isBoolean = () => z.boolean();
 // Additional validation
 const isEmail = () => isString().email({ message: "Email tidak valid" });
 const isRequiredOptions = () =>
-    isString()
+    z.boolean()
+        .optional()
         .nullable()
         .refine((val) => val !== null && val !== undefined, {
             message: "Silahkan pilih opsi",
@@ -49,7 +50,7 @@ const isRequiredDate = () =>
         .date({
             errorMap: (issue, { defaultError }) => ({
                 message:
-                    issue.code === "invalid_date"
+                    issue.code === "invalid_union"
                         ? "Bidang ini harus diisi"
                         : defaultError,
             }),

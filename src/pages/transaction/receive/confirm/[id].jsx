@@ -11,27 +11,27 @@ import useReceiveMedicineAPI from "@/pages/api/transaction/receiveMedicine";
 import { useRouter } from "next/router";
 import { useState, useEffect } from "react";
 import { z, ZodError } from "zod";
-import { isRequiredNumber, isRequiredString, isRequiredDate } from "@/helpers/validation";
+import { isRequiredNumber, isRequiredString, isRequiredDate, isRequiredOptions } from "@/helpers/validation";
 import Button from "@/components/Button";
 import { Modal } from "rsuite";
 import { toast } from "react-toastify";
 
-const medicineRequestSchema = z.object({
-    currStock: isRequiredNumber(),
-})
-
-const medicineSchema = z.object({
+const existingMedicineRequestSchema = z.object({
+    medicineId: isRequiredNumber(),
     documentNumber: isRequiredString(),
     batchCode: isRequiredString(),
+    quantity: isRequiredNumber(),
     vendorId: isRequiredNumber(),
     buyingPrice: isRequiredNumber(),
     paymentMethod: isRequiredString(),
     deadline: isRequiredDate(),
-    isArrived: z.boolean().nullable().refine(value => value !== null, {
-        message: "Bidang ini harus diisi",
-    }),
-    medicineRequest: medicineRequestSchema,
+    isArrived: isRequiredOptions(),
+    quantity: isRequiredNumber(),
     vendorId: isRequiredNumber(),
+    medicineRequest: z.object({
+        currStock: isRequiredNumber(),
+        expiredDate: isRequiredDate(),
+    })
 })
 
 export default function Index() {
@@ -192,7 +192,7 @@ export default function Index() {
                 paymentMethod: input.paymentMethod ? input.paymentMethod : "",
                 deadline: input.deadline ? new Date(input.deadline) : "",
                 is_active: false,
-                isArrived: input.isArrived !== null ? input.isArrived : null,
+                isArrived: typeof input.isArrived === "boolean" ? input.isArrived : null,
                 reportId: null,
                 expiredDate: new Date(input.expiredDate) || ""
             }
@@ -202,10 +202,12 @@ export default function Index() {
             const validatedData = {
                 ...payload, 
                 medicineRequest: {
-                    currStock: payload.quantity
+                    currStock: payload.quantity,
+                    expiredDate: payload.expiredDate
                 }
             }
-             medicineSchema.parse(validatedData);
+            console.log("validatedData: ", validatedData);
+            existingMedicineRequestSchema.parse(validatedData)
 
             const res = await SaveReceiveMedicine(payload);
             if (res.code !== 200) {
@@ -219,20 +221,25 @@ export default function Index() {
                 router.push("/transaction/receive");
             }, 2000)
         } catch (error) {
+            console.log("erorr: ", error)
             setIsLoading(false);
             if (error instanceof ZodError) {
                 const newErrors = { ...errors };
                 error.issues.forEach((issue) => {
                     if (issue.path.length > 0) {
-                        if (issue.path[0] === "classificationList") {
-                            newErrors[`classificationList[${issue.path[1]}]`] = issue.message;
-                        }
-                        else {
+                        if (issue.path[0] === "medicineRequest") {
+                            if (issue.path[1] === "classificationList") {
+                                newErrors[`classificationList[${issue.path[2]}]`] = issue.message;
+                            } else {
+                                newErrors[`medicineRequest.${issue.path[1]}`] = issue.message;
+                            }
+                        } else {
                             const fieldName = issue.path[0];
                             newErrors[fieldName] = issue.message;
                         }
                     }
                 });
+                console.log("new error: ", newErrors)
                 setErrors(newErrors);
             }
         } 
@@ -258,15 +265,16 @@ export default function Index() {
             }
 
             setErrors({});
+            console.log("payload: ", payload);
             const validatedData = {
                 ...payload, 
                 medicineRequest: {
-                    currStock: payload.quantity
+                    currStock: payload.quantity,
+                    expiredDate: payload.expiredDate
                 }
             }
-            console.log("payload: ", payload);
-            console.log("validatedData", validatedData);
-             medicineSchema.parse(validatedData);
+            console.log("validatedData: ", validatedData);
+            existingMedicineRequestSchema.parse(validatedData)
             const res = await ConfirmReceiveMedicine(payload);
             if (res.code !== 200) {
                 toast.error(res.response.data.message, { autoClose: 2000, position: "top-right" });

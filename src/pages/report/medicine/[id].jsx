@@ -20,8 +20,27 @@ import formatDate, { formatCalendar } from "@/helpers/dayHelper";
 import usePharmacy from "@/pages/api/pharmacy";
 import Text from "@/components/Text";
 import prescriptionStatusMapped from "@/helpers/prescriptionStatusMap";
-import { FaFilePdf } from "react-icons/fa";
+import { z, ZodError } from "zod";
+import { ErrorForm } from "@/helpers/errorForm";
+import { isRequiredString } from "@/helpers/validation";
 import MedicineList from "@/components/MedicineLIst/MedicineList";
+import { FaFilePdf } from "react-icons/fa";
+
+const witnessesSchema = z.object({
+    name: isRequiredString(),
+    nip: isRequiredString(),
+    role: isRequiredString()
+})
+
+const physicalReportSchema = z.object({
+    data: z.object({
+        witnesses: z.array(witnessesSchema)
+    }),
+});
+
+const medicineSchemaWithPhysicalReport = z.object({
+    physicalReport: physicalReportSchema
+});
 
 export default function index() {
     const router = useRouter();
@@ -422,6 +441,8 @@ export default function index() {
                     },
                 },
             };
+            console.log("submitedData: ", submitedData);
+            medicineSchemaWithPhysicalReport.parse(submitedData)
             const res = await bulkCreate(submitedData);
             toast.success(res.message, {
                 autoClose: 2000,
@@ -436,26 +457,32 @@ export default function index() {
             });
             setShowExpiredMedicine(false);
         } catch (error) {
-            console.error(error);
+            console.log("error bulkCreate: ", error);
+            if (error instanceof ZodError) {
+                const newErrors = { ...errors };
+                error.issues.forEach((issue) => {
+                    console.log("error zod: ", issue);
+                    if (issue.path.length > 0) {
+                        if (issue.path[0] === "physicalReport") {
+                            const path = issue.path.join('.')
+                            newErrors[path] = issue.message
+                        } else {
+                            const fieldName = issue.path[0];
+                            newErrors[fieldName] = issue.message;
+                        }
+                    }
+                });
+                setErrors(newErrors);
+            } else {
+                toast.error(error.response?.data.message, {
+                    autoClose: 2000,
+                    position: "top-right",
+                });
+                error = error.response?.data.errors
+                ErrorForm(error, setErrors, false);
+            }
         }
     };
-
-    useEffect(() => {
-        console.log("value: ", value);
-        console.log("value: ", JSON.stringify(value));
-    }, [value]);
-
-    useEffect(() => {
-        console.log("showVendor: ", showVendor);
-    }, [showVendor]);
-
-    useEffect(() => {
-        console.log("activeIndex", activeIndex);
-    }, [activeIndex]);
-
-    useEffect(() => {
-        console.log("hasExpiredMedicine", hasExpiredMedicine);
-    }, [hasExpiredMedicine]);
 
     const handleFetchPharmacyInfo = async () => {
         try {
@@ -466,6 +493,15 @@ export default function index() {
             console.error(error);
         }
     };
+
+    useEffect(() => {
+        console.log("errors from parent: ", errors);
+    }, [errors])
+
+    useEffect(() => {
+        console.log("active index: ", activeIndex);
+        console.log("outputMedicine: ", value.outputMedicines[activeIndex]);
+    }, [activeIndex])
 
     return (
         <Layout active="master-report" user={user}>
@@ -682,6 +718,8 @@ export default function index() {
                                                         className="inline-flex items-center justify-center w-8 h-8 text-center bg-transparent border-0 rounded-lg"
                                                         onClick={() => {
                                                             setShowVendor(true);
+                                                            console.log("index detail obat: ", index);
+                                                            console.log("receiveMediicne", value.receiveMedicines);
                                                             setActiveIndex(
                                                                 index,
                                                             );
@@ -793,6 +831,8 @@ export default function index() {
                                                         className="inline-flex items-center justify-center w-8 h-8 text-center bg-transparent border-0 rounded-lg"
                                                         onClick={() => {
                                                             setShowOuputMedicine(true)
+                                                            console.log("index detail obat: ", index);
+                                                            console.log("outputMedicine: ", value.outputMedicines);
                                                             setActiveIndex(index)
                                                         }}
                                                     >
@@ -869,7 +909,7 @@ export default function index() {
                     btnAppearance="primary"
                 />
 
-                {value && value.transactions.length > 0 ? (
+                {value && value.transactions.length > 0 && value.transactions[activeIndex] ? (
                     <Toaster
                         size="lg"
                         type="primary"
@@ -939,7 +979,7 @@ export default function index() {
                                 <Text type={"title"} className="mb-3">
                                     List Obat
                                 </Text>
-                                <MedicineList 
+                                <MedicineList
                                     medicineList = {value.transactions[activeIndex].prescription.medicineList}
                                     isReport = {true}
                                 />
@@ -1016,7 +1056,7 @@ export default function index() {
                 ) : null}
 
 
-                {value && value.outputMedicines.length > 0 ? (
+                {value && value.outputMedicines.length > 0 && value.outputMedicines[activeIndex]  ? (
 <>
                         <Toaster
                             size="lg"
@@ -1148,7 +1188,7 @@ export default function index() {
 </>
                 ): null}
 
-                {value && value.receiveMedicines.length > 0 ? (
+                {value && value.receiveMedicines.length > 0 && value.receiveMedicines[activeIndex] ? (
                     <>
                         <Toaster
                             size="lg"

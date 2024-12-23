@@ -16,33 +16,8 @@ import ReceiveMedicineForm from "@/components/DynamicForms/ReceiveMedicineForm";
 import useVendorAPI from "@/pages/api/master/vendor";
 import useReceiveMedicineAPI from "@/pages/api/transaction/receiveMedicine";
 
-const classificationSchema = z.object({
-    classificationId: isRequiredNumber(),
-});
-
-const medicineRequestSchema = z.object({
-    name: isRequiredString(),
-    genericNameId: isRequiredNumber(),
-    merk: isRequiredString(),
-    price: isRequiredNumber(),
-    description: isRequiredString(),
-    currStock: isRequiredNumber(),
-    minStock: isRequiredNumber(),
-    maxStock: isRequiredNumber(),
-    packagingId: isRequiredNumber(),
-    unitOfMeasure: isRequiredString().nullable().refine(value => value !== null, {
-        message: "Bidang ini harus diisi",
-    }),
-    sideEffect: isRequiredString(),
-    classificationList: z.array(classificationSchema),
-    expiredDate: isRequiredDate(),
-})
-
-const newMedicineSchema = z.object({
+const existingMedicineRequestSchema = z.object({
     medicineId: isRequiredNumber(),
-})
-
-const medicineSchema = z.object({
     documentNumber: isRequiredString(),
     batchCode: isRequiredString(),
     quantity: isRequiredNumber(),
@@ -50,12 +25,45 @@ const medicineSchema = z.object({
     buyingPrice: isRequiredNumber(),
     paymentMethod: isRequiredString(),
     deadline: isRequiredDate(),
-    isArrived: z.boolean().nullable().refine(value => value !== null, {
-        message: "Bidang ini harus diisi",
-    }),
-    medicineRequest: medicineRequestSchema,
+    isArrived: isRequiredOptions(),
     quantity: isRequiredNumber(),
     vendorId: isRequiredNumber(),
+    medicineRequest: z.object({
+        currStock: isRequiredNumber(),
+        expiredDate: isRequiredDate(),
+    })
+})
+
+const newMedicineRequestSchema = z.object({
+    documentNumber: isRequiredString(),
+    batchCode: isRequiredString(),
+    quantity: isRequiredNumber(),
+    vendorId: isRequiredNumber(),
+    buyingPrice: isRequiredNumber(),
+    paymentMethod: isRequiredString(),
+    deadline: isRequiredDate(),
+    isArrived: isRequiredOptions(),
+    quantity: isRequiredNumber(),
+    vendorId: isRequiredNumber(),
+    medicineRequest: z.object({
+        name: isRequiredString(),
+        genericNameId: isRequiredNumber(),
+        merk: isRequiredString(),
+        price: isRequiredNumber(),
+        description: isRequiredString(),
+        currStock: isRequiredNumber(),
+        minStock: isRequiredNumber(),
+        maxStock: isRequiredNumber(),
+        packagingId: isRequiredNumber(),
+        unitOfMeasure: isRequiredString().nullable().refine(value => value !== null, {
+            message: "Bidang ini harus diisi",
+        }),
+        sideEffect: isRequiredString(),
+        classificationList: z.array(z.object({
+            classificationId: isRequiredNumber(),
+        })),
+        expiredDate: isRequiredDate(),
+    }),
 })
 //.refine(data => data.minStock < data.maxStock, {
 //    message: "Jumlah obat minimum harus kurang dari jumlah maksimum",
@@ -97,7 +105,7 @@ export default function Index() {
         buyingPrice: "",
         paymentMethod: "",
         deadline: "",
-        isArrived: "",
+        isArrived: null,
         medicineRequest: {
             name: "",
             genericNameId: "",
@@ -273,7 +281,6 @@ export default function Index() {
                 classificationList: !existingMedicine ? classifications :  (medicines?.find(item => item.id == input?.medicineId)?.classifications?.map(item => ({ medicineId: input.medicineId, classificationId: item.id }))),
             }
 
-            console.log("isArrived: ", input.isArrived)
             const payload = {
                 documentNumber: input.documentNumber || "",
                 batchCode: input.batchCode || "",
@@ -281,7 +288,7 @@ export default function Index() {
                 quantity: parseInt(input.quantity) || parseInt(input.currStock) || 0,
                 vendorId: parseInt(input.vendorId) || 0,
                 buyingPrice: parseFloat(input.buyingPrice) || 0,
-                isArrived: input.isArrived !== null ? input.isArrived : null,
+                isArrived: typeof input.isArrived === "boolean" ? input.isArrived : null,
                 paymentMethod: input.paymentMethod || "",
                 deadline: input.deadline || "",
                 isPaid: input.isPaid || null,
@@ -290,9 +297,12 @@ export default function Index() {
             }
 
             setErrors({});
-            console.log("payload: ", payload)
-            medicineSchema.parse(payload);
-            if (existingMedicine)  newMedicineSchema.parse(payload)
+            if (existingMedicine) {
+                existingMedicineRequestSchema.parse(payload)
+            }
+            else {
+                newMedicineRequestSchema.parse(payload);
+            }
 
             const res = await CreateReceiveMedicine(payload);
             if (res.code !== 200) {
@@ -354,6 +364,7 @@ export default function Index() {
                         defaultChecked={false} onChange={e => {
                             handleClearInput();
                             setExistingMedicine(e)
+                            setErrors({})
                         }} />
                     </div>
                     
