@@ -23,6 +23,8 @@ import prescriptionStatusMapped from "@/helpers/prescriptionStatusMap";
 import { z, ZodError } from "zod";
 import { ErrorForm } from "@/helpers/errorForm";
 import { isRequiredString } from "@/helpers/validation";
+import MedicineList from "@/components/MedicineLIst/MedicineList";
+import { FaFilePdf } from "react-icons/fa";
 
 const witnessesSchema = z.object({
     name: isRequiredString(),
@@ -977,7 +979,7 @@ export default function index() {
                                 <Text type={"title"} className="mb-3">
                                     List Obat
                                 </Text>
-                                <MedicineList 
+                                <MedicineList
                                     medicineList = {value.transactions[activeIndex].prescription.medicineList}
                                     isReport = {true}
                                 />
