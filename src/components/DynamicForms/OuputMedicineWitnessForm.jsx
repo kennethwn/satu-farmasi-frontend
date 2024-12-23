@@ -64,13 +64,11 @@ export default function OutputMedicineWitnessForm(props) {
 		return null;
 	}
 
-	console.log("error from dynamic form: ", errors);
-
 	return (
 		<div id="form-2 w-full">
 			<div className="grid grid-cols-1 gap-x-6 gap-y-2 w-full">
 				{formFields?.map((form, index) => (
-					<div key={index} className='col-span-12 w-full lg:grid lg:grid-cols-11 gap-x-6'>
+					<div key={index} className='col-span-12 w-full lg:grid lg:grid-cols-11 gap-x-6 text-start'>
 						<div className='max-lg:w-full'>
 							{index === 0 && (
 								<div className="flex text-sm invisible font-medium leading-6 text-gray-900 lg:justify-center">
