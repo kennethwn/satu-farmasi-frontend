@@ -243,7 +243,7 @@ const ReceiveMedicineForm = (props) => {
                             label="Harga Jual Obat"
                             value={existingMedicine
                                 ? (dataMedicines?.find(item => item?.id == input.medicineId)?.price) || input?.medicineRequest?.price
-                                : input?.price || 0
+                                : input?.price
                             }                            
                             currency={true}
                         />
@@ -261,7 +261,7 @@ const ReceiveMedicineForm = (props) => {
                             label="Harga Jual Obat"
                             value={existingMedicine
                                 ? dataMedicines?.find(item => item?.id == input.medicineId)?.price || input?.medicineRequest?.price
-                                : input?.price || 0
+                                : input?.price
                             }
                             error={errors['medicineRequest.price']}
                             currency={true}
@@ -287,7 +287,6 @@ const ReceiveMedicineForm = (props) => {
                             type="number"
                             id="currStock"
                             name="currStock"
-                            placeholder="0"
                             label="Stok Baru"
                             value={input?.currStock || input?.quantity}
                             error={errors['medicineRequest.currStock']}
@@ -310,7 +309,7 @@ const ReceiveMedicineForm = (props) => {
                             label="Stok Minimum"
                             value={existingMedicine
                                 ? dataMedicines?.find(item => item?.id == input?.medicineId)?.minStock || input?.medicineRequest?.minStock
-                                : input?.minStock || 0
+                                : input?.minStock
                             }
                             disabled={true}
                         />
@@ -324,7 +323,7 @@ const ReceiveMedicineForm = (props) => {
                             error={errors['medicineRequest.minStock']}
                             value={existingMedicine
                                 ? dataMedicines?.find(item => item?.id == input?.medicineId)?.minStock || input?.medicineRequest?.minStock
-                                : input?.minStock || 0
+                                : input?.minStock
                             }
                             onChange={e => {
                                 setInput({ ...input, minStock: parseInt(e.target.value) })
@@ -346,7 +345,7 @@ const ReceiveMedicineForm = (props) => {
                             label="Stok Maksimum"
                             value={existingMedicine
                                 ? dataMedicines?.find(item => item?.id == input?.medicineId)?.maxStock || input?.medicineRequest?.maxStock
-                                : input?.maxStock || 0
+                                : input?.maxStock
                             }
                             disabled={true}
                         />
@@ -360,7 +359,7 @@ const ReceiveMedicineForm = (props) => {
                             error={errors['medicineRequest.maxStock']}
                             value={existingMedicine
                                 ? dataMedicines?.find(item => item?.id == input?.medicineId)?.maxStock || input?.medicineRequest?.maxStock
-                                : input?.maxStock || 0
+                                : input?.maxStock
                             }
                             onChange={e => {
                                 setInput({ ...input, maxStock: parseInt(e.target.value) })

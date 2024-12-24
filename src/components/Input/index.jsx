@@ -70,6 +70,7 @@ export default function Input(props) {
                             className={`block w-full rounded-md px-14 border py-2 text-dark hadow-sm placeholder:text-gray-400 sm:text-md sm:leading-6 ${className.join(" ")}`}
                             // className={`block w-full rounded-full px-4 border py-1.5 text-dark border-dark placeholder:text-gray-400 sm:text-base sm:leading-6 ${className.join(" ")}`}
                             autoFocus={autofocus}
+                            min={0}
                             {...register(name)}
                         />
                     </div>
@@ -85,6 +86,7 @@ export default function Input(props) {
                         className={`block w-full rounded-md px-4 border py-2 text-dark shadow-sm placeholder:text-gray-400 sm:text-md sm:leading-6 ${className.join(" ")}`}
                         // className={`block w-full rounded-full px-4 border py-1.5 text-dark border-dark placeholder:text-gray-400 sm:text-base sm:leading-6 ${className.join(" ")}`}
                         autoFocus={autofocus}
+                        min={0}
                         {...register(name)}
                     />
             }
