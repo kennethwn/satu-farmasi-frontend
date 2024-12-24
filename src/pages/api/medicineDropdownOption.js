@@ -8,7 +8,7 @@ export default function useMedicineDropdownOption() {
         setIsLoading(true)
         try {
             console.log("getting medicine dropdown")
-            const response = await api.get('/api/v1/medicines/dropdownOptions?is_active=' + is_active + '&is_prescription=' + is_prescription)
+            const response = await api.get('/api/v1/medicines/dropdownOptions?isActive=' + is_active + '&isPrescription=' + is_prescription)
             .then((response) => {
                 setIsLoading(false);
                 return response;
