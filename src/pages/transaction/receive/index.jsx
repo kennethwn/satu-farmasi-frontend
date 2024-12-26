@@ -198,7 +198,7 @@ export default function Index() {
                     </Column>
 
                     <Column width={150} fixed="right">
-                        <HeaderCell className="text-dark font-bold">Status Pembayaran</HeaderCell>
+                        <HeaderCell className="text-dark font-bold">Status Penerimaan</HeaderCell>
                         <Cell dataKey='isArrived'>
                             {rowData => resolveisArrivedStatus(rowData?.isArrived)}
                         </Cell>
