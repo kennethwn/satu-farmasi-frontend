@@ -7,12 +7,15 @@ const isBoolean = () => z.boolean();
 // Additional validation
 const isEmail = () => isString().email({ message: "Email tidak valid" });
 const isRequiredOptions = () =>
-    z.boolean()
-        .optional()
-        .nullable()
-        .refine((val) => val !== null && val !== undefined, {
-            message: "Silahkan pilih opsi",
-        });
+    isRequiredString()
+    .or(
+        z.boolean()
+            .optional()
+            .nullable()
+            .refine((val) => val !== null && val !== undefined, {
+                message: "Silahkan pilih opsi",
+            })
+    );
 const isRequiredString = () =>
     isString().min(1, { message: "Bidang ini harus diisi" });
 const isRequiredStringOptional = () =>

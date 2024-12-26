@@ -76,6 +76,7 @@ export default function Login() {
     const RegisterHandler = async (data) => {
         try {
             const submitedData = {...data, phoneNum: data.phoneNum.toString()}
+            console.log("submitedData: ", submitedData)
             if (data.role === "pharmacist") await addPharmacist(submitedData);
             else await addDoctor(submitedData);
             toast.success("Pengguna Berhasil Ditambahkan", { autoClose: 2000, position: 'top-right' });
@@ -110,6 +111,7 @@ export default function Login() {
     const submitForm = () => formRef.current.requestSubmit();
 
     useEffect(() => {
+        console.log("error in register: ", errors)
         if (Object.keys(errors).length > 0) {
             if (errors.email || errors.password || errors.confirmPassword) {
                 credentialsRef.current.style.display = "block";
