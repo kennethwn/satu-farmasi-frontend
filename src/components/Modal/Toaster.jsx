@@ -22,6 +22,8 @@ export default function Toaster({
                 return <span className="text-center w-full text-success font-bold">Berhasil</span>
             case 'warning':
                 return <p className="text-center w-full text-danger font-bold">Peringatan!</p>
+            case 'confirm':
+                return <p className="text-center w-full text-dark font-bold">Konfirmasi!</p>
             default:
                 return <span className="text-center w-full text-dark font-bold">{title}</span>
         }
