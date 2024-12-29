@@ -38,6 +38,13 @@ export default function Toaster({
                         <Button className="w-full" isLoading={isLoading} appearance={btnAppearance} onClick={() => onClick()} isDisabled={isLoading}>{btnText}</Button>
                     </div>
                 )
+            case 'confirm':
+                return (
+                    <div className="w-full flex flex-row items-center gap-4 justify-between">
+                        <Button className="w-full" onClick={() => props.onClose()} isDisabled={isLoading} appearance="subtle">Batalkan</Button>
+                        <Button className="w-full" isLoading={isLoading} appearance="primary" onClick={() => onClick()} isDisabled={isLoading}>{btnText}</Button>
+                    </div>
+                )
             default:
                 return <Button className="w-full" onClick={() => onClick()} isDisabled={isLoading}>{btnText}</Button>
         }
