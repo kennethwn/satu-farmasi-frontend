@@ -299,29 +299,28 @@ export default function PrescriptionDetail(props) {
             />
 
             <Toaster
-                type="warning"
+                type="confirm"
                 open={open.markAsDone}
                 onClose={() => setOpen({ ...open, markAsDone: false })}
                 body={
                     <>
                         Apakah Anda yakin ingin menandai transaksi ini sebagai selesai?
-                        <span className="font-bold text-danger">Perubahan ini tidak dapat dikembalikan</span>
+                        <span className="font-semibold text-black"> Perubahan ini tidak dapat dikembalikan</span>
                     </>
                 }
-
-                title={"Mark Prescription as Done"}
+                title={"Selesaikan Preskripsi"}
                 onClick={handleMarkAsDone}
                 isLoading={hasSubmit}
             />
 
             <Toaster
-                type="warning"
+                type="confirm"
                 open={open.canceled}
                 onClose={() => setOpen({ ...open, canceled: false })}
                 body={
                     <>
                         Apakah anda yakin ingin membatalkan preskripsi ini,
-                        setelah konfirmasi maka <span className="font-bold text-danger">perubahan ini tidak dapat dikembalikan</span>
+                        setelah konfirmasi maka <span className="font-semibold text-black">perubahan ini tidak dapat dikembalikan</span>
                     </>
                 }
                 btnText="Konfirmasi"
