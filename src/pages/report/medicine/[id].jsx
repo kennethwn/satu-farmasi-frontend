@@ -413,6 +413,7 @@ export default function index() {
 
             const input = res.data.physicalReport.data;
             input.created_at = res.data.physicalReport.created_at;
+            input.outputQuantity = res.data.quantity;
 
             let medicines = [];
             const medicine = res.data.medicine;

@@ -84,6 +84,7 @@ export default function Index() {
                 sipaNumber: "",
                 pharmacy: "",
                 addressPharmacy: "",
+                quantity: 0,
                 witnesses: [{ name: "", nip: "", role: "" }],
             }
         }
@@ -98,6 +99,7 @@ export default function Index() {
             formData.physicalReport.data.pharmacist = user.name;
             formData.physicalReport.data.sipaNumber = user.sipaNumber;
             formData.physicalReport.data.witnesses = formField;
+            formData.physicalReport.data.quantity = formData.quantity;
 
             setErrors({});
             console.log("form data: ", formData);
