@@ -1,40 +1,49 @@
-This is a [Next.js](https://nextjs.org/) project bootstrapped with [`create-next-app`](https://github.com/vercel/next.js/tree/canary/packages/create-next-app).
+# [SatuFarmasi](https://satu-farmasi.my.id) - The Implementation of Three-Tier Architecture
 
-## Getting Started
+> **This repository was created for academic purposes to support completion of Bachelor's degree in Computer Science Program**  
+>  
+> ### *Design And Implementation of Three-Tier Architecture for Software as a Service Pharmacy Management System to Improve Healthcare Service Efficiency*  
 
-First, run the development server:
+---
 
-```bash
-npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
-```
+## 👨‍💻 Authors
+This project was collaboratively developed by:  
+- **[Mahesa Insan Raushanfikir](https://github.com/MahesaInsan)**  
+- **[Kenneth William Noverianto](https://github.com/kennethwn)**  
+- **[Dimas Dani Zani](https://github.com/orangeMangoDimz)**  
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+---
 
-You can start editing the page by modifying `pages/index.js`. The page auto-updates as you edit the file.
+## 📋 Purpose
 
-[API routes](https://nextjs.org/docs/api-routes/introduction) can be accessed on [http://localhost:3000/api/hello](http://localhost:3000/api/hello). This endpoint can be edited in `pages/api/hello.js`.
+The purpose of this thesis is to analyze business requirements and implement **software as a service pharmacy management system using a three-tier architecture**. 
 
-The `pages/api` directory is mapped to `/api/*`. Files in this directory are treated as [API routes](https://nextjs.org/docs/api-routes/introduction) instead of React pages.
+---
 
-This project uses [`next/font`](https://nextjs.org/docs/basic-features/font-optimization) to automatically optimize and load Inter, a custom Google Font.
+## ⚙️ Development
 
-## Learn More
+The development of the SatuFarmasi application follows the **Software Development Life Cycle (SDLC)** using the **agile methodology**. 
 
-To learn more about Next.js, take a look at the following resources:
+---
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+## 🛠️ Results
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js/) - your feedback and contributions are welcome!
+The result of this work is a **web-based application** that applies a three-tier architecture, providing advantages in:
+- Scalability
+- Portability
+- Performance
 
-## Deploy on Vercel
+The SatuFarmasi application has also adopted a **software as a service (SaaS)** business model with a dedicated deployment method.
 
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
+---
 
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/deployment) for more details.
+## 📊 Testing & Feedback
+
+Based on testing conducted with **17 respondents** as end users using the **User Acceptance Testing (UAT)** method:
+- The SatuFarmasi application achieved a **satisfaction rate of approximately 92.71%**, indicating that it falls into the category of being **highly accepted**.
+
+---
+
+## 🔗 Links
+
+- 🌐 **Application**: [SatuFarmasi](https://satu-farmasi.my.id)
